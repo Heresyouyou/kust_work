@@ -1,0 +1,1436 @@
+{
+  "palettes": [
+    {
+      "id": "npg",
+      "name": "Nature 风格",
+      "source": "ggsci · npg",
+      "type": "categorical",
+      "group": "期刊分类配色",
+      "note": "源自 Nature Publishing Group 系列期刊图表用色，10 色分类循环",
+      "colors": [
+        {
+          "hex": "#E64B35"
+        },
+        {
+          "hex": "#4DBBD5"
+        },
+        {
+          "hex": "#00A087"
+        },
+        {
+          "hex": "#3C5488"
+        },
+        {
+          "hex": "#F39B7F"
+        },
+        {
+          "hex": "#8491B4"
+        },
+        {
+          "hex": "#91D1C2"
+        },
+        {
+          "hex": "#DC0000"
+        },
+        {
+          "hex": "#7E6148"
+        },
+        {
+          "hex": "#B09C85"
+        }
+      ]
+    },
+    {
+      "id": "aaas",
+      "name": "Science 风格",
+      "source": "ggsci · aaas",
+      "type": "categorical",
+      "group": "期刊分类配色",
+      "note": "源自 AAAS / Science 系列期刊图表用色，10 色分类循环",
+      "colors": [
+        {
+          "hex": "#3B4992"
+        },
+        {
+          "hex": "#EE0000"
+        },
+        {
+          "hex": "#008B45"
+        },
+        {
+          "hex": "#631879"
+        },
+        {
+          "hex": "#008280"
+        },
+        {
+          "hex": "#BB0021"
+        },
+        {
+          "hex": "#5F559B"
+        },
+        {
+          "hex": "#A20056"
+        },
+        {
+          "hex": "#808180"
+        },
+        {
+          "hex": "#1B1919"
+        }
+      ]
+    },
+    {
+      "id": "nejm",
+      "name": "NEJM 风格",
+      "source": "ggsci · nejm",
+      "type": "categorical",
+      "group": "期刊分类配色",
+      "note": "新英格兰医学杂志风格，8 色，医疗/临床图表常用",
+      "colors": [
+        {
+          "hex": "#BC3C29"
+        },
+        {
+          "hex": "#0072B5"
+        },
+        {
+          "hex": "#E18727"
+        },
+        {
+          "hex": "#20854E"
+        },
+        {
+          "hex": "#7876B1"
+        },
+        {
+          "hex": "#6F99AD"
+        },
+        {
+          "hex": "#FFDC91"
+        },
+        {
+          "hex": "#EE4C97"
+        }
+      ]
+    },
+    {
+      "id": "lancet",
+      "name": "Lancet 风格",
+      "source": "ggsci · lancet",
+      "type": "categorical",
+      "group": "期刊分类配色",
+      "note": "柳叶刀杂志风格，9 色，深蓝+正红对比鲜明",
+      "colors": [
+        {
+          "hex": "#00468B"
+        },
+        {
+          "hex": "#ED0000"
+        },
+        {
+          "hex": "#42B540"
+        },
+        {
+          "hex": "#0099B4"
+        },
+        {
+          "hex": "#925E9F"
+        },
+        {
+          "hex": "#FDAF91"
+        },
+        {
+          "hex": "#AD002A"
+        },
+        {
+          "hex": "#ADB6B6"
+        },
+        {
+          "hex": "#1B1919"
+        }
+      ]
+    },
+    {
+      "id": "jama",
+      "name": "JAMA 风格",
+      "source": "ggsci · jama",
+      "type": "categorical",
+      "group": "期刊分类配色",
+      "note": "美国医学会杂志风格，7 色低饱和，稳重耐看",
+      "colors": [
+        {
+          "hex": "#374E55"
+        },
+        {
+          "hex": "#DF8F44"
+        },
+        {
+          "hex": "#00A1D5"
+        },
+        {
+          "hex": "#B24745"
+        },
+        {
+          "hex": "#79AF97"
+        },
+        {
+          "hex": "#6A6599"
+        },
+        {
+          "hex": "#80796B"
+        }
+      ]
+    },
+    {
+      "id": "jco",
+      "name": "JCO 风格",
+      "source": "ggsci · jco",
+      "type": "categorical",
+      "group": "期刊分类配色",
+      "note": "临床肿瘤学杂志风格，10 色，明暗层次分明",
+      "colors": [
+        {
+          "hex": "#0073C2"
+        },
+        {
+          "hex": "#EFC000"
+        },
+        {
+          "hex": "#868686"
+        },
+        {
+          "hex": "#CD534C"
+        },
+        {
+          "hex": "#7AA6DC"
+        },
+        {
+          "hex": "#003C67"
+        },
+        {
+          "hex": "#8F7700"
+        },
+        {
+          "hex": "#3B3B3B"
+        },
+        {
+          "hex": "#A73030"
+        },
+        {
+          "hex": "#4A6990"
+        }
+      ]
+    },
+    {
+      "id": "ics-periods",
+      "name": "国际年代地层表（ICS/CGMW）",
+      "source": "ICS / CGMW 官方色码",
+      "type": "labeled",
+      "group": "地学专属配色",
+      "note": "国际年代地层表官方配色，地质图件与国际接轨的标准色，按由新到老排列",
+      "colors": [
+        {
+          "hex": "#F9F97F",
+          "label": "第四纪 Q"
+        },
+        {
+          "hex": "#FFE619",
+          "label": "新近纪 Ng"
+        },
+        {
+          "hex": "#FD9A52",
+          "label": "古近纪 Pg"
+        },
+        {
+          "hex": "#7FC64E",
+          "label": "白垩纪 K"
+        },
+        {
+          "hex": "#34B2C9",
+          "label": "侏罗纪 J"
+        },
+        {
+          "hex": "#812B92",
+          "label": "三叠纪 Tr"
+        },
+        {
+          "hex": "#F04028",
+          "label": "二叠纪 P"
+        },
+        {
+          "hex": "#67A599",
+          "label": "石炭纪 C"
+        },
+        {
+          "hex": "#CB8C37",
+          "label": "泥盆纪 D"
+        },
+        {
+          "hex": "#B3E1B6",
+          "label": "志留纪 S"
+        },
+        {
+          "hex": "#009270",
+          "label": "奥陶纪 O"
+        },
+        {
+          "hex": "#7FA056",
+          "label": "寒武纪 Cm"
+        }
+      ]
+    },
+    {
+      "id": "cmap-terrain",
+      "name": "地形高程色阶",
+      "source": "matplotlib · terrain",
+      "type": "sequential",
+      "group": "地学专属配色",
+      "note": "DEM / 高程图常用，低海拔绿→高海拔褐白，适合地形晕渲与等高线填色",
+      "colors": [
+        {
+          "hex": "#333399"
+        },
+        {
+          "hex": "#0888EE"
+        },
+        {
+          "hex": "#01CC66"
+        },
+        {
+          "hex": "#81E680"
+        },
+        {
+          "hex": "#FEFE98"
+        },
+        {
+          "hex": "#BEAC76"
+        },
+        {
+          "hex": "#815E56"
+        },
+        {
+          "hex": "#C1B0AC"
+        },
+        {
+          "hex": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "id": "viridis",
+      "name": "Viridis",
+      "source": "matplotlib · viridis",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "感知均匀 + 色盲友好 + 黑白打印层次保留，热力图与散点第一选择",
+      "colors": [
+        {
+          "hex": "#440154"
+        },
+        {
+          "hex": "#472D7B"
+        },
+        {
+          "hex": "#3B528B"
+        },
+        {
+          "hex": "#2C728E"
+        },
+        {
+          "hex": "#21918C"
+        },
+        {
+          "hex": "#28AE80"
+        },
+        {
+          "hex": "#5EC962"
+        },
+        {
+          "hex": "#ADDC30"
+        },
+        {
+          "hex": "#FDE725"
+        }
+      ]
+    },
+    {
+      "id": "cividis",
+      "name": "Cividis",
+      "source": "matplotlib · cividis",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "专为色盲优化的连续色阶，红绿色盲人群辨识度最高",
+      "colors": [
+        {
+          "hex": "#00224E"
+        },
+        {
+          "hex": "#1A386F"
+        },
+        {
+          "hex": "#434E6C"
+        },
+        {
+          "hex": "#61656F"
+        },
+        {
+          "hex": "#7D7C78"
+        },
+        {
+          "hex": "#9B9476"
+        },
+        {
+          "hex": "#BCAE6C"
+        },
+        {
+          "hex": "#DEC958"
+        },
+        {
+          "hex": "#FEE838"
+        }
+      ]
+    },
+    {
+      "id": "plasma",
+      "name": "Plasma",
+      "source": "matplotlib · plasma",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "紫→红→黄，色彩跨度大，散点图与多序列折线区分度高",
+      "colors": [
+        {
+          "hex": "#0D0887"
+        },
+        {
+          "hex": "#4C02A1"
+        },
+        {
+          "hex": "#7E03A8"
+        },
+        {
+          "hex": "#AA2395"
+        },
+        {
+          "hex": "#CC4778"
+        },
+        {
+          "hex": "#E66C5C"
+        },
+        {
+          "hex": "#F89540"
+        },
+        {
+          "hex": "#FDC527"
+        },
+        {
+          "hex": "#F0F921"
+        }
+      ]
+    },
+    {
+      "id": "magma",
+      "name": "Magma",
+      "source": "matplotlib · magma",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "黑→紫→黄白，深色底图上表现力强，适合密度图",
+      "colors": [
+        {
+          "hex": "#000004"
+        },
+        {
+          "hex": "#1D1147"
+        },
+        {
+          "hex": "#51127C"
+        },
+        {
+          "hex": "#832681"
+        },
+        {
+          "hex": "#B73779"
+        },
+        {
+          "hex": "#E75263"
+        },
+        {
+          "hex": "#FC8961"
+        },
+        {
+          "hex": "#FEC488"
+        },
+        {
+          "hex": "#FCFDBF"
+        }
+      ]
+    },
+    {
+      "id": "inferno",
+      "name": "Inferno",
+      "source": "matplotlib · inferno",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "黑→红→黄，热流/温度场一类变量的经典表达",
+      "colors": [
+        {
+          "hex": "#000004"
+        },
+        {
+          "hex": "#210C4A"
+        },
+        {
+          "hex": "#57106E"
+        },
+        {
+          "hex": "#8A226A"
+        },
+        {
+          "hex": "#BC3754"
+        },
+        {
+          "hex": "#E45A31"
+        },
+        {
+          "hex": "#F98E09"
+        },
+        {
+          "hex": "#F9CB35"
+        },
+        {
+          "hex": "#FCFFA4"
+        }
+      ]
+    },
+    {
+      "id": "blues",
+      "name": "Blues 单色渐进",
+      "source": "matplotlib · Blues",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "单色系由浅到深，适合表现浓度、强度等单向递增变量",
+      "colors": [
+        {
+          "hex": "#F7FBFF"
+        },
+        {
+          "hex": "#DEEBF7"
+        },
+        {
+          "hex": "#C6DBEF"
+        },
+        {
+          "hex": "#9DCAE1"
+        },
+        {
+          "hex": "#6AAED6"
+        },
+        {
+          "hex": "#4191C6"
+        },
+        {
+          "hex": "#2070B4"
+        },
+        {
+          "hex": "#08509B"
+        },
+        {
+          "hex": "#08306B"
+        }
+      ]
+    },
+    {
+      "id": "rdbu",
+      "name": "RdBu 红蓝发散",
+      "source": "matplotlib · RdBu_r",
+      "type": "diverging",
+      "group": "发散型配色",
+      "note": "以中性灰为界，红蓝双向发散；适合正负异常、同位素偏差、相关性矩阵",
+      "colors": [
+        {
+          "hex": "#053061"
+        },
+        {
+          "hex": "#2065AB"
+        },
+        {
+          "hex": "#4393C3"
+        },
+        {
+          "hex": "#90C4DD"
+        },
+        {
+          "hex": "#D1E5F0"
+        },
+        {
+          "hex": "#F7F6F6"
+        },
+        {
+          "hex": "#FDDBC7"
+        },
+        {
+          "hex": "#F3A481"
+        },
+        {
+          "hex": "#D6604D"
+        },
+        {
+          "hex": "#B1182B"
+        },
+        {
+          "hex": "#67001F"
+        }
+      ]
+    },
+    {
+      "id": "spectral",
+      "name": "Spectral 光谱发散",
+      "source": "matplotlib · Spectral_r",
+      "type": "diverging",
+      "group": "发散型配色",
+      "note": "红黄蓝光谱型发散，中间过渡柔和，适合大范围异常场展示",
+      "colors": [
+        {
+          "hex": "#5E4FA2"
+        },
+        {
+          "hex": "#3387BC"
+        },
+        {
+          "hex": "#66C2A5"
+        },
+        {
+          "hex": "#AADCA4"
+        },
+        {
+          "hex": "#E6F598"
+        },
+        {
+          "hex": "#FFFEBE"
+        },
+        {
+          "hex": "#FEE08B"
+        },
+        {
+          "hex": "#FDAD60"
+        },
+        {
+          "hex": "#F46D43"
+        },
+        {
+          "hex": "#D43D4F"
+        },
+        {
+          "hex": "#9E0142"
+        }
+      ]
+    },
+    {
+      "id": "piyg",
+      "name": "PiYG 粉绿发散",
+      "source": "matplotlib · PiYG",
+      "type": "diverging",
+      "group": "发散型配色",
+      "note": "粉绿双向发散，冷暖对比强烈，适合二分类对立关系",
+      "colors": [
+        {
+          "hex": "#8E0152"
+        },
+        {
+          "hex": "#CB3289"
+        },
+        {
+          "hex": "#E897C4"
+        },
+        {
+          "hex": "#FAD6EA"
+        },
+        {
+          "hex": "#F7F7F6"
+        },
+        {
+          "hex": "#D9F0BC"
+        },
+        {
+          "hex": "#9ACD61"
+        },
+        {
+          "hex": "#589B28"
+        },
+        {
+          "hex": "#276419"
+        }
+      ]
+    },
+    {
+      "id": "d3-category10",
+      "name": "D3 Category10",
+      "source": "D3.js · category10",
+      "type": "categorical",
+      "group": "分类型配色",
+      "note": "数据可视化领域最通用的 10 色分类板，兼容性最好",
+      "colors": [
+        {
+          "hex": "#1F77B4"
+        },
+        {
+          "hex": "#FF7F0E"
+        },
+        {
+          "hex": "#2CA02C"
+        },
+        {
+          "hex": "#D62728"
+        },
+        {
+          "hex": "#9467BD"
+        },
+        {
+          "hex": "#8C564B"
+        },
+        {
+          "hex": "#E377C2"
+        },
+        {
+          "hex": "#7F7F7F"
+        },
+        {
+          "hex": "#BCBD22"
+        },
+        {
+          "hex": "#17BECF"
+        }
+      ]
+    },
+    {
+      "id": "cb-set2",
+      "name": "ColorBrewer Set2",
+      "source": "ColorBrewer · Set2",
+      "type": "categorical",
+      "group": "分类型配色",
+      "note": "低饱和柔和分类色，色觉障碍友好，适合并列柱状与箱线图",
+      "colors": [
+        {
+          "hex": "#66C2A5"
+        },
+        {
+          "hex": "#FC8D62"
+        },
+        {
+          "hex": "#8DA0CB"
+        },
+        {
+          "hex": "#E78AC3"
+        },
+        {
+          "hex": "#A6D854"
+        },
+        {
+          "hex": "#FFD92F"
+        },
+        {
+          "hex": "#E5C494"
+        },
+        {
+          "hex": "#B3B3B3"
+        }
+      ]
+    },
+    {
+      "id": "cb-paired",
+      "name": "ColorBrewer Paired",
+      "source": "ColorBrewer · Paired",
+      "type": "categorical",
+      "group": "分类型配色",
+      "note": "成对深/浅同色相，适合处理前-后、实验组-对照组成对比较",
+      "colors": [
+        {
+          "hex": "#A6CEE3"
+        },
+        {
+          "hex": "#1F78B4"
+        },
+        {
+          "hex": "#B2DF8A"
+        },
+        {
+          "hex": "#33A02C"
+        },
+        {
+          "hex": "#FB9A99"
+        },
+        {
+          "hex": "#E31A1C"
+        },
+        {
+          "hex": "#FDBF6F"
+        },
+        {
+          "hex": "#FF7F00"
+        },
+        {
+          "hex": "#CAB2D6"
+        },
+        {
+          "hex": "#6A3D9A"
+        },
+        {
+          "hex": "#FFFF99"
+        },
+        {
+          "hex": "#B15928"
+        }
+      ]
+    },
+    {
+      "id": "uchicago",
+      "name": "UChicago 风格",
+      "source": "ggsci · uchicago",
+      "type": "categorical",
+      "group": "分类型配色",
+      "note": "芝加哥大学视觉规范配色，9 色，学术报告质感强",
+      "colors": [
+        {
+          "hex": "#800000"
+        },
+        {
+          "hex": "#767676"
+        },
+        {
+          "hex": "#FFA319"
+        },
+        {
+          "hex": "#8A9045"
+        },
+        {
+          "hex": "#155F83"
+        },
+        {
+          "hex": "#C16622"
+        },
+        {
+          "hex": "#8F3931"
+        },
+        {
+          "hex": "#58593F"
+        },
+        {
+          "hex": "#350E20"
+        }
+      ]
+    },
+    {
+      "id": "bmj",
+      "name": "BMJ 风格",
+      "source": "ggsci · bmj",
+      "type": "categorical",
+      "group": "期刊分类配色",
+      "note": "英国医学杂志 BMJ 系列期刊图表用色，9 色，蓝黄紫对比明快",
+      "colors": [
+        {
+          "hex": "#2A6EBB"
+        },
+        {
+          "hex": "#F0AB00"
+        },
+        {
+          "hex": "#C50084"
+        },
+        {
+          "hex": "#7D5CC6"
+        },
+        {
+          "hex": "#E37222"
+        },
+        {
+          "hex": "#69BE28"
+        },
+        {
+          "hex": "#00B2A9"
+        },
+        {
+          "hex": "#CD202C"
+        },
+        {
+          "hex": "#747678"
+        }
+      ]
+    },
+    {
+      "id": "frontiers",
+      "name": "Frontiers 风格",
+      "source": "ggsci · frontiers",
+      "type": "categorical",
+      "group": "期刊分类配色",
+      "note": "Frontiers 出版社全系列期刊图表用色，10 色，明度高适合屏幕展示",
+      "colors": [
+        {
+          "hex": "#D51317"
+        },
+        {
+          "hex": "#F39200"
+        },
+        {
+          "hex": "#EFD500"
+        },
+        {
+          "hex": "#95C11F"
+        },
+        {
+          "hex": "#007B3D"
+        },
+        {
+          "hex": "#31B7BC"
+        },
+        {
+          "hex": "#0094CD"
+        },
+        {
+          "hex": "#164194"
+        },
+        {
+          "hex": "#6F286A"
+        },
+        {
+          "hex": "#706F6F"
+        }
+      ]
+    },
+    {
+      "id": "okabe-ito",
+      "name": "Okabe-Ito 色盲友好",
+      "source": "Okabe & Ito（Wong, Nature Methods 推荐）",
+      "type": "categorical",
+      "group": "分类型配色",
+      "note": "色盲友好 8 色，各类色觉障碍下均可区分；Bang Wong 在 Nature Methods 推广，是期刊最常推荐的分类色板",
+      "colors": [
+        {
+          "hex": "#E69F00"
+        },
+        {
+          "hex": "#56B4E9"
+        },
+        {
+          "hex": "#009E73"
+        },
+        {
+          "hex": "#F0E442"
+        },
+        {
+          "hex": "#0072B2"
+        },
+        {
+          "hex": "#D55E00"
+        },
+        {
+          "hex": "#CC79A7"
+        },
+        {
+          "hex": "#000000"
+        }
+      ]
+    },
+    {
+      "id": "cosmic-hallmarks",
+      "name": "COSMIC Hallmarks",
+      "source": "ggsci · cosmic（Wellcome Sanger）",
+      "type": "categorical",
+      "group": "分类型配色",
+      "note": "COSMIC 肿瘤基因组「十大标志」官方配色，基因组/肿瘤学图表常用",
+      "colors": [
+        {
+          "hex": "#2E2A2B"
+        },
+        {
+          "hex": "#CF4E9C"
+        },
+        {
+          "hex": "#8C57A2"
+        },
+        {
+          "hex": "#358DB9"
+        },
+        {
+          "hex": "#82581F"
+        },
+        {
+          "hex": "#2F509E"
+        },
+        {
+          "hex": "#E5614C"
+        },
+        {
+          "hex": "#97A1A7"
+        },
+        {
+          "hex": "#3DA873"
+        },
+        {
+          "hex": "#DC9445"
+        }
+      ]
+    },
+    {
+      "id": "crameri-batlow",
+      "name": "Batlow（Crameri）",
+      "source": "Crameri 科学色标 · batlow",
+      "type": "sequential",
+      "group": "期刊推荐色标",
+      "note": "Crameri 默认通用色标，感知均匀且色盲友好，可替代 jet/rainbow",
+      "colors": [
+        {
+          "hex": "#011959"
+        },
+        {
+          "hex": "#114360"
+        },
+        {
+          "hex": "#226061"
+        },
+        {
+          "hex": "#4D734D"
+        },
+        {
+          "hex": "#828231"
+        },
+        {
+          "hex": "#BE9035"
+        },
+        {
+          "hex": "#F19D6B"
+        },
+        {
+          "hex": "#FDB4B4"
+        },
+        {
+          "hex": "#FACCFA"
+        }
+      ]
+    },
+    {
+      "id": "crameri-lajolla",
+      "name": "La Jolla（Crameri）",
+      "source": "Crameri 科学色标 · lajolla",
+      "type": "sequential",
+      "group": "期刊推荐色标",
+      "note": "低亮度端不刺眼，浅色底印刷与投影表现好",
+      "colors": [
+        {
+          "hex": "#191900"
+        },
+        {
+          "hex": "#372411"
+        },
+        {
+          "hex": "#67342A"
+        },
+        {
+          "hex": "#A64644"
+        },
+        {
+          "hex": "#D9604E"
+        },
+        {
+          "hex": "#E58751"
+        },
+        {
+          "hex": "#ECAC54"
+        },
+        {
+          "hex": "#F7D971"
+        },
+        {
+          "hex": "#FFFECB"
+        }
+      ]
+    },
+    {
+      "id": "crameri-oslo",
+      "name": "Oslo（Crameri）",
+      "source": "Crameri 科学色标 · oslo",
+      "type": "sequential",
+      "group": "期刊推荐色标",
+      "note": "冷色调单向色阶，适合温度梯度、深度一类变量",
+      "colors": [
+        {
+          "hex": "#010101"
+        },
+        {
+          "hex": "#0E1E2E"
+        },
+        {
+          "hex": "#15395B"
+        },
+        {
+          "hex": "#26578C"
+        },
+        {
+          "hex": "#507BBC"
+        },
+        {
+          "hex": "#7B98CA"
+        },
+        {
+          "hex": "#A2B0CA"
+        },
+        {
+          "hex": "#CED1D7"
+        },
+        {
+          "hex": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "id": "crameri-devon",
+      "name": "Devon（Crameri）",
+      "source": "Crameri 科学色标 · devon",
+      "type": "sequential",
+      "group": "期刊推荐色标",
+      "note": "柔和单向色阶，大面积填色时不易产生虚假边界",
+      "colors": [
+        {
+          "hex": "#2C1A4C"
+        },
+        {
+          "hex": "#29386A"
+        },
+        {
+          "hex": "#29588F"
+        },
+        {
+          "hex": "#4272BC"
+        },
+        {
+          "hex": "#7E8FDD"
+        },
+        {
+          "hex": "#AFAAEE"
+        },
+        {
+          "hex": "#CAC6F4"
+        },
+        {
+          "hex": "#E4E2FA"
+        },
+        {
+          "hex": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "id": "crameri-roma",
+      "name": "Roma（Crameri 发散）",
+      "source": "Crameri 科学色标 · roma",
+      "type": "diverging",
+      "group": "期刊推荐色标",
+      "note": "双向发散，感知均匀，是 RdBu 的改良替代",
+      "colors": [
+        {
+          "hex": "#7E1700"
+        },
+        {
+          "hex": "#984E14"
+        },
+        {
+          "hex": "#AC7726"
+        },
+        {
+          "hex": "#C1A343"
+        },
+        {
+          "hex": "#D2D484"
+        },
+        {
+          "hex": "#C0EAC3"
+        },
+        {
+          "hex": "#89DAD7"
+        },
+        {
+          "hex": "#4DB3CF"
+        },
+        {
+          "hex": "#2D88BE"
+        },
+        {
+          "hex": "#1E5FAC"
+        },
+        {
+          "hex": "#033198"
+        }
+      ]
+    },
+    {
+      "id": "crameri-vik",
+      "name": "Vik（Crameri 发散）",
+      "source": "Crameri 科学色标 · vik",
+      "type": "diverging",
+      "group": "期刊推荐色标",
+      "note": "冷暖双向发散，跨度大，适合异常场与差值图",
+      "colors": [
+        {
+          "hex": "#001261"
+        },
+        {
+          "hex": "#023A7B"
+        },
+        {
+          "hex": "#116496"
+        },
+        {
+          "hex": "#5496B7"
+        },
+        {
+          "hex": "#A7C9DA"
+        },
+        {
+          "hex": "#ECE5E0"
+        },
+        {
+          "hex": "#E1B8A0"
+        },
+        {
+          "hex": "#CD8961"
+        },
+        {
+          "hex": "#B75A26"
+        },
+        {
+          "hex": "#852206"
+        },
+        {
+          "hex": "#590008"
+        }
+      ]
+    },
+    {
+      "id": "cmocean-thermal",
+      "name": "Thermal 温度场",
+      "source": "cmocean · thermal（Oceanography 2016）",
+      "type": "sequential",
+      "group": "地学专属配色",
+      "note": "海洋/地学温度场标准色标，热流、地温梯度首选",
+      "colors": [
+        {
+          "hex": "#042333"
+        },
+        {
+          "hex": "#19337C"
+        },
+        {
+          "hex": "#563B9C"
+        },
+        {
+          "hex": "#83508F"
+        },
+        {
+          "hex": "#B15F82"
+        },
+        {
+          "hex": "#DE7065"
+        },
+        {
+          "hex": "#F99242"
+        },
+        {
+          "hex": "#F9C441"
+        },
+        {
+          "hex": "#E8FA5B"
+        }
+      ]
+    },
+    {
+      "id": "cmocean-haline",
+      "name": "Haline 盐度",
+      "source": "cmocean · haline（Oceanography 2016）",
+      "type": "sequential",
+      "group": "地学专属配色",
+      "note": "盐度/卤水浓度专用，也可用于孔隙水化学指标",
+      "colors": [
+        {
+          "hex": "#2A186C"
+        },
+        {
+          "hex": "#2034A2"
+        },
+        {
+          "hex": "#0F5B90"
+        },
+        {
+          "hex": "#297789"
+        },
+        {
+          "hex": "#3C9387"
+        },
+        {
+          "hex": "#4FAF7E"
+        },
+        {
+          "hex": "#78CB68"
+        },
+        {
+          "hex": "#C1DD64"
+        },
+        {
+          "hex": "#FDEF9A"
+        }
+      ]
+    },
+    {
+      "id": "cmocean-oxy",
+      "name": "Oxy 溶解氧",
+      "source": "cmocean · oxy（Oceanography 2016）",
+      "type": "sequential",
+      "group": "地学专属配色",
+      "note": "氧化还原/含氧量专用色标，地球化学Redox 剖面适用",
+      "colors": [
+        {
+          "hex": "#400505"
+        },
+        {
+          "hex": "#76050F"
+        },
+        {
+          "hex": "#5C5B5B"
+        },
+        {
+          "hex": "#7A7A79"
+        },
+        {
+          "hex": "#9B9A9A"
+        },
+        {
+          "hex": "#BDBDBC"
+        },
+        {
+          "hex": "#E4E4E3"
+        },
+        {
+          "hex": "#E9E334"
+        },
+        {
+          "hex": "#DDAF19"
+        }
+      ]
+    },
+    {
+      "id": "cmocean-topo",
+      "name": "Topo 地形水深",
+      "source": "cmocean · topo（Oceanography 2016）",
+      "type": "sequential",
+      "group": "地学专属配色",
+      "note": "海陆一体化地形色标，陆地与海底用同一套色阶无缝衔接",
+      "colors": [
+        {
+          "hex": "#281A2C"
+        },
+        {
+          "hex": "#404D8C"
+        },
+        {
+          "hex": "#488F9E"
+        },
+        {
+          "hex": "#7ACEA3"
+        },
+        {
+          "hex": "#0D2514"
+        },
+        {
+          "hex": "#395825"
+        },
+        {
+          "hex": "#8E8040"
+        },
+        {
+          "hex": "#D1B473"
+        },
+        {
+          "hex": "#F9FDE4"
+        }
+      ]
+    },
+    {
+      "id": "cmocean-delta",
+      "name": "Delta 发散",
+      "source": "cmocean · delta（Oceanography 2016）",
+      "type": "diverging",
+      "group": "地学专属配色",
+      "note": "正负异常发散色标，重力异常、磁异常、同位素偏差适用",
+      "colors": [
+        {
+          "hex": "#112040"
+        },
+        {
+          "hex": "#234397"
+        },
+        {
+          "hex": "#2378A3"
+        },
+        {
+          "hex": "#4EA8AF"
+        },
+        {
+          "hex": "#ACCEC6"
+        },
+        {
+          "hex": "#FFFDCD"
+        },
+        {
+          "hex": "#D8C55F"
+        },
+        {
+          "hex": "#8EA20B"
+        },
+        {
+          "hex": "#32801F"
+        },
+        {
+          "hex": "#10542C"
+        },
+        {
+          "hex": "#172313"
+        }
+      ]
+    },
+    {
+      "id": "turbo",
+      "name": "Turbo（彩虹改良）",
+      "source": "Google Turbo · matplotlib",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "Google 对 jet 的改良版：保留彩虹辨识度，去掉虚假条带；需要彩虹色时的推荐替代，但单向变量仍优先 viridis",
+      "colors": [
+        {
+          "hex": "#30123B"
+        },
+        {
+          "hex": "#466BE3"
+        },
+        {
+          "hex": "#28BCEB"
+        },
+        {
+          "hex": "#32F298"
+        },
+        {
+          "hex": "#A4FC3C"
+        },
+        {
+          "hex": "#EECF3A"
+        },
+        {
+          "hex": "#FB7E21"
+        },
+        {
+          "hex": "#D02F05"
+        },
+        {
+          "hex": "#7A0403"
+        }
+      ]
+    }
+  ]
+}

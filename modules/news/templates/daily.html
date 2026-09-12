@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>今日早报 · kust.work</title>
+<style>
+  /* 深色为默认值（/theme.js 缺失也完整可读）；浅色由 theme.js 注入的
+     :root[data-theme="light"] 覆盖。新增颜色一律走变量，勿写死色值。 */
+  :root {
+    /* 面 */
+    --bg: #2b2b2b; --surface: #1f1f1f; --surface-2: #262626; --surface-3: #2f2f2f;
+    /* 线 */
+    --border: #3a3a3a; --border-hover: #4a4a4a;
+    /* 字 */
+    --text: #e8e4df; --muted: #8a867f; --dim: #6f6b64; --link: #cfd8d2;
+    /* 主色 */
+    --accent: #4a9e6a; --accent-dim: #2d6e46; --accent-line: #2d6e46;
+    --accent-soft: #232823; --accent-soft-hover: #242a24;
+    --on-accent: #101710; --logo-bg: #2d6e46; --logo-fg: #e2f3e8;
+    --meta-key: #5f7d69;
+    /* 语义 */
+    --warn: #f0a030; --warn-border: #6a4a15; --err: #c0524a;
+    /* 相关度分档 */
+    --tier-strong-bg: #23402e; --tier-strong-fg: #79d39b; --tier-strong-bd: #2f5a3e;
+    --tier-mid-bg: #23323f; --tier-mid-fg: #7fb5d8; --tier-mid-bd: #2f4757;
+    --tier-low-bg: #33312a; --tier-low-fg: #b3a67c; --tier-low-bd: #4a4638;
+    /* 关键词 chip */
+    --kw-bg: #22261f; --kw-bd: #333a30; --kw-fg: #8d9b8f;
+    /* 组件 */
+    --sw-border: rgba(255,255,255,.07); --sw-shadow: 0 4px 12px rgba(0,0,0,.45);
+    --toast-bg: #1a1a1a; --placeholder: #6a665f;
+    --vb-hover-bg: #24352a; --vb-hover-fg: #9dc9ae;
+    --scroll-bg: #1a1a1a; --scroll-track: #222222; --scroll-thumb: #444444;
+    --stage-track: rgba(255,255,255,.08); --stage-fill: rgba(255,255,255,.12);
+    --shimmer: rgba(255,255,255,.05);
+    --pdf-shadow: 0 4px 18px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04);
+    --card-shadow: none;
+    --radius: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+  a { color: inherit; text-decoration: none; }
+
+  header { height: 48px; background: var(--surface); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 20px; gap: 12px; flex-shrink: 0; }
+  .back { font-size: 12px; color: var(--muted); }
+  .back:hover { color: var(--accent); }
+  .logo { width: 24px; height: 24px; border-radius: 5px; background: var(--logo-bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: var(--logo-fg); letter-spacing: -0.3px; }
+  .brand { font-weight: 600; font-size: 14px; letter-spacing: -0.3px; }
+  .spacer { flex: 1; }
+  .stat { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+
+  main { flex: 1; width: 100%; max-width: 1100px; margin: 0 auto; padding: 34px 20px 44px; }
+
+  .head { display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 18px; flex-wrap: wrap; margin-bottom: 22px; }
+  .head h1 { font-size: 21px; font-weight: 600; letter-spacing: -0.4px; margin-bottom: 6px; }
+  .head p { font-size: 12.5px; color: var(--muted); }
+  .btn { display: inline-flex; align-items: center; gap: 7px; font-size: 13px;
+    padding: 9px 16px; border-radius: var(--radius); border: 1px solid var(--accent-dim);
+    background: var(--accent-soft); color: var(--accent); transition: .18s; white-space: nowrap; }
+  .btn:hover { background: var(--accent-soft-hover); border-color: var(--accent); }
+  .btn.off { border-color: var(--border); color: var(--muted); background: transparent;
+    cursor: not-allowed; }
+
+  .cols { display: grid; grid-template-columns: 1fr 320px; gap: 18px; align-items: start; }
+
+  .panel { background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden; }
+  .panel-h { padding: 12px 16px; border-bottom: 1px solid var(--border);
+    font-size: 11px; color: var(--muted); letter-spacing: 1.1px;
+    display: flex; align-items: center; justify-content: space-between; }
+  .panel-h b { color: var(--text); font-weight: 400; letter-spacing: 0; }
+
+  .item { padding: 13px 16px; border-bottom: 1px solid var(--surface-3); display: flex; gap: 12px; }
+  .item:last-child { border-bottom: none; }
+  .item:hover { background: var(--surface-2); }
+  .num { font-size: 11px; color: var(--muted); font-family: ui-monospace, Consolas, monospace;
+    padding-top: 3px; flex-shrink: 0; width: 18px; }
+  .it-b { flex: 1; min-width: 0; }
+  .it-t { font-size: 13.5px; font-weight: 600; line-height: 1.5; margin-bottom: 4px; }
+  .it-t:hover { color: var(--accent); }
+  .it-s { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 5px; }
+  .it-m { font-size: 11px; color: var(--dim); display: flex; gap: 9px; flex-wrap: wrap; }
+  .cat { color: var(--accent); }
+
+  .poster { padding: 12px; }
+  .poster img { width: 100%; border-radius: 4px; display: block; border: 1px solid var(--border); }
+  .empty { padding: 34px 16px; text-align: center; color: var(--muted); font-size: 12.5px;
+    line-height: 1.8; }
+
+  footer { border-top: 1px solid var(--border); background: var(--surface);
+    padding: 10px 20px; font-size: 11px; color: var(--muted); flex-shrink: 0; }
+  footer code { font-family: ui-monospace, Consolas, monospace; color: var(--text); }
+
+  @media (max-width: 820px) {
+    .cols { grid-template-columns: 1fr; }
+    main { padding: 26px 16px 34px; }
+  }
+</style>
+<!-- 主题引擎：必须同步加载（勿加 defer/async），否则会先闪深色再变浅色。
+     由它在右上角挂出「自动 / 浅色 / 深色」三态切换按钮。 -->
+<script src="/theme.js"></script>
+</head>
+<body>
+
+<header>
+  <a class="back" href="/">&larr; 工作台</a>
+  <span class="logo">ku</span>
+  <span class="brand">今日早报</span>
+  <span class="spacer"></span>
+  <div class="stat"><span class="dot" id="dotSt"></span><span id="txtSt">读取中</span></div>
+</header>
+
+<main>
+  <div class="head">
+    <div>
+      <h1 id="hTitle">今日早报</h1>
+      <p id="hMeta">正在读取推送记录…</p>
+    </div>
+    <a class="btn off" id="btnDoc" href="#" target="_blank" rel="noopener">飞书文档</a>
+  </div>
+
+  <div class="cols">
+    <div class="panel">
+      <div class="panel-h"><span>今日新闻</span><b id="cnt">—</b></div>
+      <div id="list"><div class="empty">加载中…</div></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-h"><span>日报海报</span></div>
+      <div class="poster" id="poster"><div class="empty">加载中…</div></div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  数据源 <code>news.json</code> · <code>daily_push_state.json</code> · 只读展示，不改动推送数据
+</footer>
+
+<script>
+(function () {
+  var btnDoc = document.getElementById('btnDoc');
+  var hTitle = document.getElementById('hTitle');
+  var hMeta = document.getElementById('hMeta');
+  var cnt = document.getElementById('cnt');
+  var list = document.getElementById('list');
+  var poster = document.getElementById('poster');
+  var dotSt = document.getElementById('dotSt');
+  var txtSt = document.getElementById('txtSt');
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function safeUrl(u) {
+    return /^https?:\/\//i.test(u || '') ? u : '';
+  }
+
+  // ① 状态与海报
+  fetch('/api/news/latest', { cache: 'no-store' })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      if (d.has_url) {
+        btnDoc.href = d.url;
+        btnDoc.className = 'btn';
+        btnDoc.textContent = '打开飞书早报';
+      } else {
+        btnDoc.className = 'btn off';
+        btnDoc.textContent = '链接未记录';
+        btnDoc.onclick = function (e) { e.preventDefault(); };
+      }
+
+      var parts = [];
+      if (d.date) {
+        parts.push(d.date + (d.is_today ? '（今日）' : (d.age_days != null ? '（' + d.age_days + ' 天前）' : '')));
+      }
+      if (d.news_total) parts.push('共 ' + d.news_total + ' 条新闻');
+      if (d.feishu_sent) {
+        parts.push('飞书推送：' + ({ success: '成功', failed: '失败', skipped: '已跳过' }[d.feishu_sent] || d.feishu_sent));
+      }
+      hMeta.textContent = parts.length ? parts.join(' · ') : '暂无推送记录';
+      if (d.date) hTitle.textContent = '今日早报 · ' + d.date;
+
+      dotSt.className = 'dot ' + (d.is_today ? 'ok' : 'warn');
+      txtSt.textContent = d.is_today ? '今日已推送' : '非今日记录';
+
+      if (d.poster_url) {
+        poster.innerHTML = '<img alt="日报海报" src="' + d.poster_url + '?t=' + Date.now() + '">';
+      } else {
+        poster.innerHTML = '<div class="empty">未找到日报海报<br>文件命名需为 daily_poster_YYYYMMDD.png</div>';
+      }
+    })
+    .catch(function () {
+      dotSt.className = 'dot down';
+      txtSt.textContent = '读取失败';
+      hMeta.textContent = '无法读取推送状态';
+    });
+
+  // ② 新闻列表
+  fetch('/api/news/list', { cache: 'no-store' })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      var items = d.items || [];
+      cnt.textContent = items.length ? items.length + ' 条' : '—';
+      if (!items.length) {
+        list.innerHTML = '<div class="empty">news.json 里暂无新闻条目</div>';
+        return;
+      }
+      list.innerHTML = items.map(function (it) {
+        var u = safeUrl(it.url);
+        var title = u
+          ? '<a class="it-t" href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(it.title) + '</a>'
+          : '<div class="it-t">' + esc(it.title) + '</div>';
+        var meta = [it.source, it.pub_date].filter(Boolean).map(esc).join(' · ');
+        return '<div class="item">'
+          + '<span class="num">' + esc(it.num) + '</span>'
+          + '<div class="it-b">' + title
+          + (it.summary ? '<div class="it-s">' + esc(it.summary) + '</div>' : '')
+          + '<div class="it-m">'
+          + (it.cat ? '<span class="cat">' + esc(it.cat) + '</span>' : '')
+          + '<span>' + meta + '</span></div>'
+          + '</div></div>';
+      }).join('');
+    })
+    .catch(function () {
+      list.innerHTML = '<div class="empty">读取新闻失败</div>';
+    });
+})();
+</script>
+
+</body>
+</html>

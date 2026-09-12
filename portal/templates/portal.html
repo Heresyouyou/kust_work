@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>kust.work · 工作台</title>
+<style>
+  /* 深色为默认值（theme.js 加载失败也完整可读）；
+     浅色由 /theme.js 注入的 :root[data-theme="light"] 覆盖。
+     新增颜色一律走变量，页面里不要出现硬编码色值。 */
+  :root {
+    /* 面 */
+    --bg: #2b2b2b; --surface: #1f1f1f; --surface-2: #262626; --surface-3: #2f2f2f;
+    /* 线 */
+    --border: #3a3a3a; --border-hover: #4a4a4a;
+    /* 字 */
+    --text: #e8e4df; --muted: #8a867f; --dim: #6f6b64; --link: #cfd8d2;
+    /* 主色 */
+    --accent: #4a9e6a; --accent-dim: #2d6e46; --accent-line: #2d6e46;
+    --accent-soft: #232823; --accent-soft-hover: #242a24;
+    --on-accent: #101710; --logo-bg: #2d6e46; --logo-fg: #e2f3e8;
+    --meta-key: #5f7d69;
+    /* 语义 */
+    --warn: #f0a030; --warn-border: #6a4a15; --err: #c0524a;
+    /* 相关度分档 */
+    --tier-strong-bg: #23402e; --tier-strong-fg: #79d39b; --tier-strong-bd: #2f5a3e;
+    --tier-mid-bg: #23323f; --tier-mid-fg: #7fb5d8; --tier-mid-bd: #2f4757;
+    --tier-low-bg: #33312a; --tier-low-fg: #b3a67c; --tier-low-bd: #4a4638;
+    /* 关键词 chip */
+    --kw-bg: #22261f; --kw-bd: #333a30; --kw-fg: #8d9b8f;
+    /* 组件 */
+    --sw-border: rgba(255,255,255,.07); --sw-shadow: 0 4px 12px rgba(0,0,0,.45);
+    --toast-bg: #1a1a1a; --placeholder: #6a665f;
+    --vb-hover-bg: #24352a; --vb-hover-fg: #9dc9ae;
+    --scroll-bg: #1a1a1a; --scroll-track: #222222; --scroll-thumb: #444444;
+    --stage-track: rgba(255,255,255,.08); --stage-fill: rgba(255,255,255,.12);
+    --shimmer: rgba(255,255,255,.05);
+    --pdf-shadow: 0 4px 18px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04);
+    --card-shadow: none;
+    --radius: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    background: var(--bg); color: var(--text); min-height: 100vh;
+    display: flex; flex-direction: column; }
+  a { color: inherit; text-decoration: none; }
+
+  /* ── 顶栏 ── */
+  header { height: 48px; background: var(--surface); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 20px; gap: 12px; flex-shrink: 0; }
+  .logo { width: 24px; height: 24px; border-radius: 5px; background: var(--logo-bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: var(--logo-fg); letter-spacing: -0.3px; }
+  .brand { font-weight: 600; font-size: 14px; letter-spacing: -0.3px; }
+  .spacer { flex: 1; }
+  .stat { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+  .dot.ok { background: var(--accent); }
+  .dot.warn { background: var(--warn); }
+  .dot.down { background: var(--err); }
+
+  /* ── 主体 ── */
+  main { flex: 1; width: 100%; max-width: 1100px; margin: 0 auto; padding: 44px 20px 40px; }
+  .hero { margin-bottom: 38px; }
+  .hero h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.4px; margin-bottom: 7px; }
+  .hero p { font-size: 13px; color: var(--muted); }
+
+  .grp { margin-bottom: 34px; }
+  .grp-t { font-size: 11px; font-weight: 400; color: var(--muted); letter-spacing: 1.2px;
+    margin-bottom: 14px; padding-bottom: 9px; border-bottom: 1px solid var(--border); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(248px, 1fr)); gap: 14px; }
+
+  .card { display: flex; flex-direction: column; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px; min-height: 116px; box-shadow: var(--card-shadow);
+    transition: border-color .18s, background .18s, transform .18s; }
+  a.card:hover { border-color: var(--accent); background: var(--accent-soft-hover); transform: translateY(-1px); }
+  .card.accent { border-color: var(--accent-line); background: var(--accent-soft); }
+  a.card.accent:hover { border-color: var(--accent); background: var(--accent-soft-hover); }
+  .card.off { opacity: .42; }
+
+  .card-h { display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; margin-bottom: 9px; }
+  .card-n { font-size: 14px; font-weight: 600; letter-spacing: -0.2px; }
+  .card-tag { font-size: 10px; padding: 2px 7px; border-radius: 3px; white-space: nowrap;
+    border: 1px solid var(--border); color: var(--muted); }
+  .card-tag.on { color: var(--accent); border-color: var(--accent-dim); }
+  .card-tag.beta { color: var(--warn); border-color: var(--warn-border); }
+  .card-d { font-size: 12px; color: var(--muted); line-height: 1.65; flex: 1; }
+  .card-p { font-size: 11px; color: var(--accent); margin-top: 11px; opacity: .8;
+    font-family: ui-monospace, Consolas, "Courier New", monospace; }
+
+  /* ── 底栏 ── */
+  footer { border-top: 1px solid var(--border); background: var(--surface);
+    padding: 10px 20px; display: flex; align-items: center; gap: 14px;
+    font-size: 11px; color: var(--muted); flex-wrap: wrap; flex-shrink: 0; }
+  footer b { color: var(--text); font-weight: 400; }
+  footer .sep { color: var(--border); }
+
+  @media (max-width: 560px) {
+    main { padding: 28px 16px 28px; }
+    .hero h1 { font-size: 19px; }
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+<!-- 主题引擎：必须同步加载（勿加 defer/async），否则会先闪深色再变浅色。
+     由它在右上角挂出「自动 / 浅色 / 深色」三态切换按钮。 -->
+<script src="/theme.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="logo">ku</div>
+  <span class="brand">kust.work</span>
+  <span class="spacer"></span>
+  <div class="stat"><span class="dot" id="dotSvc"></span><span id="txtSvc">检测中</span></div>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>工作台</h1>
+    <p>选择一个功能开始</p>
+  </div>
+<!--PORTAL_CARDS-->
+</main>
+
+<footer>
+  <span>推理服务 <b id="fLlama">—</b></span>
+  <span class="sep">|</span>
+  <span>活跃任务 <b id="fActive">—</b></span>
+  <span class="sep">|</span>
+  <span>门户 <b>正常运行</b></span>
+  <span class="spacer"></span>
+  <span id="fTime">—</span>
+</footer>
+
+<script>
+(function () {
+  var dot = document.getElementById('dotSvc');
+  var txt = document.getElementById('txtSvc');
+  var fLlama = document.getElementById('fLlama');
+  var fActive = document.getElementById('fActive');
+  var fTime = document.getElementById('fTime');
+
+  var LEVEL = {
+    ok:      ['ok',   '推理服务正常', '正常'],
+    loading: ['warn', '模型加载中',   '加载中'],
+    down:    ['down', '推理服务离线', '离线']
+  };
+
+  function stamp() {
+    var d = new Date();
+    var p = function (n) { return n < 10 ? '0' + n : '' + n; };
+    fTime.textContent = p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
+  }
+
+  function poll() {
+    fetch('/api/portal/health', { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        var lv = LEVEL[d.llama] || LEVEL.down;
+        dot.className = 'dot ' + lv[0];
+        txt.textContent = lv[1];
+        fLlama.textContent = lv[2];
+        fActive.textContent = (d.active === null || d.active === undefined) ? '—' : d.active;
+        stamp();
+      })
+      .catch(function () {
+        dot.className = 'dot down';
+        txt.textContent = '门户后端异常';
+        fLlama.textContent = '离线';
+        fActive.textContent = '—';
+      });
+  }
+
+  poll();
+  setInterval(poll, 15000);
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) poll();
+  });
+})();
+
+/* ── 动态卡片：由 JS 去后端取「当天」数据回填，模板本身恒定 ──
+   这样每天变化的内容（飞书链接、期刊新文数）不需要改 HTML，
+   页面结构永远稳定；JS 挂了也只是退化成服务端 302 跳转，不影响可用性。 */
+(function () {
+  function cardOf(id) { return document.querySelector('[data-mod="' + id + '"]'); }
+  function tagOf(id) { return document.querySelector('[data-tag="' + id + '"]'); }
+  function descOf(id) { return cardOf(id) ? cardOf(id).querySelector('.card-d') : null; }
+
+  function setTag(id, text, kind) {
+    var t = tagOf(id);
+    if (!t) return;
+    t.textContent = text;
+    t.className = 'card-tag' + (kind ? ' ' + kind : '');
+  }
+
+  // ① 今日早报：把卡片 href 直接指向当天飞书文档
+  function bindDaily() {
+    var card = cardOf('daily');
+    if (!card) return;
+    fetch('/api/news/latest', { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        var desc = descOf('daily');
+        var bits = [];
+        if (d.date) bits.push(d.date);
+        if (d.news_total) bits.push(d.news_total + ' 条资讯');
+
+        if (d.has_url) {
+          card.setAttribute('href', d.url);
+          card.setAttribute('target', '_blank');
+          card.setAttribute('rel', 'noopener');
+          setTag('daily', d.is_today ? '今日已推送' : '已推送', 'on');
+          if (desc) desc.textContent = bits.concat('点击打开飞书早报').join(' · ');
+        } else if (d.is_today) {
+          setTag('daily', '链接待记录', 'beta');
+          if (desc) desc.textContent = bits.concat('链接将于下次推送后自动出现').join(' · ');
+        } else {
+          setTag('daily', '待推送', '');
+          if (desc) desc.textContent = bits.length
+            ? bits.concat('今日尚未推送').join(' · ')
+            : '今日早报尚未生成';
+        }
+      })
+      .catch(function () { /* 静默失败：卡片仍可走服务端 /today 跳转 */ });
+  }
+
+  // ② 期刊列表：回填本轮新文数量，有更新时点亮角标
+  function bindJournals() {
+    var card = cardOf('journals');
+    if (!card) return;
+    fetch('/api/journals/list', { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        var desc = descOf('journals');
+        var bits = [d.total_journals + ' 种期刊'];
+        if (d.total_articles) bits.push(d.total_articles + ' 篇新文章');
+        if (desc) desc.textContent = bits.join(' · ');
+        if (d.updated_journals > 0) setTag('journals', '有更新', 'on');
+      })
+      .catch(function () { /* 静默失败，保持服务端默认文案 */ });
+  }
+
+  bindDaily();
+  bindJournals();
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) { bindDaily(); bindJournals(); }
+  });
+})();
+</script>
+
+</body>
+</html>

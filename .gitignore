@@ -1,0 +1,22 @@
+# 运行时产物
+__pycache__/
+*.py[cod]
+*.pyo
+
+# 进程/日志
+.flask_*.pid
+.web_app.pid
+*.log
+
+# 用户文件（PDF、上传件、译文、离线快照）
+uploads/
+translated/
+output/
+*.pdf
+*.pdf.bak
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

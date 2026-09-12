@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>期刊列表 · kust.work</title>
+<style>
+  /* 深色为默认值（/theme.js 缺失也完整可读）；浅色由 theme.js 注入的
+     :root[data-theme="light"] 覆盖。新增颜色一律走变量，勿写死色值。 */
+  :root {
+    /* 面 */
+    --bg: #2b2b2b; --surface: #1f1f1f; --surface-2: #262626; --surface-3: #2f2f2f;
+    /* 线 */
+    --border: #3a3a3a; --border-hover: #4a4a4a;
+    /* 字 */
+    --text: #e8e4df; --muted: #8a867f; --dim: #6f6b64; --link: #cfd8d2;
+    /* 主色 */
+    --accent: #4a9e6a; --accent-dim: #2d6e46; --accent-line: #2d6e46;
+    --accent-soft: #232823; --accent-soft-hover: #242a24;
+    --on-accent: #101710; --logo-bg: #2d6e46; --logo-fg: #e2f3e8;
+    --meta-key: #5f7d69;
+    /* 语义 */
+    --warn: #f0a030; --warn-border: #6a4a15; --err: #c0524a;
+    /* 相关度分档 */
+    --tier-strong-bg: #23402e; --tier-strong-fg: #79d39b; --tier-strong-bd: #2f5a3e;
+    --tier-mid-bg: #23323f; --tier-mid-fg: #7fb5d8; --tier-mid-bd: #2f4757;
+    --tier-low-bg: #33312a; --tier-low-fg: #b3a67c; --tier-low-bd: #4a4638;
+    /* 关键词 chip */
+    --kw-bg: #22261f; --kw-bd: #333a30; --kw-fg: #8d9b8f;
+    /* 组件 */
+    --sw-border: rgba(255,255,255,.07); --sw-shadow: 0 4px 12px rgba(0,0,0,.45);
+    --toast-bg: #1a1a1a; --placeholder: #6a665f;
+    --vb-hover-bg: #24352a; --vb-hover-fg: #9dc9ae;
+    --scroll-bg: #1a1a1a; --scroll-track: #222222; --scroll-thumb: #444444;
+    --stage-track: rgba(255,255,255,.08); --stage-fill: rgba(255,255,255,.12);
+    --shimmer: rgba(255,255,255,.05);
+    --pdf-shadow: 0 4px 18px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04);
+    --card-shadow: none;
+    --radius: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+  a { color: inherit; text-decoration: none; }
+
+  header { height: 48px; background: var(--surface); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 20px; gap: 12px; flex-shrink: 0;
+    position: sticky; top: 0; z-index: 10; }
+  .back { font-size: 12px; color: var(--muted); }
+  .back:hover { color: var(--accent); }
+  .logo { width: 24px; height: 24px; border-radius: 5px; background: var(--logo-bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: var(--logo-fg); letter-spacing: -0.3px; }
+  .brand { font-weight: 600; font-size: 14px; letter-spacing: -0.3px; }
+  .spacer { flex: 1; }
+  .stat { font-size: 12px; color: var(--muted); }
+
+  main { flex: 1; width: 100%; max-width: 1240px; margin: 0 auto; padding: 32px 20px 48px; }
+
+  .head { margin-bottom: 20px; }
+  .head h1 { font-size: 21px; font-weight: 600; letter-spacing: -0.4px; margin-bottom: 6px; }
+  .head p { font-size: 12.5px; color: var(--muted); }
+
+  .bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 22px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  .tab { font-size: 12px; padding: 6px 13px; border-radius: 4px; border: 1px solid var(--border);
+    color: var(--muted); cursor: pointer; transition: .16s; background: transparent; }
+  .tab:hover { color: var(--text); border-color: var(--border-hover); }
+  .tab.on { color: var(--accent); border-color: var(--accent-line); background: var(--accent-soft); }
+  .sum { margin-left: auto; font-size: 11.5px; color: var(--muted); }
+  .sum b { color: var(--text); font-weight: 600; }
+
+  .grp-t { font-size: 11px; color: var(--muted); letter-spacing: 1.2px;
+    margin: 26px 0 13px; padding-bottom: 9px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 14px; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px; display: flex; flex-direction: column; box-shadow: var(--card-shadow);
+    transition: border-color .18s, box-shadow .18s; }
+  .card:hover { border-color: var(--border-hover); }
+  .card.has-new { border-color: var(--accent-line); }
+
+  .c-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 9px; }
+  .c-name { font-size: 14.5px; font-weight: 600; line-height: 1.4; letter-spacing: -0.2px; }
+  .c-name:hover { color: var(--accent); }
+  .c-sub { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+  .c-badge { margin-left: auto; flex-shrink: 0; font-size: 10px; padding: 2px 7px;
+    border-radius: 3px; border: 1px solid var(--accent-dim); color: var(--accent); white-space: nowrap; }
+  .c-badge.none { border-color: var(--border); color: var(--dim); }
+
+  .chips { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 11px; }
+  .chip { font-size: 10px; padding: 2px 7px; border-radius: 3px;
+    background: var(--surface-2); border: 1px solid var(--border); color: var(--muted); }
+
+  .arts { flex: 1; border-top: 1px solid var(--surface-3); padding-top: 9px; margin-top: 2px; }
+  .art { display: flex; gap: 8px; padding: 5px 0; font-size: 12px; line-height: 1.55; }
+  .art .t { flex: 1; min-width: 0; }
+  /* 英文标题下方的中文小字（离线预翻译；无翻译时不渲染这个节点，不占位） */
+  .tzh { font-size: 11px; color: var(--muted); line-height: 1.5; margin-top: 1px; }
+  .art .mk { color: var(--accent); flex-shrink: 0; font-size: 10px; padding-top: 4px; }
+  .art a { color: var(--link); }
+  .art a:hover { color: var(--accent); text-decoration: underline; }
+  .art .vi { color: var(--dim); font-size: 10.5px; flex-shrink: 0; padding-top: 2px;
+    font-family: ui-monospace, Consolas, monospace; }
+  /* 本地获取日期（MM-DD / 跨年 YYYY-MM-DD） */
+  .art .ob { color: var(--dim); font-size: 10px; flex-shrink: 0; padding-top: 3px;
+    font-family: ui-monospace, Consolas, monospace; }
+  /* 「展开其余 N 篇 / 收起」 */
+  .more { display: block; font-size: 11px; color: var(--accent); margin-top: 6px;
+    padding: 3px 0; cursor: pointer; }
+  .more:hover { text-decoration: underline; }
+  .none-tip { font-size: 11.5px; color: var(--dim); padding: 7px 0; line-height: 1.6; }
+
+  /* ── 视图切换 ── */
+  .vbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .vtab { font-size: 12.5px; padding: 7px 15px; border-radius: 5px; cursor: pointer;
+    border: 1px solid var(--border); background: transparent; color: var(--muted); transition: .16s; }
+  .vtab:hover { color: var(--text); border-color: var(--border-hover); }
+  .vtab.on { color: var(--on-accent); background: var(--accent); border-color: var(--accent); font-weight: 600; }
+  /* 「全部展开 / 收起全部」—— 一键铺开本视图内所有被折叠的条目 */
+  .vbtn { font-size: 12.5px; padding: 7px 15px; border-radius: 5px; cursor: pointer;
+    border: 1px dashed var(--border); background: transparent; color: var(--accent); transition: .16s; }
+  .vbtn:hover { border-color: var(--accent); border-style: solid; }
+  .vbtn[hidden] { display: none; }
+  .vnote { font-size: 11.5px; color: var(--muted); margin-left: auto; text-align: right; line-height: 1.6; }
+
+  /* ── 主题归档：分档徽章 / 日期 / 命中词 ── */
+  .t-badge { display: inline-block; font-size: 9.5px; padding: 1px 6px; border-radius: 3px;
+    margin-left: 6px; vertical-align: 1px; white-space: nowrap; border: 1px solid transparent; }
+  .t-strong { background: var(--tier-strong-bg); color: var(--tier-strong-fg); border-color: var(--tier-strong-bd); }
+  .t-mid { background: var(--tier-mid-bg); color: var(--tier-mid-fg); border-color: var(--tier-mid-bd); }
+  .t-low { background: var(--tier-low-bg); color: var(--tier-low-fg); border-color: var(--tier-low-bd); }
+  .art .sc { color: var(--dim); font-size: 9.5px; flex-shrink: 0; padding-top: 3px;
+    font-family: ui-monospace, Consolas, monospace; }
+  .art-w { display: flex; gap: 8px; padding: 7px 0; font-size: 12px; line-height: 1.55;
+    border-bottom: 1px solid var(--surface-3); }
+  .art-w:last-child { border-bottom: none; }
+  .art-w .body { flex: 1; min-width: 0; }
+  .art-w .meta { font-size: 10px; color: var(--dim); margin-top: 3px; display: flex;
+    gap: 8px; flex-wrap: wrap; align-items: center; }
+  .art-w .meta .k { color: var(--meta-key); }
+  .kws { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
+  .kw { font-size: 9.5px; padding: 1px 5px; border-radius: 3px;
+    background: var(--kw-bg); border: 1px solid var(--kw-bd); color: var(--kw-fg); }
+  .c-badge.topic { border-color: var(--tier-mid-bd); color: var(--tier-mid-fg); }
+  .c-badge.topic.none { border-color: var(--border); color: var(--dim); }
+  .legend { display: flex; gap: 12px; align-items: center; font-size: 11px; color: var(--muted);
+    flex-wrap: wrap; }
+  .legend .t-badge { margin-left: 0; }
+
+  .c-foot { display: flex; align-items: center; gap: 12px; margin-top: 12px;
+    padding-top: 11px; border-top: 1px solid var(--surface-3); font-size: 11.5px; flex-wrap: wrap; }
+  .c-foot a { color: var(--muted); }
+  .c-foot a:hover { color: var(--accent); }
+  .c-foot .host { color: var(--dim); font-family: ui-monospace, Consolas, monospace; font-size: 10.5px; }
+  .c-foot .sep { color: var(--border); }
+
+  .loading { padding: 60px 0; text-align: center; color: var(--muted); font-size: 13px; }
+
+  footer { border-top: 1px solid var(--border); background: var(--surface);
+    padding: 11px 20px; font-size: 11px; color: var(--muted); flex-shrink: 0; }
+  footer code { font-family: ui-monospace, Consolas, monospace; color: var(--text); }
+
+  @media (max-width: 640px) {
+    main { padding: 24px 14px 36px; }
+    .grid { grid-template-columns: 1fr; }
+    .sum { margin-left: 0; width: 100%; }
+  }
+</style>
+<!-- 主题引擎：必须同步加载（勿加 defer/async），否则会先闪深色再变浅色。
+     由它在右上角挂出「自动 / 浅色 / 深色」三态切换按钮。 -->
+<script src="/theme.js"></script>
+</head>
+<body>
+
+<header>
+  <a class="back" href="/">&larr; 工作台</a>
+  <span class="logo">ku</span>
+  <span class="brand">期刊列表</span>
+  <span class="spacer"></span>
+  <span class="stat" id="st">加载中…</span>
+</header>
+
+<main>
+  <div class="head">
+    <h1>目标期刊列表</h1>
+    <p>点击期刊名直达官网首页 · 「近 60 天」为本机近 60 天<b>获取到</b>的文章链接（本地日期时间为准，非当天发布）· 「主题归档」为近 2 个月与 filter 主题相关的命中文献</p>
+  </div>
+
+  <div class="vbar">
+    <button class="vtab on" data-view="latest">近 60 天</button>
+    <button class="vtab" data-view="topic">主题归档</button>
+    <button class="vbtn" id="allbtn" hidden>全部展开 ↓</button>
+    <span class="vnote" id="vnote"></span>
+  </div>
+
+  <div class="bar" id="bar">
+    <button class="tab on" data-region="all">全部</button>
+    <button class="tab" data-region="国际">国际期刊</button>
+    <button class="tab" data-region="国内">国内期刊</button>
+    <span class="sum" id="sum">—</span>
+  </div>
+
+  <div id="legend"></div>
+  <div id="body"><div class="loading">正在读取期刊数据…</div></div>
+</main>
+
+<footer>
+  数据源 <code>journals.json</code> · <code>journal_ledger.json</code> ·
+  <code>journal_updates.json</code> · <code>journal_batch_pending.json</code> ·
+  <code>journal_doc_urls.json</code> · <code>journal_topic_archive.json</code>（只读）
+</footer>
+
+<script>
+(function () {
+  var DATA = null, REGION = 'all', VIEW = 'latest';
+  // 单卡默认折叠条数；点「展开其余 N 篇」后按 data-id 记住展开状态
+  var PREVIEW_N = 6;
+  var EXPANDED = {};
+  var ALL_OPEN = false;   // 「全部展开」总开关：为 true 时所有卡片都铺开
+  var body = document.getElementById('body');
+  var allbtn = document.getElementById('allbtn');
+  var sum = document.getElementById('sum');
+  var st = document.getElementById('st');
+  var bar = document.getElementById('bar');
+  var vnote = document.getElementById('vnote');
+  var legend = document.getElementById('legend');
+
+  var TIER_LABEL = { strong: '强相关', mid: '相关', low: '一般' };
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function safeUrl(u) { return /^https?:\/\//i.test(u || '') ? u : ''; }
+
+  // 近 60 天条目：标题 + 本地获取日期（MM-DD）+ 卷期
+  function artRow(a) {
+    var u = safeUrl(a.url);
+    var t = u
+      ? '<a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(a.title) + '</a>'
+      : esc(a.title);
+    var vi = a.volume ? '<span class="vi">v' + esc(a.volume) + (a.issue ? 'n' + esc(a.issue) : '') + '</span>' : '';
+    var ob = a.obtained_label
+      ? '<span class="ob" title="本地获取时间 ' + esc(a.obtained_at || a.obtained_label) + '">'
+        + esc(a.obtained_label) + '</span>'
+      : '';
+    // 英文条目下方挂中文小字（离线预翻译，没有就不显示，绝不占位）
+    var zh = a.title_zh ? '<div class="tzh">' + esc(a.title_zh) + '</div>' : '';
+    return '<div class="art"><span class="mk">▸</span><div class="t">' + t + zh + '</div>' + ob + vi + '</div>';
+  }
+
+  // 主题归档条目：分数 + 分档徽章 + 日期 + 卷期页码 + 命中关键词
+  function topicRow(a) {
+    var u = safeUrl(a.url);
+    var t = u
+      ? '<a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(a.title) + '</a>'
+      : esc(a.title);
+    var tier = TIER_LABEL[a.tier] || '一般';
+    var meta = ['<span>' + esc(a.date_label) + '</span>'];
+    var vi = a.volume ? ('v' + a.volume + (a.issue ? 'n' + a.issue : '')) : '';
+    if (vi) meta.push('<span>' + esc(vi) + '</span>');
+    if (a.pages) meta.push('<span>' + esc(a.pages) + '</span>');
+    if (a.date_basis) meta.push('<span class="k">' + esc(a.date_basis) + '</span>');
+    var kws = (a.keywords || []).length
+      ? '<div class="kws">' + a.keywords.map(function (k) {
+          return '<span class="kw">' + esc(k) + '</span>';
+        }).join('') + '</div>'
+      : '';
+    var zh = a.title_zh ? '<div class="tzh">' + esc(a.title_zh) + '</div>' : '';
+    return '<div class="art-w"><span class="sc">' + esc(a.score) + '</span>'
+      + '<div class="body"><div>' + t
+      + '<span class="t-badge t-' + esc(a.tier) + '">' + esc(tier) + '</span></div>' + zh
+      + '<div class="meta">' + meta.join('') + '</div>' + kws + '</div></div>';
+  }
+
+  function headCard(j) {
+    var site = safeUrl(j.website);
+    var nameHtml = site
+      ? '<a class="c-name" href="' + esc(site) + '" target="_blank" rel="noopener" title="打开期刊首页">' + esc(j.name) + '</a>'
+      : '<div class="c-name">' + esc(j.name) + '</div>';
+    var sub = [];
+    if (j.name_cn && j.name_cn !== j.name) sub.push(j.name_cn);
+    if (j.name_en && j.name_en !== j.name) sub.push(j.name_en);
+    if (j.short_name) sub.push(j.short_name);
+    var chips = [];
+    if (j.category) chips.push('<span class="chip">' + esc(j.category) + '</span>');
+    (j.level || []).slice(0, 3).forEach(function (l) {
+      chips.push('<span class="chip">' + esc(l) + '</span>');
+    });
+    if (j.frequency) chips.push('<span class="chip">' + esc(j.frequency) + '</span>');
+    var foot = [];
+    if (site) foot.push('<a href="' + esc(site) + '" target="_blank" rel="noopener">期刊首页 &rarr;</a>');
+    var doc = safeUrl(j.doc_url);
+    if (doc) foot.push('<a href="' + esc(doc) + '" target="_blank" rel="noopener">飞书速递 &rarr;</a>');
+    if (j.site_host) foot.push('<span class="host">' + esc(j.site_host) + '</span>');
+    if (j.publisher) foot.push('<span class="sep">|</span><span>' + esc(j.publisher) + '</span>');
+    return {
+      nameHtml: nameHtml, sub: sub, chips: chips, foot: foot,
+      site: site, hasNew: !!j.article_total
+    };
+  }
+
+  // 近 60 天卡片：只展示「本地近 60 天获取到」的链接，按获取时间倒序
+  function cardLatest(j) {
+    var h = headCard(j);
+    var total = j.article_total || 0;
+    var items = j.articles || [];
+    var isOpen = !!EXPANDED[j.id];
+    var shown = isOpen ? items : items.slice(0, PREVIEW_N);
+    var win = DATA.window || {};
+    var days = win.days || 60;
+
+    var badge = total
+      ? '<span class="c-badge">' + days + ' 天内 ' + total + ' 篇</span>'
+      : '<span class="c-badge none">' + days + ' 天内无</span>';
+
+    var arts;
+    if (shown.length) {
+      arts = shown.map(artRow).join('');
+      var mk = function (label) {
+        return '<a class="more" data-more="' + esc(j.id) + '" href="javascript:void(0)">'
+          + label + '</a>';
+      };
+      if (!isOpen && total > shown.length) {
+        arts += mk('展开其余 ' + (total - shown.length) + ' 篇 ↓');
+      } else if (isOpen && total > PREVIEW_N) {
+        arts += mk('收起 ↑');
+      }
+      if (total > items.length) {
+        arts += '<div class="none-tip">另有 ' + (total - items.length) + ' 篇超出单卡展示上限</div>';
+      }
+    } else {
+      arts = '<div class="none-tip">近 ' + days + ' 天未获取到该刊文章，'
+        + '可点击期刊名前往官网查看最新目录</div>';
+    }
+    return '<div class="card' + (h.hasNew ? ' has-new' : '') + '">'
+      + '<div class="c-top"><div>' + h.nameHtml
+      + (h.sub.length ? '<div class="c-sub">' + esc(h.sub.join(' · ')) + '</div>' : '')
+      + '</div>' + badge + '</div>'
+      + (h.chips.length ? '<div class="chips">' + h.chips.join('') + '</div>' : '')
+      + '<div class="arts">' + arts + '</div>'
+      + '<div class="c-foot">' + h.foot.join('<span class="sep">|</span>') + '</div>'
+      + '</div>';
+  }
+
+  function cardTopic(j) {
+    var h = headCard(j);
+    var tiers = j.topic_tiers || {};
+    var parts = [];
+    ['strong', 'mid', 'low'].forEach(function (k) {
+      if (tiers[k]) parts.push(TIER_LABEL[k] + ' ' + tiers[k]);
+    });
+    var badge = j.topic_total
+      ? '<span class="c-badge topic">' + j.topic_total + ' 篇命中</span>'
+      : '<span class="c-badge topic none">无命中</span>';
+    var arts;
+    if (j.topic_articles && j.topic_articles.length) {
+      arts = j.topic_articles.map(topicRow).join('');
+      if (j.topic_total > j.topic_articles.length) {
+        arts += '<div class="none-tip">另有 ' + (j.topic_total - j.topic_articles.length) + ' 篇未展开</div>';
+      }
+    } else {
+      arts = '<div class="none-tip">近 2 个月该刊无与 filter 主题相关的命中文献</div>';
+    }
+    var sub2 = h.sub.length ? esc(h.sub.join(' · ')) + (parts.length ? ' · ' : '') : '';
+    return '<div class="card' + (j.topic_total ? ' has-new' : '') + '">'
+      + '<div class="c-top"><div>' + h.nameHtml
+      + '<div class="c-sub">' + sub2 + (parts.length ? esc(parts.join(' / ')) : '') + '</div>'
+      + '</div>' + badge + '</div>'
+      + (h.chips.length ? '<div class="chips">' + h.chips.join('') + '</div>' : '')
+      + '<div class="arts">' + arts + '</div>'
+      + '<div class="c-foot">' + h.foot.join('<span class="sep">|</span>') + '</div>'
+      + '</div>';
+  }
+
+  function render() {
+    var html = '', shown = 0;
+    DATA.groups.forEach(function (g) {
+      if (REGION !== 'all' && g.region !== REGION) return;
+      var js = g.journals;
+      if (VIEW === 'topic') {
+        js = js.filter(function (j) { return j.topic_total > 0; });
+      }
+      if (!js.length) return;
+      shown += js.length;
+      var label = VIEW === 'topic'
+        ? esc(g.region) + '期刊 · 有主题命中'
+        : esc(g.region) + '期刊';
+      html += '<div class="grp-t"><span>' + label + '</span><span>' + js.length + ' 种</span></div>';
+      html += '<div class="grid">'
+        + js.map(VIEW === 'topic' ? cardTopic : cardLatest).join('') + '</div>';
+    });
+    if (!html) {
+      html = '<div class="loading">' + (VIEW === 'topic'
+        ? '暂无主题归档数据（先运行 journal_backfill.py 生成 journal_topic_archive.json）'
+        : '该分类下没有期刊') + '</div>';
+    }
+    body.innerHTML = html;
+    return shown;
+  }
+
+  function updateSummary() {
+    var t = DATA.topic || {};
+    var w = DATA.window || {};
+    if (VIEW === 'latest') {
+      sum.innerHTML = '共 <b>' + DATA.total_journals + '</b> 种 · 近 <b>'
+        + (w.days || 60) + '</b> 天有获取 <b>' + DATA.updated_journals
+        + '</b> 种 · 链接 <b>' + DATA.total_articles + '</b> 条';
+      vnote.innerHTML = '获取窗口 ' + esc(w.from || '—') + ' ~ ' + esc(w.to || '—')
+        + '（本地时间）'
+        + '<br>' + (w.ledger_available
+          ? '获取台账已建立 · ' + esc(w.ledger_updated_at || '—')
+          : '获取台账缺失，暂按文件写入时间兜底');
+      legend.innerHTML = '';
+    } else {
+      sum.innerHTML = '归档命中 <b>' + t.total + '</b> 篇 · 覆盖 <b>'
+        + t.journals_with_hits + '</b> 种期刊 · 阈值 score ≥ <b>' + (t.min_score == null ? 8 : t.min_score) + '</b>';
+      vnote.innerHTML = t.available
+        ? ('时间窗 ' + esc(t.window_from) + ' ~ ' + esc(t.window_to)
+           + '<br>生成于 ' + esc(t.generated_at || '—'))
+        : '暂无归档，请先运行 journal_backfill.py';
+      var lgd = '<div class="legend" style="margin-bottom:18px">'
+        + '<span>相关度分档</span>'
+        + '<span class="t-badge t-strong">强相关 ≥19</span>'
+        + '<span class="t-badge t-mid">相关 12–18</span>'
+        + '<span class="t-badge t-low">一般 8–11</span>'
+        + '<span>· 括号内数字为相关度得分，日期标 ≈ 者由卷期推算</span>'
+        + '</div>';
+      legend.innerHTML = lgd;
+    }
+    syncAllBtn();
+  }
+
+  function draw() { render(); updateSummary(); }
+
+  fetch('/api/journals/list', { cache: 'no-store' })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      DATA = d;
+      st.textContent = d.total_journals + ' 种期刊';
+      draw();
+    })
+    .catch(function () {
+      body.innerHTML = '<div class="loading">读取期刊数据失败</div>';
+      st.textContent = '读取失败';
+    });
+
+  bar.addEventListener('click', function (e) {
+    var t = e.target.closest('.tab');
+    if (!t || !DATA) return;
+    Array.prototype.forEach.call(bar.querySelectorAll('.tab'), function (x) { x.classList.remove('on'); });
+    t.classList.add('on');
+    REGION = t.getAttribute('data-region');
+    display();
+  });
+
+  // 「全部展开 / 收起全部」——把当前视图里所有被折叠的卡片一次铺开。
+  // 只在「近 60 天」视图出现：该视图的条目全部随载荷下发，能真铺开；
+  // 「主题归档」的单卡上限由服务端裁剪，铺开也拿不到更多，故不给按钮。
+  function syncAllBtn() {
+    if (!allbtn) return;
+    var n = 0;
+    if (DATA && VIEW === 'latest') {
+      DATA.groups.forEach(function (g) {
+        if (REGION !== 'all' && g.region !== REGION) return;
+        (g.journals || []).forEach(function (j) {
+          if ((j.article_total || 0) > PREVIEW_N) n++;
+        });
+      });
+    }
+    allbtn.hidden = !n;
+    allbtn.textContent = ALL_OPEN ? '收起全部 ↑' : '全部展开 ↓';
+    allbtn.title = n
+      ? (ALL_OPEN ? '收起 ' + n + ' 张卡片中已铺开的条目' : '把 ' + n + ' 张卡片中折叠的条目全部展开')
+      : '';
+  }
+
+  allbtn.addEventListener('click', function () {
+    if (!DATA) return;
+    ALL_OPEN = !ALL_OPEN;
+    EXPANDED = {};
+    if (ALL_OPEN) {
+      DATA.groups.forEach(function (g) {
+        if (REGION !== 'all' && g.region !== REGION) return;
+        (g.journals || []).forEach(function (j) {
+          if ((j.article_total || 0) > PREVIEW_N) EXPANDED[j.id] = 1;
+        });
+      });
+    }
+    syncAllBtn();
+    render();
+  });
+
+  // 卡片内「展开其余 N 篇 / 收起」——用事件委托，因为卡片整体会被重渲染
+  body.addEventListener('click', function (e) {
+    var a = (e.target && e.target.closest) ? e.target.closest('.more') : null;
+    if (!a) return;
+    var id = a.getAttribute('data-more');
+    if (!id) return;
+    if (EXPANDED[id]) { delete EXPANDED[id]; } else { EXPANDED[id] = 1; }
+    ALL_OPEN = false;   // 逐卡操作后总开关状态不再成立
+    syncAllBtn();
+    render();   // 只重绘卡片列表，不动汇总行、不滚动页面
+  });
+
+  document.querySelector('.vbar').addEventListener('click', function (e) {
+    var t = e.target.closest('.vtab');
+    if (!t || !DATA) return;
+    Array.prototype.forEach.call(document.querySelectorAll('.vtab'), function (x) { x.classList.remove('on'); });
+    t.classList.add('on');
+    VIEW = t.getAttribute('data-view');
+    display();
+  });
+
+  function display() {
+    body.innerHTML = '<div class="loading">加载中…</div>';
+    draw();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+})();
+</script>
+
+</body>
+</html>
