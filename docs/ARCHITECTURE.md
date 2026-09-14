@@ -531,7 +531,7 @@ kust.work 根路径已改为**门户工作台**，翻译页退到 `/translate`�
 ```
 GET /            门户页        portal/routes.py     ← 9 个入口，3 个分组，5 个可用
 GET /translate   翻译页        web_app.py index     ← 原 / 的内容，一字未改
-GET /today       今日早报      modules/news/        ← 302 跳当日飞书文档
+GET /today       今日早报      modules/news/        ← 302 跳 /daily 详情页（左新闻 · 右海报）
 GET /daily       早报详情      modules/news/        ← news.json + 最新海报
 GET /journals    期刊列表      modules/journals/    ← 近 60 天「获取窗口」（5 源 + 获取台账）
 GET /palette     科研配色      modules/palette/     ← palettes.json 21 组 199 色

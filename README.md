@@ -5,6 +5,10 @@
 
 > 本仓库只做**版本管理**。运行时工作区是 `D:\PostNews\Translate`（Flask 必须从那里启动，
 > 导入路径才对得齐），两边靠 `tools/sync_from_workspace.py` 同步，避免手工拷贝漂移。
+>
+> ⚠️ **本仓库是公开的**。同步脚本在写入前会自动脱敏：内网主机名、共享名、私网 IP、
+> 内网账号一律替换成 `<nas-host>` / `<lan-ip>` / `<nas-user>` 占位符。
+> 因此 clone 下来**必须自己配**环境变量（见 §5.3），代码本身不含任何真实凭据。
 
 ---
 
@@ -14,11 +18,12 @@
 |---|---|---|
 | `/` | 门户工作台：功能卡片墙 + 今日早报动态绑定 | `portal` |
 | `/translate` | 文献翻译：上传英文地学 PDF → 中文对照译文 | `web_app.py` + `index.html` |
-| `/journals` | 期刊列表：14 种目标期刊，双视图 | `modules/journals` |
+| `/journals` | 期刊列表：双视图；页顶「今日更新」板块 = 当天获取到的文章跨刊汇总 | `modules/journals` |
 | `/archive` | 译文归档：近 48 小时译文，按论文分组 | `modules/archive` |
 | `/today` | 今日早报：302 跳转到当日飞书文档 | `modules/news` |
 | `/daily` | 早报详情页（海报 + 条目） | `modules/news` |
 | `/palette` | 科研配色：37 套权威色板 | `modules/palette` |
+| `/translate/queue` | 翻译队列：文献翻译 + 标题翻译双队列 | `modules/queue` |
 | `/theme.js` | 主题引擎（同步加载，必须早于渲染） | `portal/assets` |
 
 配套接口：
@@ -40,6 +45,8 @@
 kust_work/
 ├── web_app.py                 Flask 入口：路由、PID 单实例锁、缓存头、翻译任务队列
 ├── index.html                 翻译页（上传 + 进度 + 双语预览）
+├── bilingual.py               ★ 双语对照版：lr / tb / alt 三形态拼接，原子写出
+├── nas_archive.py             ★ NAS 文献仓库：三版本归档、JSON 索引、检索回捞、本地回收
 ├── portal/                    门户框架
 │   ├── registry.py            功能模块注册表（加卡片只改这里）
 │   ├── routes.py              / 与 /theme.js、/api/portal/health
@@ -48,13 +55,23 @@ kust_work/
 │   ├── assets/theme.js        ★ 主题引擎（日出日落本地计算）
 │   └── templates/portal.html  门户页
 ├── modules/                   业务模块（各自 Blueprint，独立注册互不拖累）
-│   ├── journals/              期刊列表
+│   ├── journals/              期刊列表（近 60 天 / 主题归档 + 页顶「今日更新」）
 │   ├── archive/               译文归档
 │   ├── news/                  今日早报
-│   └── palette/               科研配色（含 palettes.json 数据）
-├── docs/                      架构与门户文档
+│   ├── palette/               科研配色（含 palettes.json 数据）
+│   └── queue/                 翻译队列（文献 + 标题）
+├── docs/                      文档
+│   ├── ARCHITECTURE.md        翻译系统架构（硬件/依赖/迁移）
+│   ├── PORTAL.md              门户交付说明
+│   ├── PORTAL_DESIGN.md       门户化改造设计
+│   └── CODE_REFERENCE.md      ★★ 本地架构代码工作参考（全量 API + 数据流 + 铁律）
+├── requirements-lock.txt      依赖锁定 + 不可升级红线
 ├── tests/                     自建 DOM 垫片测试（不装 jsdom）
-└── tools/                     离线快照生成、同步脚本
+└── tools/
+    ├── nas_reaper.py          本地回收：超 48h 的三版本搬到 NAS 后删本地
+    ├── schedule/              ★ 本地定时任务（Windows 任务计划程序）
+    ├── make_theme_previews.py 离线主题预览页生成
+    └── sync_from_workspace.py 工作区 → 本仓库的单向同步（含发布脱敏）
 ```
 
 ---
@@ -151,6 +168,52 @@ kust_work/
 ★ **扩充色卡的铁律**：跑 `_build_palettes.py`，色值一律从权威源抓取并存档到
 `_palette_src/`，**绝不凭记忆手写 hex**；抓不到的色板跳过并告警，不拿近似色凑数。
 
+### 3.7 `modules/journals/` 的「今日更新」板块
+
+页顶单独一块，展示**当天（本地日期）本机获取到**的文章链接，跨刊汇总、按获取时间倒序。
+
+- **口径与下方完全一致**：都由服务端按「本地获取时间」切好（台账 `first_seen` 优先），
+  前端只按区域 / 搜索过滤，**不自己算日期**，避免时区与口径分歧
+- 条目渲染复用下方同一套 `.art` 样式，只多挂一个来源刊名，所以天生一致
+- 只在「近 60 天」视图出现：主题归档是发表日期口径的另一套数据，混进来会误导
+- 无获取时间的条目（undated）**不计入**今日 —— 无法证明是今天到的
+- DOM 测试里有专门的断言段，含「不蹭用 `.card` 类名」这条守卫
+  （`class="card` 会被卡片计数断言统计，蹭类名会误伤）
+
+### 3.8 `modules/queue/` —— 翻译队列
+
+文献翻译 + 标题翻译双队列，各自有自己的进度与取消。
+
+### 3.9 `bilingual.py` + `nas_archive.py` —— 产物三版本与 NAS 文献仓库
+
+翻译产出**三个版本**：原文 `uploads/`、中文版 `translated/`、双语对照 `duo/`（`bilingual.py`
+负责左右 / 上下 / 逐页交替三种拼接，原子写出，用户不会下载到半截文件）。
+
+`nas_archive.py` 把它们归档到 NAS，并在 `data/nas_index.json` 记索引：
+
+| 能力 | 说明 |
+|---|---|
+| `archive_versions()` | 三版本落 NAS 三目录 + 写索引 |
+| `lookup()` / `restore()` | 命中索引后从 NAS 回捞到本地（翻译队列 / 归档**依旧只读本地**） |
+| `reap()` | 本地超过 48h 的三版本搬到 NAS 后删除本地副本 |
+
+★ **删除前逐个校验**：NAS 副本存在、且大小与本地完全一致才删；校验不过的留在本地并记进日志。
+NAS 不可达时直接跳过，**一个文件都不删**。
+
+### 3.10 `tools/schedule/` —— 本地定时回收
+
+「本地 PDF 超 48h 就搬走」交给 **Windows 任务计划程序**，不依赖任何外部调度服务。
+任务名 `PostNews-NASReaper`，每日 09:00 / 21:00；`install_task.bat` 一键安装。
+
+改这块前**必须读**这两个坑（都实测踩过）：
+
+1. **内层路径只能用单引号**：任务参数二次解析，双引号会被 `powershell.exe` 拆开，
+   带空格的 Python 路径直接失效 → `LastResult=1` 且**完全没有日志**（典型假成功）。
+2. **必须注入 `PYTHONIOENCODING=utf-8`**：定时任务控制台是 cp936，打印中文/emoji
+   会让 Python 当场崩，而手动跑完全正常。
+
+判定真跑通：`status_task.bat` 里 **LastResult 必须为 0**，且 `logs/nas_reaper.log` 有新记录。
+
 ---
 
 ## 4. 数据契约（只读）
@@ -194,6 +257,18 @@ cd D:\PostNews\Translate
 >
 > 判据：`curl /api/journals/list | grep -c '"window"'` → `0` 说明跑的还是旧代码。
 
+### 5.3 环境变量
+
+| 变量 | 用途 | 缺省 |
+|---|---|---|
+| `NAS_PDF_ROOT` | NAS 文献仓库根目录（UNC 或盘符均可） | 依次探测 `S:/Translator_PDFs` → UNC |
+| `NAS_TTL_HOURS` | 本地 PDF 保留时长，超过后回收到 NAS | `48` |
+| `POSTNEWS_PYTHON` | 定时任务用的 `python.exe` 绝对路径 | 自动探测（优先 `D:\Python 3.12.4`） |
+| `NO_PROXY` | **必须含** `127.0.0.1,localhost`，否则本机回环请求会走代理 → 翻译 404 | 建议显式设置 |
+
+> 代码里的 `<nas-host>` / `<lan-ip>` / `<nas-user>` 都是同步时自动替换的占位符，
+> clone 后**必须自己配** `NAS_PDF_ROOT` 才能用 NAS 相关功能。
+
 ---
 
 ## 6. 测试
@@ -224,7 +299,7 @@ python tools/sync_from_workspace.py --check  # 只比对差异，不写盘
 
 | 仓库 | 职责 |
 |---|---|
-| **kust_work**（本仓库） | Web 站源码：门户框架 + 5 个业务模块 + 测试 + 文档 |
+| **kust_work**（本仓库） | Web 站源码：门户框架 + 5 个业务模块 + 双语版 / NAS 归档 + 定时回收 + 测试 + 文档 |
 | `Geo-Mine-Translator` | PDF 翻译引擎：llama.cpp 接入、BabelDOC、术语表 |
 | `D:\PostNews`（非 git） | 期刊抓取管线 + 数据文件（台账、归档、早报状态） |
 

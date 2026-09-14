@@ -123,6 +123,7 @@
       <h1 id="hTitle">今日早报</h1>
       <p id="hMeta">正在读取推送记录…</p>
     </div>
+    <a class="btn" id="btnArchive" href="/daily/archive">早报归档</a>
     <a class="btn off" id="btnDoc" href="#" target="_blank" rel="noopener">飞书文档</a>
   </div>
 
@@ -164,75 +165,96 @@
     return /^https?:\/\//i.test(u || '') ? u : '';
   }
 
-  // ① 状态与海报
-  fetch('/api/news/latest', { cache: 'no-store' })
-    .then(function (r) { return r.json(); })
-    .then(function (d) {
-      if (d.has_url) {
-        btnDoc.href = d.url;
-        btnDoc.className = 'btn';
-        btnDoc.textContent = '打开飞书早报';
-      } else {
-        btnDoc.className = 'btn off';
-        btnDoc.textContent = '链接未记录';
-        btnDoc.onclick = function (e) { e.preventDefault(); };
-      }
+  // 历史早报：?date=YYYY-MM-DD 时加载该日快照，否则加载最新
+  var params = new URLSearchParams(location.search || '');
+  var DATE = params.get('date');
 
-      var parts = [];
-      if (d.date) {
-        parts.push(d.date + (d.is_today ? '（今日）' : (d.age_days != null ? '（' + d.age_days + ' 天前）' : '')));
-      }
-      if (d.news_total) parts.push('共 ' + d.news_total + ' 条新闻');
-      if (d.feishu_sent) {
-        parts.push('飞书推送：' + ({ success: '成功', failed: '失败', skipped: '已跳过' }[d.feishu_sent] || d.feishu_sent));
-      }
-      hMeta.textContent = parts.length ? parts.join(' · ') : '暂无推送记录';
-      if (d.date) hTitle.textContent = '今日早报 · ' + d.date;
+  function renderStatus(d) {
+    if (d.has_url) {
+      btnDoc.href = d.url;
+      btnDoc.className = 'btn';
+      btnDoc.textContent = '打开飞书早报';
+    } else {
+      btnDoc.className = 'btn off';
+      btnDoc.textContent = '链接未记录';
+      btnDoc.onclick = function (e) { e.preventDefault(); };
+    }
+    var parts = [];
+    if (d.date) {
+      parts.push(d.date + (d.is_today ? '（今日）' : (d.age_days != null ? '（' + d.age_days + ' 天前）' : '')));
+    }
+    if (d.news_total) parts.push('共 ' + d.news_total + ' 条新闻');
+    if (d.feishu_sent) {
+      parts.push('飞书推送：' + ({ success: '成功', failed: '失败', skipped: '已跳过' }[d.feishu_sent] || d.feishu_sent));
+    }
+    hMeta.textContent = parts.length ? parts.join(' · ') : '暂无推送记录';
+    hTitle.textContent = '今日早报' + (DATE ? ' · ' + d.date + '（历史）' : (d.date ? ' · ' + d.date : ''));
+    dotSt.className = 'dot ' + (d.is_today ? 'ok' : 'warn');
+    txtSt.textContent = d.is_today ? '今日已推送' : (DATE ? '历史早报' : '非今日记录');
+    if (d.poster_url) {
+      poster.innerHTML = '<img alt="日报海报" src="' + esc(d.poster_url) + '?t=' + Date.now() + '">';
+    } else {
+      poster.innerHTML = '<div class="empty">' + (DATE ? '未找到该日海报' : '未找到日报海报')
+        + '<br>文件命名需为 daily_poster_YYYYMMDD.png</div>';
+    }
+  }
 
-      dotSt.className = 'dot ' + (d.is_today ? 'ok' : 'warn');
-      txtSt.textContent = d.is_today ? '今日已推送' : '非今日记录';
+  function renderList(items) {
+    cnt.textContent = items.length ? items.length + ' 条' : '—';
+    if (!items.length) {
+      list.innerHTML = '<div class="empty">' + (DATE ? '该日新闻未存档（仅海报）' : 'news.json 里暂无新闻条目') + '</div>';
+      return;
+    }
+    list.innerHTML = items.map(function (it) {
+      var u = safeUrl(it.url);
+      var title = u
+        ? '<a class="it-t" href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(it.title) + '</a>'
+        : '<div class="it-t">' + esc(it.title) + '</div>';
+      var meta = [it.source, it.pub_date].filter(Boolean).map(esc).join(' · ');
+      return '<div class="item">'
+        + '<span class="num">' + esc(it.num) + '</span>'
+        + '<div class="it-b">' + title
+        + (it.summary ? '<div class="it-s">' + esc(it.summary) + '</div>' : '')
+        + '<div class="it-m">'
+        + (it.cat ? '<span class="cat">' + esc(it.cat) + '</span>' : '')
+        + '<span>' + meta + '</span></div>'
+        + '</div></div>';
+    }).join('');
+  }
 
-      if (d.poster_url) {
-        poster.innerHTML = '<img alt="日报海报" src="' + d.poster_url + '?t=' + Date.now() + '">';
-      } else {
-        poster.innerHTML = '<div class="empty">未找到日报海报<br>文件命名需为 daily_poster_YYYYMMDD.png</div>';
-      }
-    })
-    .catch(function () {
-      dotSt.className = 'dot down';
-      txtSt.textContent = '读取失败';
-      hMeta.textContent = '无法读取推送状态';
-    });
-
-  // ② 新闻列表
-  fetch('/api/news/list', { cache: 'no-store' })
-    .then(function (r) { return r.json(); })
-    .then(function (d) {
-      var items = d.items || [];
-      cnt.textContent = items.length ? items.length + ' 条' : '—';
-      if (!items.length) {
-        list.innerHTML = '<div class="empty">news.json 里暂无新闻条目</div>';
-        return;
-      }
-      list.innerHTML = items.map(function (it) {
-        var u = safeUrl(it.url);
-        var title = u
-          ? '<a class="it-t" href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(it.title) + '</a>'
-          : '<div class="it-t">' + esc(it.title) + '</div>';
-        var meta = [it.source, it.pub_date].filter(Boolean).map(esc).join(' · ');
-        return '<div class="item">'
-          + '<span class="num">' + esc(it.num) + '</span>'
-          + '<div class="it-b">' + title
-          + (it.summary ? '<div class="it-s">' + esc(it.summary) + '</div>' : '')
-          + '<div class="it-m">'
-          + (it.cat ? '<span class="cat">' + esc(it.cat) + '</span>' : '')
-          + '<span>' + meta + '</span></div>'
-          + '</div></div>';
-      }).join('');
-    })
-    .catch(function () {
-      list.innerHTML = '<div class="empty">读取新闻失败</div>';
-    });
+  if (DATE) {
+    fetch('/api/daily/snapshot?date=' + encodeURIComponent(DATE), { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d.ok) {
+          hMeta.textContent = '未找到 ' + DATE + ' 的早报';
+          poster.innerHTML = '<div class="empty">未找到该日早报</div>';
+          dotSt.className = 'dot down'; txtSt.textContent = '无记录';
+          return;
+        }
+        renderStatus(d);
+        renderList(d.items || []);
+      })
+      .catch(function () {
+        hMeta.textContent = '读取失败';
+        poster.innerHTML = '<div class="empty">读取历史早报失败</div>';
+      });
+  } else {
+    // ① 状态与海报
+    fetch('/api/news/latest', { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(renderStatus)
+      .catch(function () {
+        dotSt.className = 'dot down';
+        txtSt.textContent = '读取失败';
+        hMeta.textContent = '无法读取推送状态';
+      });
+    // ② 新闻列表
+    fetch('/api/news/list', { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) { renderList(d.items || []); })
+      .catch(function () { list.innerHTML = '<div class="empty">读取新闻失败</div>'; });
+  }
 })();
 </script>
 

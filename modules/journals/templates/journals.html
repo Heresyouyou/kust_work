@@ -70,6 +70,16 @@
   .sum { margin-left: auto; font-size: 11.5px; color: var(--muted); }
   .sum b { color: var(--text); font-weight: 600; }
 
+  /* 全站搜索框（跨卡片实时过滤标题 + 中文小字） */
+  .search { font-size: 12px; padding: 6px 11px; border-radius: 4px; border: 1px solid var(--border);
+    background: var(--surface-2); color: var(--text); min-width: 210px; transition: .16s; }
+  .search:focus { outline: none; border-color: var(--accent-dim); }
+  .search::placeholder { color: var(--placeholder); }
+  .clr { font-size: 11px; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border);
+    background: transparent; color: var(--muted); cursor: pointer; transition: .16s; }
+  .clr:hover { color: var(--text); border-color: var(--border-hover); }
+  .clr[hidden] { display: none; }
+
   .grp-t { font-size: 11px; color: var(--muted); letter-spacing: 1.2px;
     margin: 26px 0 13px; padding-bottom: 9px; border-bottom: 1px solid var(--border);
     display: flex; justify-content: space-between; }
@@ -80,6 +90,22 @@
     transition: border-color .18s, box-shadow .18s; }
   .card:hover { border-color: var(--border-hover); }
   .card.has-new { border-color: var(--accent-line); }
+
+  /* ── 今日更新（页顶板块）──
+     刻意不叫 .card：DOM 测试里用 `class="card` 统计卡片数，蹭类名会误计数。
+     内部条目完全复用 .art / .tzh / .ob / .vi，所以视觉与下方卡片天然一致，
+     唯一多出来的是来源刊名 .tj。 */
+  .today { background: var(--surface); border: 1px solid var(--accent-line);
+    border-radius: var(--radius); padding: 16px; margin-bottom: 18px; }
+  .today[hidden] { display: none; }
+  .today-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 9px; }
+  .today-title { font-size: 14.5px; font-weight: 600; letter-spacing: -0.2px; line-height: 1.4; }
+  .today-tip { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+  /* 当天条目可能较多，按两列铺开；每列宽度与下方 .grid 一致 */
+  .today .arts { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+    gap: 0 20px; }
+  .art .tj { color: var(--muted); font-size: 10.5px; flex-shrink: 0; padding-top: 2px;
+    max-width: 38%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
   .c-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 9px; }
   .c-name { font-size: 14.5px; font-weight: 600; line-height: 1.4; letter-spacing: -0.2px; }
@@ -199,9 +225,12 @@
     <button class="tab on" data-region="all">全部</button>
     <button class="tab" data-region="国际">国际期刊</button>
     <button class="tab" data-region="国内">国内期刊</button>
+    <input class="search" id="search" type="search" placeholder="搜索标题 / 中文翻译…" autocomplete="off">
+    <button class="clr" id="clr" hidden>清除</button>
     <span class="sum" id="sum">—</span>
   </div>
 
+  <div id="today" hidden></div>
   <div id="legend"></div>
   <div id="body"><div class="loading">正在读取期刊数据…</div></div>
 </main>
@@ -214,7 +243,7 @@
 
 <script>
 (function () {
-  var DATA = null, REGION = 'all', VIEW = 'latest';
+  var DATA = null, REGION = 'all', VIEW = 'latest', Q = '', MATCHED = 0;
   // 单卡默认折叠条数；点「展开其余 N 篇」后按 data-id 记住展开状态
   var PREVIEW_N = 6;
   var EXPANDED = {};
@@ -226,6 +255,7 @@
   var bar = document.getElementById('bar');
   var vnote = document.getElementById('vnote');
   var legend = document.getElementById('legend');
+  var todayEl = document.getElementById('today');
 
   var TIER_LABEL = { strong: '强相关', mid: '相关', low: '一般' };
 
@@ -236,8 +266,44 @@
   }
   function safeUrl(u) { return /^https?:\/\//i.test(u || '') ? u : ''; }
 
+  // 全站搜索：按查询过滤某卡片的文章列表（标题 + 中文小字 + 主题命中词）。
+  // 返回卡片的「过滤副本」，并打 _force 标记让卡片铺开全部匹配项（不再折叠预览）。
+  function applyQuery(j) {
+    var q = Q.trim().toLowerCase();
+    if (!q) return j;
+    var c = {
+      id: j.id, name: j.name, name_cn: j.name_cn, name_en: j.name_en, short_name: j.short_name,
+      website: j.website, site_host: j.site_host, publisher: j.publisher,
+      doc_url: j.doc_url, category: j.category, level: j.level, frequency: j.frequency,
+      sub: j.sub, article_total: j.article_total, topic_total: j.topic_total, topic_tiers: j.topic_tiers,
+      _force: true
+    };
+    if (VIEW === 'latest') {
+      var arts = (j.articles || []).filter(function (a) {
+        return (a.title || '').toLowerCase().indexOf(q) >= 0
+          || (a.title_zh || '').toLowerCase().indexOf(q) >= 0;
+      });
+      c.articles = arts;
+      c.article_total = arts.length;
+      c.article_newest = j.article_newest;
+      c.article_undated = j.article_undated;
+    } else {
+      var ta = (j.topic_articles || []).filter(function (a) {
+        return (a.title || '').toLowerCase().indexOf(q) >= 0
+          || (a.title_zh || '').toLowerCase().indexOf(q) >= 0
+          || (a.keywords || []).join(' ').toLowerCase().indexOf(q) >= 0
+          || (a.date_label || '').toLowerCase().indexOf(q) >= 0;
+      });
+      c.topic_articles = ta;
+      c.topic_total = ta.length;
+    }
+    return c;
+  }
+
   // 近 60 天条目：标题 + 本地获取日期（MM-DD）+ 卷期
-  function artRow(a) {
+  // jname 可空：传了就在日期前挂一个来源刊名（只「今日更新」板块用它，
+  // 下方卡片本来就是按刊分组的，不需要重复显示）。除此之外与下方完全一致。
+  function artRow(a, jname) {
     var u = safeUrl(a.url);
     var t = u
       ? '<a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(a.title) + '</a>'
@@ -249,7 +315,9 @@
       : '';
     // 英文条目下方挂中文小字（离线预翻译，没有就不显示，绝不占位）
     var zh = a.title_zh ? '<div class="tzh">' + esc(a.title_zh) + '</div>' : '';
-    return '<div class="art"><span class="mk">▸</span><div class="t">' + t + zh + '</div>' + ob + vi + '</div>';
+    var tj = jname ? '<span class="tj" title="' + esc(jname) + '">' + esc(jname) + '</span>' : '';
+    return '<div class="art"><span class="mk">▸</span><div class="t">' + t + zh + '</div>'
+      + tj + ob + vi + '</div>';
   }
 
   // 主题归档条目：分数 + 分档徽章 + 日期 + 卷期页码 + 命中关键词
@@ -308,14 +376,22 @@
     var h = headCard(j);
     var total = j.article_total || 0;
     var items = j.articles || [];
-    var isOpen = !!EXPANDED[j.id];
+    var isOpen = !!EXPANDED[j.id] || !!j._force;   // 搜索时铺开全部匹配项
     var shown = isOpen ? items : items.slice(0, PREVIEW_N);
     var win = DATA.window || {};
     var days = win.days || 60;
+    var searching = !!Q.trim();
 
-    var badge = total
-      ? '<span class="c-badge">' + days + ' 天内 ' + total + ' 篇</span>'
-      : '<span class="c-badge none">' + days + ' 天内无</span>';
+    var badge;
+    if (searching) {
+      badge = total
+        ? '<span class="c-badge">' + total + ' 篇匹配</span>'
+        : '<span class="c-badge none">无匹配</span>';
+    } else {
+      badge = total
+        ? '<span class="c-badge">' + days + ' 天内 ' + total + ' 篇</span>'
+        : '<span class="c-badge none">' + days + ' 天内无</span>';
+    }
 
     var arts;
     if (shown.length) {
@@ -376,16 +452,68 @@
       + '</div>';
   }
 
+  // 「今日更新」板块（页顶）：把当天获取到的文章跨刊汇总。
+  // 判据与下方完全同源 —— 都是「本地获取时间」，由服务端按当天日期切好，
+  // 前端只负责按区域/搜索过滤后渲染，不自己算日期（避免时区与口径分歧）。
+  // 只在「近 60 天」视图出现：主题归档是另一套数据（发表日期口径），混进来会误导。
+  function renderToday() {
+    if (!todayEl) return;
+    var t = DATA && DATA.today;
+    if (VIEW !== 'latest' || !t || !t.total) {
+      todayEl.hidden = true; todayEl.innerHTML = ''; return;
+    }
+    var q = Q.trim().toLowerCase();
+    var items = (t.items || []).filter(function (a) {
+      if (REGION !== 'all' && a.region !== REGION) return false;
+      if (!q) return true;
+      return ((a.title || '') + ' ' + (a.title_zh || '')).toLowerCase().indexOf(q) >= 0;
+    });
+    if (!items.length) { todayEl.hidden = true; todayEl.innerHTML = ''; return; }
+
+    var seen = {}, jn = 0;
+    items.forEach(function (a) {
+      if (a.journal && !seen[a.journal]) { seen[a.journal] = 1; jn++; }
+    });
+
+    var head = '<div class="today-head"><div>'
+      + '<div class="today-title">今日更新</div>'
+      + '<div class="today-tip">' + esc(t.date) + ' 本机获取到的文章链接 · 按获取时间倒序'
+      + ' · 与下方「近 60 天」同源同口径</div>'
+      + '</div><span class="c-badge">' + items.length + ' 篇 · ' + jn + ' 种期刊</span></div>';
+
+    var rows = items.map(function (a) { return artRow(a, a.journal); }).join('');
+    if (t.hidden) {
+      rows += '<div class="none-tip">另有 ' + t.hidden + ' 篇超出单日展示上限</div>';
+    }
+    todayEl.innerHTML = '<div class="today">' + head
+      + '<div class="arts">' + rows + '</div></div>';
+    todayEl.hidden = false;
+  }
+
   function render() {
-    var html = '', shown = 0;
+    var q = Q.trim();
+    var html = '', shown = 0, matched = 0;
     DATA.groups.forEach(function (g) {
       if (REGION !== 'all' && g.region !== REGION) return;
       var js = g.journals;
-      if (VIEW === 'topic') {
+      if (VIEW === 'topic' && !q) {
         js = js.filter(function (j) { return j.topic_total > 0; });
+      }
+      // 搜索：先按查询过滤每卡片，再剔除非空卡片
+      if (q) {
+        js = js.map(applyQuery).filter(function (j) {
+          return VIEW === 'topic'
+            ? (j.topic_articles || []).length > 0
+            : (j.articles || []).length > 0;
+        });
       }
       if (!js.length) return;
       shown += js.length;
+      if (q) {
+        matched += (VIEW === 'topic'
+          ? js.reduce(function (s, j) { return s + (j.topic_articles || []).length; }, 0)
+          : js.reduce(function (s, j) { return s + (j.articles || []).length; }, 0));
+      }
       var label = VIEW === 'topic'
         ? esc(g.region) + '期刊 · 有主题命中'
         : esc(g.region) + '期刊';
@@ -394,17 +522,30 @@
         + js.map(VIEW === 'topic' ? cardTopic : cardLatest).join('') + '</div>';
     });
     if (!html) {
-      html = '<div class="loading">' + (VIEW === 'topic'
-        ? '暂无主题归档数据（先运行 journal_backfill.py 生成 journal_topic_archive.json）'
-        : '该分类下没有期刊') + '</div>';
+      if (q) {
+        html = '<div class="loading">没有匹配「' + esc(q) + '」的'
+          + (VIEW === 'topic' ? '主题命中文献' : '文章') + '</div>';
+      } else {
+        html = '<div class="loading">' + (VIEW === 'topic'
+          ? '暂无主题归档数据（先运行 journal_backfill.py 生成 journal_topic_archive.json）'
+          : '该分类下没有期刊') + '</div>';
+      }
     }
     body.innerHTML = html;
+    renderToday();     // 页顶「今日更新」跟着一起重绘（所有调用方都走这里）
+    MATCHED = matched;
     return shown;
   }
 
   function updateSummary() {
     var t = DATA.topic || {};
     var w = DATA.window || {};
+    if (Q.trim()) {
+      sum.innerHTML = '搜索「<b>' + esc(Q.trim()) + '</b>」匹配 <b>' + MATCHED + '</b> 条'
+        + (VIEW === 'topic' ? ' 主题文献' : ' 文章');
+      syncAllBtn();
+      return;
+    }
     if (VIEW === 'latest') {
       sum.innerHTML = '共 <b>' + DATA.total_journals + '</b> 种 · 近 <b>'
         + (w.days || 60) + '</b> 天有获取 <b>' + DATA.updated_journals
@@ -457,11 +598,31 @@
     display();
   });
 
+  // 全站搜索：输入即过滤（标题 + 中文小字 + 主题命中词），不区分视图
+  var searchEl = document.getElementById('search');
+  var clrEl = document.getElementById('clr');
+  function onSearch() {
+    if (!DATA) return;
+    Q = searchEl.value || '';
+    clrEl.hidden = !Q;
+    render();
+    updateSummary();
+  }
+  searchEl.addEventListener('input', onSearch);
+  clrEl.addEventListener('click', function () {
+    searchEl.value = ''; Q = '';
+    clrEl.hidden = true;
+    render();
+    updateSummary();
+    try { searchEl.focus(); } catch (e) {}
+  });
+
   // 「全部展开 / 收起全部」——把当前视图里所有被折叠的卡片一次铺开。
   // 只在「近 60 天」视图出现：该视图的条目全部随载荷下发，能真铺开；
   // 「主题归档」的单卡上限由服务端裁剪，铺开也拿不到更多，故不给按钮。
   function syncAllBtn() {
     if (!allbtn) return;
+    if (Q.trim()) { allbtn.hidden = true; return; }   // 搜索时不显示「全部展开」
     var n = 0;
     if (DATA && VIEW === 'latest') {
       DATA.groups.forEach(function (g) {

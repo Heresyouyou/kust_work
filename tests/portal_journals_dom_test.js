@@ -74,7 +74,7 @@ function boot(payload) {
   const els = {
     body: makeEl('body'), sum: makeEl('sum'), st: makeEl('st'),
     bar: makeEl('bar'), vnote: makeEl('vnote'), legend: makeEl('legend'),
-    allbtn: makeEl('allbtn'),
+    allbtn: makeEl('allbtn'), today: makeEl('today'),
   };
   const regionTabs = [
     { region: 'all', on: true }, { region: '国际' }, { region: '国内' },
@@ -97,7 +97,7 @@ function boot(payload) {
   const vbar = withClassList(makeEl('vbar'));
   vbar.querySelectorAll = () => viewTabs;
   els.bar.querySelectorAll = () => regionTabs;
-  ['body', 'sum', 'st', 'vnote', 'legend', 'allbtn'].forEach(k => withClassList(els[k]));
+  ['body', 'sum', 'st', 'vnote', 'legend', 'allbtn', 'today'].forEach(k => withClassList(els[k]));
 
   const document = {
     getElementById: id => els[id] || makeEl(id),
@@ -169,6 +169,25 @@ const countArt = h => (h.match(/class="art"/g) || []).length;
      `卡片提供「展开其余 ${bigJ.article_total - api.max_per_card} 篇」`);
   ok(!h.includes(esc(bigJ.articles[api.max_per_card].title).slice(0, 30)),
      '被折叠的条目默认不渲染');
+
+  console.log('\n【今日更新 · 页顶板块】');
+  const T = api.today || { total: 0, items: [] };
+  if (T.total) {
+    const th = els.today._html;
+    ok(th.includes('今日更新'), '今日板块已渲染');
+    ok(th.includes(T.date), '板块标注当天日期', T.date);
+    const tCount = (th.match(/class="art"/g) || []).length;
+    ok(tCount === T.items.length, `今日条目数 = ${T.items.length}`, '实际 ' + tCount);
+    ok(th.includes(esc(T.items[0].title).slice(0, 30)), '今日首条标题已渲染');
+    ok(th.includes(esc(T.items[0].journal)), '今日条目带来源刊名', T.items[0].journal);
+    ok(th.includes('class="ob"'), '今日条目同样带获取日期（与下方同口径）');
+    ok(th.includes(T.items.length + ' 篇 · ' + T.journal_count + ' 种期刊'),
+       '徽章显示篇数与期刊数');
+    // 计数守卫：蹭用 .card 类名会让上面「卡片数 = total_journals」那条断言误伤
+    ok(!/class="card/.test(th), '未蹭用 .card 类名（不干扰下方卡片计数）');
+  } else {
+    ok(els.today._html === '', '当天无获取时不渲染今日板块');
+  }
 
   console.log('\n【展开 / 收起 交互】');
   const moreEl = withClassList(makeEl('more-' + bigJ.id));
@@ -248,6 +267,7 @@ const countArt = h => (h.match(/class="art"/g) || []).length;
   ok(els.sum._html.includes('归档命中'), '汇总行切换为归档口径');
   ok(els.vnote._html.includes(api.topic.window_from), '归档时间窗展示');
   ok(els.allbtn.hidden, '主题归档视图隐藏总开关（服务端已裁剪，铺不开）');
+  ok(els.today._html === '', '主题归档视图隐藏今日板块（口径不同，避免误导）');
 
   const t0 = flat(api).find(j => j.topic_total).topic_articles[0];
   ok(h.includes(String(t0.score)), '归档条目显示相关度得分', 'score=' + t0.score);
@@ -287,6 +307,13 @@ const countArt = h => (h.match(/class="art"/g) || []).length;
     ok(h2.includes('另有 ' + over + ' 篇超出单卡展示上限'),
        '超上限卡有提示', '另有 ' + over + ' 篇');
     ok(h2.includes('展开其余 ' + (200 - 6) + ' 篇'), '超上限卡仍先折叠到 6 条');
+
+    // 今日板块的「当天无获取」分支（真实数据当天有货时走不到这里）
+    const synth2 = JSON.parse(JSON.stringify(synth));
+    synth2.today = { date: W.to, total: 0, journal_count: 0, items: [], hidden: 0 };
+    const envT = boot(synth2);
+    await tick(); await tick();
+    ok(envT.els.today._html === '', '今日无获取 → 板块不渲染');
   }
 
   console.log('\n' + '='.repeat(58));

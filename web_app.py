@@ -8,14 +8,36 @@ from pathlib import Path
 from queue import Queue
 from flask import Flask, request, jsonify, send_from_directory, render_template_string, Response
 
+# ── 双语拼接版（翻译完成后自动生成：左原文 / 右译文）──
+try:
+    from bilingual import (find_translated, mono_to_dual_name,
+                           make_bilingual, ensure_dual)
+except Exception as _e:  # 绝不能因为双语模块挂掉翻译服务
+    logger.warning('bilingual 模块不可用，双语版将跳过: %s', _e)
+    find_translated = mono_to_dual_name = make_bilingual = ensure_dual = None
+
 # ── 日志 ──
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 logger = logging.getLogger('geo')
+
+# ── NAS 文献仓库（译文三版本归档 / 本地索引检索 / 48h 回收）──
+# 与双语模块同款防护：NAS 可能没挂载，绝不能因此拖垮翻译主流程。
+try:
+    import nas_archive
+except Exception as _nas_e:
+    logger.warning('nas_archive 模块不可用，NAS 归档将跳过: %s', _nas_e)
+    nas_archive = None
 
 # ── 目录 ──
 BASE = Path(__file__).parent.resolve()
 UPLOAD_DIR = BASE / 'uploads'
 TRANSLATED_DIR = BASE / 'translated'
+
+# ── 双语拼接版模式: lr=左右对照 / tb=上下对照 / alt=逐页交替 ──
+# 改这里即可全局切换，无需动其它代码
+BILINGUAL_MODE = os.environ.get('BILINGUAL_MODE', 'lr').strip().lower()
+if BILINGUAL_MODE not in ('lr', 'tb', 'alt'):
+    BILINGUAL_MODE = 'lr'
 
 # ── 端口 & 进程锁 (防多 Flask 启动冲突) ──
 PORT = 5555
@@ -138,6 +160,15 @@ MAX_JOBS = 12
 QUEUE = Queue(maxsize=64)
 _worker_started = False
 
+# ── 卡死防护（★ 队列卡死的根因就在这里） ──
+# 单任务硬超时：跑这么久还没结束，调度线程就放弃等待、继续消费下一个任务。
+# 没有它，一个卡住的翻译任务会让整个队列永久停摆。
+TRANSLATE_HARD_TIMEOUT = 30 * 60
+# 无进度软超时：这么久没收到进度回调 → 先发取消信号，让 BabelDOC 自己退出（更优雅）。
+# 比硬超时温和：能自己退就自己退，退不了才由硬超时兜底。
+TRANSLATE_STALL_TIMEOUT = 10 * 60
+WATCHDOG_INTERVAL = 30
+
 # ── 引擎单例 ──
 _engine = None
 _engine_lock = threading.Lock()
@@ -188,7 +219,7 @@ def _find_cache(name):
                 return {
                     'exists': True,
                     'mono_url': f'/translated/{f.name}',
-                    'dual_url': None,
+                    'dual_url': _dual_url_for(f),
                     'stem': stem,
                 }
 
@@ -199,9 +230,35 @@ def _find_cache(name):
                 return {
                     'exists': True,
                     'mono_url': f'/translated/{f.name}',
-                    'dual_url': None,
+                    'dual_url': _dual_url_for(f),
                     'stem': stem,
                 }
+
+    # 3. NAS 文献仓库兜底
+    #    本地没有 → 查本地 JSON 索引（不扫网络）→ 命中则把三版本拷回本地。
+    #    ⚠️ 必须拷回本地：队列与归档只读本地，前端 URL 也是 /translated/xxx.pdf，
+    #       拷回后 URL 完全一致，前端与归档逻辑都不用改。
+    if nas_archive is not None:
+        try:
+            item = nas_archive.lookup(name)
+            if item:
+                rr = nas_archive.restore(item, UPLOAD_DIR, TRANSLATED_DIR)
+                if rr.get('ok'):
+                    logger.info('📦 NAS 命中并已取回本地: %s → %s',
+                                name, [x['name'] for x in rr['restored']])
+                    for f in TRANSLATED_DIR.iterdir():
+                        if f.is_file() and stem in f.stem and f.name.endswith('.zh.mono.pdf'):
+                            return {
+                                'exists': True,
+                                'mono_url': f'/translated/{f.name}',
+                                'dual_url': _dual_url_for(f),
+                                'stem': stem,
+                                'from_nas': True,
+                            }
+                else:
+                    logger.warning('NAS 索引命中但取回失败: %s → %s', name, rr)
+        except Exception as e:
+            logger.warning('NAS 缓存查找失败（非致命）: %s', e)
     return None
 
 # ── API: health + 缓存检查 ──
@@ -224,7 +281,12 @@ def api_check():
 
     # GET: llama health check (兼容旧行为)
     try:
-        r = __import__('requests').get('http://127.0.0.1:8090/health', timeout=2)
+        # trust_env=False: 本地回环不走 HTTP_PROXY
+        # (否则代理把请求行改写为绝对 URI -> llama.cpp 路由匹配不上 -> 404)
+        _req = __import__('requests')
+        _sess = _req.Session()
+        _sess.trust_env = False
+        r = _sess.get('http://127.0.0.1:8090/health', timeout=2)
         return jsonify({'ok': True, 'llama': r.json()})
     except Exception as e:
         return jsonify({'ok': False, 'error': str(e)}), 503
@@ -256,11 +318,26 @@ def api_upload():
     cache = _find_cache(fname)
     if cache:
         logger.info('✅ Cache hit: %s → %s', fname, cache['mono_url'])
+        # 历史译文可能没有双语版（本功能上线前产出的）→ 拿本次上传的原文现场补拼
+        # 实测 24 页约 0.4s，同步做不会拖慢响应
+        dual_url = cache.get('dual_url')
+        if not dual_url and ensure_dual is not None:
+            try:
+                _mono = TRANSLATED_DIR / Path(cache['mono_url']).name
+                if _mono.exists():
+                    _dp = ensure_dual(save_path, _mono, mode=BILINGUAL_MODE)
+                    if _dp:
+                        dual_url = f'/translated/{_dp.name}'
+                        # 补出的双语版也回写 NAS，保持仓库三版本完整
+                        _nas_archive_versions(save_path, _mono, _dp,
+                                              display_name=fname, source='cache-hit')
+            except Exception as e:
+                logger.warning('缓存命中补双语版失败（非致命）: %s', e)
         return jsonify({
             'status': 'done',
             'original_url': original_url,
             'mono_url': cache['mono_url'],
-            'dual_url': cache['dual_url'],
+            'dual_url': dual_url,
             'name': fname,
             'cache_hit': True,
         })
@@ -307,99 +384,193 @@ def _ensure_worker():
     global _worker_started
     if _worker_started: return
     _worker_started = True
-    t = threading.Thread(target=_queue_worker, daemon=True)
+    t = threading.Thread(target=_queue_worker, daemon=True, name='queue-worker')
     t.start()
-    logger.info('Queue worker started')
+    w = threading.Thread(target=_stall_watchdog, daemon=True, name='stall-watchdog')
+    w.start()
+    logger.info('Queue worker + stall watchdog started')
+
 
 def _queue_worker():
+    """队列调度线程 —— 串行消费，但**每个任务交给独立工作线程**，超时可放弃。
+
+    ⚠️ 为什么不能直接在本线程里跑翻译：
+    _run_translate() 里的 babel_translate() 是同步阻塞、且无法从外部打断。
+    一旦 BabelDOC / llama-server 挂起（模型无响应、GPU 卡住、大文件卡在某阶段），
+    本线程就永久卡死 → 队列再也不消费 → 后面所有任务永远停在「等待中」。
+    这就是过去「翻译队列卡死」的真正原因。
+
+    改成分离后：本线程 join(timeout) 等工作线程，超时就放弃该任务、继续消费
+    下一个；卡住的那个变成 daemon 孤儿线程（进程退出即结束，且因 status 守卫
+    无法再改写已被接管的任务）。
+    """
     while True:
         try:
             job_id = QUEUE.get(timeout=1)
-        except:
+        except Exception:
             continue
 
-        with jobs_lock:
-            j = jobs.get(job_id)
-            if not j or j.get('status') not in ('queued','translating'):
-                if j: j['status'] = 'cancelled'
-                continue
-            j['status'] = 'translating'
-            j['started_at'] = time.time()
-            j['progress'] = 0
-            j['message'] = '初始化...'
-
         try:
-            _run_translate(job_id)
-        except Exception as e:
-            logger.exception('translate failed')
             with jobs_lock:
                 j = jobs.get(job_id)
-                if j:
-                    j['status'] = 'failed'
-                    j['error'] = str(e)
-                    j['ended_at'] = time.time()
-                    j['elapsed'] = j['ended_at'] - j.get('started_at', j['created_at'])
+                if not j or j.get('status') not in ('queued', 'translating'):
+                    if j: j['status'] = 'cancelled'
+                    continue
+                j['status'] = 'translating'
+                j['started_at'] = time.time()
+                j['last_progress_at'] = time.time()   # 看门狗据此判定「无进度」
+                j['progress'] = 0
+                j['message'] = '初始化...'
+
+            t = threading.Thread(target=_run_job_safely, args=(job_id,),
+                                 daemon=True, name='job-' + job_id[:8])
+            t.start()
+            t.join(TRANSLATE_HARD_TIMEOUT)
+
+            if t.is_alive():
+                logger.error('Job %s 硬超时 %.0f 分钟未完成 → 放弃，队列继续消费',
+                             job_id, TRANSLATE_HARD_TIMEOUT / 60.0)
+                _mark_timeout(job_id, TRANSLATE_HARD_TIMEOUT)
+        except Exception:
+            # 调度线程绝不能死：它一死就再没人消费队列，且 _worker_started 已为 True，
+            # 之后也不会重启 → 队列彻底停摆。这里吞掉异常保证线程存活。
+            logger.exception('queue worker 调度异常（已跳过该任务，线程继续存活）')
+            time.sleep(0.5)
+
+
+def _run_job_safely(job_id):
+    """工作线程入口：异常兜底，且不会覆盖已被超时/取消接管的任务状态。"""
+    try:
+        _run_translate(job_id)
+    except Exception as e:
+        logger.exception('translate failed')
+        with jobs_lock:
+            j = jobs.get(job_id)
+            # 只有仍处于 translating 才写失败：已被超时/取消接管的不要覆盖
+            if j and j.get('status') == 'translating':
+                j['status'] = 'failed'
+                j['error'] = str(e)
+                j['message'] = '失败'
+                j['ended_at'] = time.time()
+                j['elapsed'] = j['ended_at'] - j.get('started_at', j['created_at'])
+
+
+def _mark_timeout(job_id, seconds):
+    """硬超时：标记失败，并尽力让还活着的孤儿线程尽早自行退出。"""
+    with jobs_lock:
+        j = jobs.get(job_id)
+        if not j:
+            return
+        ce = j.get('cancel_event')
+        if j.get('status') == 'translating':
+            # 不足 1 分钟按秒显示，避免「超过 0 分钟」这种近似值
+            dur = ('%.0f 分钟' % (seconds / 60.0)) if seconds >= 60 \
+                else ('%.0f 秒' % seconds)
+            j['status'] = 'failed'
+            j['error'] = ('翻译超过 %s 未完成，已跳过。'
+                          '后端可能已卡死，建议重启翻译服务。' % dur)
+            j['message'] = '超时，已跳过'
+            j['ended_at'] = time.time()
+            j['elapsed'] = j['ended_at'] - j.get('started_at', j['created_at'])
+    if ce:
+        ce.set()
+
+
+def _stall_watchdog():
+    """软超时看门狗：任务长时间无进度 → 发取消信号，让 BabelDOC 自己退出。
+
+    BabelDOC 会在段落翻译间隙检查 cancel_event 并抛 CancelError，工作线程随即
+    正常结束，调度线程 join 立刻返回，队列马上继续 —— 比硬超时优雅得多。
+    若它不响应取消，则由调度线程的硬超时兜底。两层保护缺一不可。
+    """
+    while True:
+        try:
+            time.sleep(WATCHDOG_INTERVAL)
+            now = time.time()
+            with jobs_lock:
+                running = [(k, v) for k, v in jobs.items()
+                           if v.get('status') == 'translating']
+            for jid, j in running:
+                last = j.get('last_progress_at') or j.get('started_at') or now
+                if now - last >= TRANSLATE_STALL_TIMEOUT:
+                    ce = j.get('cancel_event')
+                    if ce and not ce.is_set():
+                        gap = now - last
+                        gap_s = ('%.0f 分钟' % (gap / 60.0)) if gap >= 60 \
+                            else ('%.0f 秒' % gap)
+                        logger.warning('Job %s 已 %s 无进度 → 发送取消信号',
+                                       jid, gap_s)
+                        ce.set()
+                        with jobs_lock:
+                            j['message'] = '长时间无进度，正在尝试中断…'
+        except Exception:
+            logger.exception('看门狗异常（已忽略，继续监控）')
+            time.sleep(WATCHDOG_INTERVAL)
 
 # ── 翻译主入口 ──
 def _translated_path(stem, suffix):
+    """定位产物。
+
+    ⚠️ 绝不能硬拼 `{stem}.zh.{suffix}.pdf`：BabelDOC 在 NoWatermark 模式下
+    产物名是 `{stem}.no_watermark.zh.mono.pdf`，硬拼路径 exists() 恒为 False，
+    会导致 mono_url 拿不到、双语版永不生成（dual 长期为 0 的根因）。
+    一律走 glob 匹配，命中多个取最新。
+    """
+    if find_translated is not None:
+        found = find_translated(TRANSLATED_DIR, stem, suffix)
+        if found:
+            return found
     return TRANSLATED_DIR / f'{stem}.zh.{suffix}.pdf'
 
 def _dual_path(stem):
     return TRANSLATED_DIR / f'{stem}.zh.dual.pdf'
 
-def _make_dual_pdf(orig_pdf: Path, mono_pdf: Path, dual_pdf: Path) -> bool:
-    """PyMuPDF 逐页左右拼接: 左=原文 右=译文 (A4+A4→宽A3)
-    保留所有 link annotations (kind=2 URI + kind=4 内部跳转), 右半坐标偏移 +page_w
-    
-    比 BabelDOC 自己生成 dual 快得多 (省一轮 Typesetting + Save PDF)
+def _dual_url_for(mono_path):
+    """已存在的双语版 → URL；不存在返回 None（由调用方决定是否现拼）。"""
+    if not mono_path or mono_to_dual_name is None:
+        return None
+    dual = Path(mono_path).parent / mono_to_dual_name(Path(mono_path).name)
+    return f'/translated/{dual.name}' if dual.exists() else None
+
+def _make_dual_pdf(orig_pdf: Path, mono_pdf: Path, dual_pdf: Path, mode: str = 'lr') -> bool:
+    """PyMuPDF 拼接双语版 —— 实现已下沉到 bilingual 模块，这里保留旧签名作兼容。
+
+    mode: lr=左右对照(默认) / tb=上下对照 / alt=逐页交替
+    保留所有 link annotations (URI 外链 + 内部跳转)，右半坐标按 mode 平移。
+    比 BabelDOC 自己生成 dual 快得多 (省一轮 Typesetting + Save PDF)：
+    实测 24 页 0.4s。
     """
-    try:
-        import fitz
-        
-        s1 = fitz.open(str(orig_pdf))
-        s2 = fitz.open(str(mono_pdf))
-        n = max(len(s1), len(s2))
-        if n == 0:
-            s1.close(); s2.close()
-            return False
-
-        ref = s1[0] if len(s1) > 0 else s2[0]
-        page_w = ref.rect.width
-        page_h = ref.rect.height
-
-        dst = fitz.open()
-        for i in range(n):
-            pg = dst.new_page(width=page_w*2, height=page_h)
-            
-            # 左半: 原文 (坐标不变)
-            if i < len(s1):
-                pg.show_pdf_page(fitz.Rect(0, 0, page_w, page_h), s1, i)
-                for lk in s1[i].get_links():
-                    pg.insert_link(lk)
-            
-            # 右半: 译文 (坐标 +page_w)
-            if i < len(s2):
-                pg.show_pdf_page(fitz.Rect(page_w, 0, page_w*2, page_h), s2, i)
-                for lk in s2[i].get_links():
-                    r = lk.get("from")
-                    if r:
-                        lk["from"] = fitz.Rect(r.x0 + page_w, r.y0, r.x1 + page_w, r.y1)
-                    t = lk.get("to")
-                    if isinstance(t, fitz.Rect):
-                        lk["to"] = fitz.Rect(t.x0 + page_w, t.y0, t.x1 + page_w, t.y1)
-                    elif isinstance(t, fitz.Point):
-                        lk["to"] = fitz.Point(t.x + page_w, t.y)
-                    pg.insert_link(lk)
-
-        dst.save(str(dual_pdf), garbage=4, deflate=True)
-        s1.close(); s2.close(); dst.close()
-        
-        logger.info('✅ PyMuPDF dual: %s → %s (%d pages, %.1fMB)',
-                    orig_pdf.name, dual_pdf.name, n, dual_pdf.stat().st_size/1e6)
-        return True
-    except Exception as e:
-        logger.warning('PyMuPDF dual 拼接失败 (非致命): %s', e)
+    if make_bilingual is None:
+        logger.warning('bilingual 不可用，跳过双语拼接')
         return False
+    return make_bilingual(orig_pdf, mono_pdf, dual_pdf, mode=mode)
+
+
+def _nas_archive_versions(orig_path, mono_path, dual_path=None, *,
+                          display_name='', source='translate'):
+    """把译文三版本归档进 NAS 文献仓库（原文 / 中文 / 双语）。
+
+    ★ 失败只记日志，绝不抛异常 —— NAS 可能没挂载、可能只读、可能网络断了，
+      这些都不能让一次已经完成的翻译失败。
+    """
+    if nas_archive is None:
+        return None
+    try:
+        _o = Path(orig_path) if orig_path and Path(orig_path).exists() else None
+        _m = Path(mono_path) if mono_path and Path(mono_path).exists() else None
+        _d = Path(dual_path) if dual_path and Path(dual_path).exists() else None
+        if _m is None:                       # 没有译文就没必要归档
+            return None
+        ar = nas_archive.archive(_o, _m, _d, display_name=display_name, source=source)
+        if ar.get('ok'):
+            logger.info('📦 已归档到 NAS 文献仓库: %s (%s)', display_name, ar.get('stem'))
+        else:
+            logger.warning('NAS 归档未完整: %s → %s', display_name, ar)
+        return ar
+    except Exception as e:
+        logger.warning('NAS 归档失败（非致命）: %s', e)
+        return None
+
 
 def _run_translate(job_id):
     with jobs_lock:
@@ -477,6 +648,7 @@ def _run_translate(job_id):
                     j['stage_progresses'][stage] = min(100.0, float(cur) / tot * 100.0)
                 j['progress'] = max(j.get('progress', 0), _calc_overall(j['stage_progresses']))
                 j['current_stage'] = stage
+                j['last_progress_at'] = time.time()   # 看门狗据此判定「无进度」
                 cn = _STAGE_CN.get(stage, stage)
                 j['message'] = f'{cn} ({cur}/{tot})' if tot > 0 else cn
             finally:
@@ -505,16 +677,30 @@ def _run_translate(job_id):
         if cancel_event and cancel_event.is_set():
             raise CancelError('用户取消')
 
-        mono_path = _translated_path(stem, 'mono')
-        dual_path = _dual_path(stem)
-
+        mono_path = _translated_path(stem, 'mono')   # glob 匹配，兼容 .no_watermark
         mono_url = f'/translated/{mono_path.name}' if mono_path.exists() else None
 
-        # dual: PyMuPDF 拼接 (不再依赖 BabelDOC 的 no_dual=False)
+        # 双语拼接版：翻译完成即自动生成（左原文 / 右译文），供前端下载
+        # ⚠️ 必须在 mono 定位成功之后做 —— 否则 dual 恒为 None
         dual_url = None
         if mono_path.exists():
-            if _make_dual_pdf(Path(src_path), mono_path, dual_path):
-                dual_url = f'/translated/{dual_path.name}'
+            try:
+                # 拼接期间刷新心跳，避免看门狗误判「长时间无进度」
+                with jobs_lock:
+                    _jj = jobs.get(job_id)
+                    if _jj:
+                        _jj['message'] = '生成双语对照版…'
+                        _jj['last_progress_at'] = time.time()
+            except Exception:
+                pass
+            if ensure_dual is not None:
+                _dp = ensure_dual(Path(src_path), mono_path, mode=BILINGUAL_MODE)
+                if _dp:
+                    dual_url = f'/translated/{_dp.name}'
+            else:
+                dual_path = _dual_path(stem)
+                if _make_dual_pdf(Path(src_path), mono_path, dual_path):
+                    dual_url = f'/translated/{dual_path.name}'
 
         # 兜底: 找任何译版
         if not mono_url:
@@ -525,9 +711,18 @@ def _run_translate(job_id):
                     mono_url = f'/translated/{mono_path.name}'
                     break
 
+        # ── 归档到 NAS 文献仓库（原文 / 中文 / 双语 三版本）──
+        _nas_archive_versions(
+            src_path, mono_path,
+            (TRANSLATED_DIR / Path(dual_url).name) if dual_url else None,
+            display_name=name, source='translate',
+        )
+
         with jobs_lock:
             j = jobs.get(job_id)
-            if j:
+            # 已被超时/取消接管的任务不覆盖：孤儿线程晚完成时，
+            # 不能把「已超时跳过」刷回「完成」，否则队列状态自相矛盾。
+            if j and j.get('status') == 'translating':
                 j['status'] = 'done'
                 j['progress'] = 100
                 j['message'] = '完成'
@@ -542,7 +737,8 @@ def _run_translate(job_id):
         logger.info('Job %s cancelled by user: %s', job_id, e)
         with jobs_lock:
             j = jobs.get(job_id)
-            if j:
+            # 同样加守卫：已被超时接管的不改判为 cancelled
+            if j and j.get('status') == 'translating':
                 j['status'] = 'cancelled'
                 j['message'] = '已取消'
                 j['ended_at'] = time.time()
@@ -661,6 +857,58 @@ def _active_jobs():
                    if j.get('status') in ('queued', 'translating'))
 
 
+def _queue_snapshot():
+    """文献翻译队列快照 —— 供门户「翻译队列」页只读展示（不走写路径）。
+
+    ⚠️ 只挑可 JSON 序列化的字段：jobs 里混着 threading.Event(cancel_event)
+    等活对象，直接 jsonify(jobs) 会抛 TypeError。
+    在 jobs_lock 内取数，避免跨线程迭代竞态（jobs 由 worker 线程并发改写）。
+    """
+    _FIELDS = ('job_id', 'name', 'status', 'progress', 'message',
+               'created_at', 'started_at', 'ended_at', 'elapsed',
+               'error', 'original_url', 'mono_url', 'dual_url')
+    try:
+        with jobs_lock:
+            items = [{k: j.get(k) for k in _FIELDS} for j in jobs.values()]
+            order = list(getattr(QUEUE, 'queue', ()))
+            qsize = QUEUE.qsize()
+    except Exception:
+        logger.exception('❌ 翻译队列快照失败')
+        return {'ok': False, 'items': [], 'stats': {}, 'queue_size': 0}
+
+    for it in items:
+        p = it.get('progress')
+        it['progress'] = round(float(p), 1) if isinstance(p, (int, float)) else 0.0
+        # 排队位次只对「还在队列里没开跑」的任务有意义
+        pos = 0
+        if it.get('status') == 'queued':
+            try:
+                pos = order.index(it.get('job_id')) + 1
+            except ValueError:
+                pos = 0
+        it['queue_position'] = pos
+
+    st = {'queued': 0, 'translating': 0, 'done': 0, 'failed': 0, 'cancelled': 0}
+    for it in items:
+        s = it.get('status')
+        if s in st:
+            st[s] += 1
+    st['total'] = len(items)
+    st['active'] = st['queued'] + st['translating']
+
+    # 排序：翻译中 → 排队中（按入队先后）→ 已结束（按结束时间倒序）
+    def _key(it):
+        s = it.get('status')
+        rank = 0 if s == 'translating' else (1 if s == 'queued' else 2)
+        t = it.get('created_at') or 0
+        if rank == 2:
+            t = -(it.get('ended_at') or 0)
+        return (rank, t)
+
+    items.sort(key=_key)
+    return {'ok': True, 'queue_size': qsize, 'stats': st, 'items': items}
+
+
 try:
     import portal
     portal.init_portal(app, get_active=_active_jobs)
@@ -678,7 +926,7 @@ try:
     # 今日早报要读 daily_push_state.json / news.json / output/*.png，
     # 期刊列表要读 journals.json 等。模块自己不猜路径，一律由这里注入。
     modules.register_all(app, upload_dir=UPLOAD_DIR, translated_dir=TRANSLATED_DIR,
-                         data_dir=BASE.parent)
+                         data_dir=BASE.parent, get_queue=_queue_snapshot)
 except Exception:
     logger.exception('❌ 功能模块注册失败（门户本身仍可用）')
 

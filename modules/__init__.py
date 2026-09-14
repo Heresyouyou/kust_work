@@ -22,6 +22,8 @@ from .archive import init_archive
 from .journals import init_journals
 from .news import init_news
 from .palette import init_palette
+from .queue import init_queue
+from .share import init_share
 
 logger = logging.getLogger('geo')
 
@@ -34,17 +36,26 @@ _MODULES = [
     ('今日早报', init_news, True),
     ('期刊列表', init_journals, True),
     ('科研配色', init_palette, False),
+    ('翻译队列', init_queue, True),
+    ('内网共享', init_share, False),
 ]
 
 
-def register_all(app, *, upload_dir=None, translated_dir=None, data_dir=None):
-    """注册全部功能模块。目录由 web_app 注入，模块不自己去猜路径。"""
+def register_all(app, *, upload_dir=None, translated_dir=None, data_dir=None, get_queue=None):
+    """注册全部功能模块。目录由 web_app 注入，模块不自己去猜路径。
+
+    get_queue: web_app 注入的「文献翻译队列」只读快照函数。
+      队列数据在 web_app 的内存里，模块不能反向 import（会循环导入），
+      所以和门户 get_active 一样走回调注入。
+    """
     ok, failed = [], []
 
     for name, init_fn, need_data in _MODULES:
         try:
             if name == '译文归档':
                 init_fn(app, upload_dir=upload_dir, translated_dir=translated_dir)
+            elif name == '翻译队列':
+                init_fn(app, data_dir=data_dir, get_queue=get_queue)
             elif need_data:
                 init_fn(app, data_dir=data_dir)
             else:

@@ -26,10 +26,10 @@
 
 ```
 浏览器
-  │  kust.work  →  DNS A 记录直接指向私网 10.109.0.222（仅校园网内可达）
+  │  kust.work  →  DNS A 记录直接指向私网 <lan-ip>（仅校园网内可达）
   ▼
 NAS (QNAP) Apache :80
-  │  ProxyPass /  →  http://192.168.10.100:5555/
+  │  ProxyPass /  →  http://<lan-ip>:5555/
   ▼
 Windows Flask (waitress, host=0.0.0.0, port=5555)   ← 就是 GeoTranslate 本体
   │  GET /  →  render_template_string(index.html)
@@ -64,7 +64,7 @@ llama-server :8090（本地推理）
 浏览器
   │  kust.work
   ▼
-NAS Apache :80     ProxyPass /  →  192.168.10.100:5555     ← 完全不动
+NAS Apache :80     ProxyPass /  →  <lan-ip>:5555     ← 完全不动
   ▼
 Windows Flask :5555（单进程，就是现在这一个）
   ├── GET  /                  →  portal.html     ← 新增：欢迎主页
@@ -75,7 +75,7 @@ Windows Flask :5555（单进程，就是现在这一个）
 ```
 
 **为什么前端 4 处 `fetch('/api/...')` 不需要改？**
-因为 `/translate` 是页面 URL，而 `/api/*` 留在根路径。浏览器从 `/translate` 页面发起的 `/api/check` 会解析为 `https://kust.work/api/check` → Apache `ProxyPass /` 全量转发 → Flask 命中 `@app.route('/api/check')` ✅。
+因为 `/translate` 是页面 URL，而 `/api/*` 留在根路径。浏览器从 `/translate` 页面发起的 `/api/check` 会解析为 `https://<nas-host>/<share>/check` → Apache `ProxyPass /` 全量转发 → Flask 命中 `@app.route('/api/check')` ✅。
 后端产出的 `/translated/xxx.pdf` 同理 ✅。
 
 ### 2.2 改动清单（web_app.py 仅 2 处）
@@ -200,8 +200,8 @@ app.register_blueprint(geo_api_bp,   url_prefix='/api')             # API 留在
 
 ```
 NAS Apache :80
-  ├── /translate, /api/, /uploads/, /translated/  →  192.168.10.100:5555   (GeoTranslate)
-  └── /  (兜底)                                    →  192.168.10.100:5560   (门户服务)
+  ├── /translate, /api/, /uploads/, /translated/  →  <lan-ip>:5555   (GeoTranslate)
+  └── /  (兜底)                                    →  <lan-ip>:5560   (门户服务)
 ```
 
 ### 4.2 NAS 侧配置（`/etc/config/apache/extra/apache-reverse-proxy.conf`）
@@ -219,18 +219,18 @@ ProxyRequests Off
 </Directory>
 
 # ① 翻译模块 —— 长的前缀必须写在兜底 / 之前！
-ProxyPass        "/translate"   "http://192.168.10.100:5555/"
-ProxyPassReverse "/translate"   "http://192.168.10.100:5555/"
-ProxyPass        "/api/"        "http://192.168.10.100:5555/api/"
-ProxyPassReverse "/api/"        "http://192.168.10.100:5555/api/"
-ProxyPass        "/uploads/"    "http://192.168.10.100:5555/uploads/"
-ProxyPassReverse "/uploads/"    "http://192.168.10.100:5555/uploads/"
-ProxyPass        "/translated/" "http://192.168.10.100:5555/translated/"
-ProxyPassReverse "/translated/" "http://192.168.10.100:5555/translated/"
+ProxyPass        "/translate"   "http://<lan-ip>:5555/"
+ProxyPassReverse "/translate"   "http://<lan-ip>:5555/"
+ProxyPass        "/api/"        "http://<lan-ip>:5555/api/"
+ProxyPassReverse "/api/"        "http://<lan-ip>:5555/api/"
+ProxyPass        "/uploads/"    "http://<lan-ip>:5555/uploads/"
+ProxyPassReverse "/uploads/"    "http://<lan-ip>:5555/uploads/"
+ProxyPass        "/translated/" "http://<lan-ip>:5555/translated/"
+ProxyPassReverse "/translated/" "http://<lan-ip>:5555/translated/"
 
 # ② 门户 —— 兜底放最后
-ProxyPass        "/"            "http://192.168.10.100:5560/"
-ProxyPassReverse "/"            "http://192.168.10.100:5560/"
+ProxyPass        "/"            "http://<lan-ip>:5560/"
+ProxyPassReverse "/"            "http://<lan-ip>:5560/"
 ```
 
 > **为什么 `/api/` `/uploads/` `/translated/` 这三条不能省？**
@@ -240,12 +240,12 @@ ProxyPassReverse "/"            "http://192.168.10.100:5560/"
 
 | 风险 | 说明 | 对策 |
 |------|------|------|
-| **`/webdav/` 会被兜底规则吃掉** | 现状已有 `http://kust.work/webdav/Public/`（PROPFIND 返回 207）。新增 `ProxyPass /` 兜底后，若 `/webdav/` 规则写在它后面就失效 | **改造前先 dump 现有 Apache 配置**，把 `/webdav/` 规则放在最前 |
+| **`/webdav/` 会被兜底规则吃掉** | 现状已有 `http://<nas-host>/<share>/Public/`（PROPFIND 返回 207）。新增 `ProxyPass /` 兜底后，若 `/webdav/` 规则写在它后面就失效 | **改造前先 dump 现有 Apache 配置**，把 `/webdav/` 规则放在最前 |
 | ProxyPass 顺序 | `/` 是通配，必须在最后 | 长短前缀顺序：最具体 → 最宽泛 |
 | `<Directory /> Require all denied` | 主 `apache.conf` L26 会先 403 拦截 | 反代配置里 `<Directory /> Require all granted` 覆盖 |
 | LoadModule 顺序 | `proxy_http.so` 先于 `proxy.so` → `undefined symbol` | proxy → proxy_http → proxy_connect |
 | Include 位置 | 必须在 `apache-default-modules.conf` 之后 | 确认 `grep reverse-proxy apache.conf` 有输出 |
-| Windows 静态 IP | 反代硬编码 `192.168.10.100`，该地址必须被本机长期占住 | NAS DHCP 池起点已在 `.150`，`.100` 已做 MAC 静态绑定 ✅（已固化） |
+| Windows 静态 IP | 反代硬编码 `<lan-ip>`，该地址必须被本机长期占住 | NAS DHCP 池起点已在 `.150`，`.100` 已做 MAC 静态绑定 ✅（已固化） |
 | 新增常驻进程 | 门户服务需随开机自启 | 做成计划任务/服务，或干脆门户也用 Flask + waitress |
 
 ### 4.4 优点 / 缺点
@@ -262,11 +262,11 @@ ProxyPassReverse "/"            "http://192.168.10.100:5560/"
 ## 5. 方案 D：子域名 `/` 独立域名（不推荐）
 
 ```
-translate.kust.work  →  NAS:80  →  192.168.10.100:5555
-kust.work            →  NAS:80  →  192.168.10.100:5560
+translate.kust.work  →  NAS:80  →  <lan-ip>:5555
+kust.work            →  NAS:80  →  <lan-ip>:5560
 ```
 
-- `kust.work` 的公网 A 记录**直接指向私网 IP**（`10.109.0.222`），说明 DNS 记录在校园网侧管理
+- `kust.work` 的公网 A 记录**直接指向私网 IP**（`<lan-ip>`），说明 DNS 记录在校园网侧管理
 - 加子域名需要校园网 DNS 管理权限，**不确定性高**
 - 还要额外处理 HTTPS 证书
 - **除非你确认能自己加 DNS 记录，否则不作为方案**

@@ -32,9 +32,11 @@
   journal_topic_archive.json  近 N 个月主题相关文献回溯归档
 
 页面：GET /journals
-       （视图一「近 60 天」另有前端「全部展开 / 收起全部」总开关，
+       （页顶「今日更新」板块 = 当天 00:00 之后**获取到**的文章跨刊汇总，
+        与视图一同源同口径，都由服务端按 obtained_ts 切好，前端只做区域/搜索过滤；
+        视图一「近 60 天」另有前端「全部展开 / 收起全部」总开关，
        靠 `_MAX_EXPAND_PER_CARD` 保证下发量够铺开；见 GEO_TRANSLATE_ARCHITECTURE.md §15.4）
-接口：GET /api/journals/list     （两个视图的数据一次性返回）
+接口：GET /api/journals/list     （两个视图的数据一次性返回，另含 `today` 切片）
 """
 import re
 from datetime import datetime, timedelta
@@ -59,6 +61,8 @@ _MAX_PER_CARD = 6
 _MAX_EXPAND_PER_CARD = 200
 # 主题归档视图单卡片最多展示条数（归档命中多的刊可展开更多）
 _MAX_TOPIC_PER_CARD = 8
+# 「今日更新」板块单日最多展示条数（当天全刊汇总，超出部分明确提示不静默截断）
+_TODAY_MAX = 300
 
 # 相关度分档：标签 / 阈值下限（与 journal_filter.STRONG_RELEVANCE_MIN_SCORE=8 对齐）
 TIERS = [
@@ -320,6 +324,11 @@ def _build():
     topic_total, topic_journals, tier_count = 0, 0, {}
     undated_total, expired_total = 0, 0
 
+    # 「今日更新」板块：把当天（本地日期）获取到的文章跨刊汇总，
+    # 仍以 obtained_ts（获取时间）为唯一判据，与下方 60 天窗口同源同口径。
+    today_date = now.date()
+    today_items = []
+
     for region_label, key in _REGION_ORDER:
         rows = []
         for j in journals.get(key, []) or []:
@@ -340,6 +349,23 @@ def _build():
                 tier_count[name][t['tier']] = tier_count[name].get(t['tier'], 0) + 1
 
             site = (j.get('website') or '').strip()
+
+            # 今日切片：无获取时间的条目无法证明是今天到的，一律不计入
+            for a in articles:
+                ts = a.get('obtained_ts') or 0
+                if not ts:
+                    continue
+                try:
+                    if datetime.fromtimestamp(ts).date() != today_date:
+                        continue
+                except Exception:
+                    continue
+                item = dict(a)
+                item['journal'] = name
+                item['journal_url'] = site
+                item['region'] = region_label
+                today_items.append(item)
+
             rows.append({
                 'id': j.get('id') or name,
                 'name': name,
@@ -380,6 +406,8 @@ def _build():
                 'journals': rows,
             })
 
+    today_items.sort(key=lambda x: x['obtained_ts'], reverse=True)
+
     return {
         'ok': True,
         'total_journals': sum(g['count'] for g in groups),
@@ -412,6 +440,14 @@ def _build():
             'date_estimated': topic_meta.get('date_estimated'),
             'date_missing': topic_meta.get('date_missing'),
             'available': bool(topic_total),
+        },
+        # 「今日更新」板块：当天（本地日期）跨刊汇总，与下方窗口同源同口径
+        'today': {
+            'date': now.strftime('%Y-%m-%d'),
+            'total': len(today_items),
+            'journal_count': len({i['journal'] for i in today_items}),
+            'items': today_items[:_TODAY_MAX],
+            'hidden': max(0, len(today_items) - _TODAY_MAX),
         },
         'groups': groups,
     }

@@ -181,8 +181,9 @@
 })();
 
 /* ── 动态卡片：由 JS 去后端取「当天」数据回填，模板本身恒定 ──
-   这样每天变化的内容（飞书链接、期刊新文数）不需要改 HTML，
-   页面结构永远稳定；JS 挂了也只是退化成服务端 302 跳转，不影响可用性。 */
+   每天变化的内容（推送日期、新闻条数、角标）不需要改 HTML，
+   页面结构永远稳定；「今日早报」卡片固定指向 /daily 详情页，
+   JS 挂了也不影响可用性（飞书文档按钮在详情页右上角另行提供）。 */
 (function () {
   function cardOf(id) { return document.querySelector('[data-mod="' + id + '"]'); }
   function tagOf(id) { return document.querySelector('[data-tag="' + id + '"]'); }
@@ -195,7 +196,8 @@
     t.className = 'card-tag' + (kind ? ' ' + kind : '');
   }
 
-  // ① 今日早报：把卡片 href 直接指向当天飞书文档
+  // ① 今日早报：卡片固定指向 /daily 详情页（左侧新闻标题+链接、右侧海报），
+  //    不再把 href 改写成飞书直链 —— 飞书文档在详情页右上角按钮打开。
   function bindDaily() {
     var card = cardOf('daily');
     if (!card) return;
@@ -208,11 +210,8 @@
         if (d.news_total) bits.push(d.news_total + ' 条资讯');
 
         if (d.has_url) {
-          card.setAttribute('href', d.url);
-          card.setAttribute('target', '_blank');
-          card.setAttribute('rel', 'noopener');
           setTag('daily', d.is_today ? '今日已推送' : '已推送', 'on');
-          if (desc) desc.textContent = bits.concat('点击打开飞书早报').join(' · ');
+          if (desc) desc.textContent = bits.concat('点击查看今日早报').join(' · ');
         } else if (d.is_today) {
           setTag('daily', '链接待记录', 'beta');
           if (desc) desc.textContent = bits.concat('链接将于下次推送后自动出现').join(' · ');
@@ -223,7 +222,7 @@
             : '今日早报尚未生成';
         }
       })
-      .catch(function () { /* 静默失败：卡片仍可走服务端 /today 跳转 */ });
+      .catch(function () { /* 静默失败：卡片仍指向 /daily 详情页 */ });
   }
 
   // ② 期刊列表：回填本轮新文数量，有更新时点亮角标

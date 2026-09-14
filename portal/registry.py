@@ -25,12 +25,21 @@ MODULES = [
         'id': 'daily',
         'group': '资讯与推送',
         'name': '今日早报',
-        'desc': '每日地矿资讯海报与飞书早报文档，点击直达',
-        'url': '/today',
+        'desc': '每日地矿资讯海报与新闻列表，点击查看',
+        'url': '/daily',
         'tag': '今日',
         'status': 'online',
         'accent': True,
         'live': True,
+    },
+    {
+        'id': 'dailyarchive',
+        'group': '资讯与推送',
+        'name': '早报归档',
+        'desc': '按日期回看历史每日早报：新闻列表 + 日报海报',
+        'url': '/daily/archive',
+        'tag': '新增',
+        'status': 'online',
     },
     {
         'id': 'pushlog',
@@ -73,6 +82,15 @@ MODULES = [
         'status': 'online',
     },
     {
+        'id': 'transqueue',
+        'group': '科研工具',
+        'name': '翻译队列',
+        'desc': '文献翻译（当前文件队列）与英文标题翻译的进度、覆盖率与失败样例',
+        'url': '/translate/queue',
+        'tag': '新增',
+        'status': 'online',
+    },
+    {
         'id': 'archive',
         'group': '科研工具',
         'name': '译文归档',
@@ -92,6 +110,16 @@ MODULES = [
     },
 
     # ═══════════ 系统 ═══════════
+    {
+        'id': 'share',
+        'group': '系统',
+        'name': '内网共享',
+        'desc': '把 NAS 共享目录挂到本机 S 盘：一键脚本 / 命令复制 / 排错',
+        'url': '/share',
+        'tag': '新增',
+        'status': 'online',
+        'accent': True,
+    },
     {
         'id': 'monitor',
         'group': '系统',

@@ -55,8 +55,8 @@ def _card(m):
     """渲染单张功能卡片。coming 状态渲染为不可点击的 div。
 
     每张卡片带 data-mod="<id>"，供 portal.html 里的 JS 按 id 定位并动态改写
-    （如今日早报的 href 指向当天飞书链接）—— 这样 HTML 模板本身保持恒定，
-    天天变的链接不进模板，前端结构不需要跟着改。
+    （如今日早报的角标/描述由后端当天数据回填）—— 这样 HTML 模板本身保持恒定，
+    天天变的文案不进模板，前端结构不需要跟着改。
     """
     status = m.get('status') or 'coming'
     _, tag_cls, card_extra = _LEVEL.get(status, _LEVEL['coming'])
@@ -120,7 +120,10 @@ def portal_health():
     """
     llama = 'down'
     try:
-        r = requests.get(_LLAMA_HEALTH, timeout=2)
+        # trust_env=False: 本地回环不走 HTTP_PROXY(代理会改写请求行 -> llama 404)
+        _sess = requests.Session()
+        _sess.trust_env = False
+        r = _sess.get(_LLAMA_HEALTH, timeout=2)
         body = r.json() if r.content else {}
         if r.status_code == 200 and body.get('status') == 'ok':
             llama = 'ok'

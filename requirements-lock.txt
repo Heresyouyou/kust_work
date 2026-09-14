@@ -1,0 +1,48 @@
+# PostNews / Translate —— 关键依赖锁定清单
+#
+# 用途：本项目**不是**新建虚拟环境，而是直接用系统 Python
+#       D:\Python 3.12.4\python.exe（依赖装在用户级 site-packages
+#       C:\Users\youyo\Python\Python312\site-packages）。
+#       因此一次 `pip install -U <pkg>` 就可能把生产跑挂。
+#       本文件记录"已验证可用"的版本，升级前请先看这里的警告。
+#
+# 校验： python -c "import importlib.metadata as m; print(m.version('pdfminer.six'))"
+
+# ─────────────────────────────────────────────────────────────
+# ⚠️ 高危：pdfminer.six 必须 < 20250506
+# ─────────────────────────────────────────────────────────────
+# BabelDOC 0.2.33 的 PDFPageInterpreterEx 直接读写解释器上的 self.ncs：
+#     babeldoc/pdfinterp.py:  self.ncs = self.csmap[...]   /  if self.ncs:
+# 而 pdfminer.six 自 20250506 起做了一次重构，把颜色空间状态从解释器搬到了
+#     self.graphicstate.ncs
+# 并且 init_state() 里不再初始化 self.ncs（20250416 仍在设 self.ncs = None）。
+# 结果：pdfminer>=20250506 + BabelDOC 0.2.33 → 解析 PDF 阶段直接抛
+#     AttributeError: 'PDFPageInterpreterEx' object has no attribute 'ncs'
+#     任务 status=failed，progress=0（连翻译都没开始）
+#
+# 实测：20250416 ✅ 可用（解释器上仍有 self.ncs）
+#       20250506 / 20251107 / 20251227 / 20251230 / 20260107 ❌ 全部崩
+#
+# 2026-09-13 22:05 就发生过一次：被升级到 20260107，导致所有翻译任务在
+# "Parse PDF and Create Intermediate Representation" 阶段失败。
+pdfminer.six==20250416
+
+babeldoc==0.2.33
+
+# ─────────────────────────────────────────────────────────────
+# ⚠️ 注意：requests 对**本机回环**必须 trust_env=False
+# ─────────────────────────────────────────────────────────────
+# 若环境里有 HTTP_PROXY/HTTPS_PROXY（例如 CI/沙箱/公司代理），requests 默认
+# trust_env=True 会把发往 127.0.0.1:8090 的请求也交给代理；urllib3 走代理时
+# 改用"绝对 URI"请求行：
+#     POST http://127.0.0.1:8090/v1/chat/completions HTTP/1.1
+# llama.cpp 的 HTTP 路由按 path 匹配 → 匹配不上 → 404 File Not Found
+# → BabelDOC 静默把原文当译文 → "大量段落没有被翻译"。
+# llama_http_engine._make_session() 已统一 trust_env=False。改代码时勿删。
+requests==2.34.2
+urllib3==2.3.0
+
+flask==3.1.3
+waitress==3.0.2
+pymupdf==1.25.2
+torch==2.5.1+cu121

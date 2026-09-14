@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>翻译队列 · kust.work</title>
+<style>
+  /* 深色为默认值（/theme.js 缺失也完整可读）；浅色由 theme.js 注入的
+     :root[data-theme="light"] 覆盖。新增颜色一律走变量，勿写死色值。 */
+  :root {
+    /* 面 */
+    --bg: #2b2b2b; --surface: #1f1f1f; --surface-2: #262626; --surface-3: #2f2f2f;
+    /* 线 */
+    --border: #3a3a3a; --border-hover: #4a4a4a;
+    /* 字 */
+    --text: #e8e4df; --muted: #8a867f; --dim: #6f6b64; --link: #cfd8d2;
+    /* 主色 */
+    --accent: #4a9e6a; --accent-dim: #2d6e46; --accent-line: #2d6e46;
+    --accent-soft: #232823; --accent-soft-hover: #242a24;
+    --on-accent: #101710; --logo-bg: #2d6e46; --logo-fg: #e2f3e8;
+    --meta-key: #5f7d69;
+    /* 语义 */
+    --warn: #f0a030; --warn-border: #6a4a15; --err: #c0524a;
+    --ok-bg: #23402e; --ok-fg: #79d39b; --ok-bd: #2f5a3e;
+    --idle-bg: #2a2f33; --idle-fg: #9fb0bd; --idle-bd: #3a4350;
+    --run-bg: #2d2a1f; --run-fg: #e6c069; --run-bd: #5a4a15;
+    /* 组件 */
+    --sw-border: rgba(255,255,255,.07); --sw-shadow: 0 4px 12px rgba(0,0,0,.45);
+    --toast-bg: #1a1a1a; --placeholder: #6a665f;
+    --card-shadow: none; --radius: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+  a { color: inherit; text-decoration: none; }
+
+  header { height: 48px; background: var(--surface); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 20px; gap: 12px; flex-shrink: 0;
+    position: sticky; top: 0; z-index: 10; }
+  .back { font-size: 12px; color: var(--muted); }
+  .back:hover { color: var(--accent); }
+  .logo { width: 24px; height: 24px; border-radius: 5px; background: var(--logo-bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: var(--logo-fg); letter-spacing: -0.3px; }
+  .brand { font-weight: 600; font-size: 14px; letter-spacing: -0.3px; }
+  .spacer { flex: 1; }
+  .stat { font-size: 12px; color: var(--muted); }
+
+  main { flex: 1; width: 100%; max-width: 860px; margin: 0 auto; padding: 32px 20px 48px; }
+  .head { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+  .head h1 { font-size: 21px; font-weight: 600; letter-spacing: -0.4px; }
+  .badge { font-size: 11px; padding: 3px 11px; border-radius: 4px; border: 1px solid var(--border); }
+  .badge.run { background: var(--run-bg); color: var(--run-fg); border-color: var(--run-bd); }
+  .badge.idle { background: var(--idle-bg); color: var(--idle-fg); border-color: var(--idle-bd); }
+  .badge.ok { background: var(--ok-bg); color: var(--ok-fg); border-color: var(--ok-bd); }
+  .badge.never { background: var(--surface-2); color: var(--muted); border-color: var(--border); }
+
+  .sec-title { display: flex; align-items: baseline; gap: 8px;
+    font-size: 13px; font-weight: 600; letter-spacing: .2px; margin: 26px 0 11px; }
+  .sec-title:first-child { margin-top: 0; }
+  .sec-sub { font-size: 11px; color: var(--muted); font-weight: 400; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 14px; }
+  .m { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 13px 15px; }
+  .m .k { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+  .m .v { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; font-family: ui-monospace, Consolas, monospace; }
+  .m .v small { font-size: 11px; color: var(--muted); font-weight: 400; }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px; margin-bottom: 16px; }
+  .panel h2 { font-size: 12px; color: var(--muted); letter-spacing: 1px; margin-bottom: 12px; font-weight: 400; }
+
+  .bar { height: 10px; border-radius: 5px; background: var(--surface-3); overflow: hidden; }
+  .bar > i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .4s; }
+  .bar-s { height: 6px; margin-top: 9px; }
+  .bar-label { font-size: 11.5px; color: var(--muted); margin-top: 7px; font-family: ui-monospace, Consolas, monospace; }
+
+  /* 文献队列：任务条目 */
+  .jobs { display: flex; flex-direction: column; gap: 10px; }
+  .job { background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 11px 13px; }
+  .jtop { display: flex; align-items: center; gap: 10px; }
+  .jname { font-size: 13px; font-weight: 500; flex: 1;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .jbadge { font-size: 11px; padding: 2px 9px; border-radius: 4px;
+    border: 1px solid var(--border); flex-shrink: 0; }
+  .jbadge.queued { background: var(--idle-bg); color: var(--idle-fg); border-color: var(--idle-bd); }
+  .jbadge.translating { background: var(--run-bg); color: var(--run-fg); border-color: var(--run-bd); }
+  .jbadge.done { background: var(--ok-bg); color: var(--ok-fg); border-color: var(--ok-bd); }
+  /* failed / cancelled 复用既有变量（--err / --muted），不新增主题变量，
+     免得 theme.js 的浅色对照表漏配。 */
+  .jbadge.failed { background: var(--surface-2); color: var(--err); border-color: var(--err); }
+  .jbadge.cancelled { background: var(--surface-2); color: var(--muted); border-color: var(--border); }
+  .jmeta { display: flex; align-items: center; gap: 10px; margin-top: 8px;
+    font-size: 11.5px; color: var(--muted); flex-wrap: wrap; }
+  .jmeta > span:first-child { flex: 1; min-width: 0; }
+  .jlinks { display: flex; gap: 10px; flex-shrink: 0; }
+  .jlinks a { color: var(--accent); border-bottom: 1px solid transparent; }
+  .jlinks a:hover { border-bottom-color: var(--accent); }
+  .jerr { color: var(--err); }
+
+  .empty { padding: 22px 0; text-align: center; color: var(--muted); font-size: 12.5px; }
+  .note { font-size: 12px; color: var(--muted); line-height: 1.7; }
+  .note code { font-family: ui-monospace, Consolas, monospace; color: var(--text); }
+
+  .failed { list-style: none; }
+  .failed li { font-size: 12px; color: var(--muted); padding: 6px 0; border-bottom: 1px solid var(--surface-3);
+    line-height: 1.5; }
+  .failed li:last-child { border-bottom: none; }
+
+  .loading { padding: 60px 0; text-align: center; color: var(--muted); font-size: 13px; }
+
+  footer { border-top: 1px solid var(--border); background: var(--surface);
+    padding: 11px 20px; font-size: 11px; color: var(--muted); flex-shrink: 0; }
+  footer code { font-family: ui-monospace, Consolas, monospace; color: var(--text); }
+
+  @media (max-width: 640px) {
+    main { padding: 24px 14px 36px; }
+    .grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+<!-- 主题引擎：必须同步加载（勿加 defer/async），否则会先闪深色再变浅色。 -->
+<script src="/theme.js"></script>
+</head>
+<body>
+
+<header>
+  <a class="back" href="/">&larr; 工作台</a>
+  <span class="logo">ku</span>
+  <span class="brand">翻译队列</span>
+  <span class="spacer"></span>
+  <span class="stat" id="st">加载中…</span>
+</header>
+
+<main>
+  <div class="head">
+    <h1>翻译队列</h1>
+    <span class="badge never" id="badge">—</span>
+  </div>
+
+  <div id="body"><div class="loading">正在读取队列状态…</div></div>
+</main>
+
+<footer>
+  文献队列来自 Flask 内存 <code>jobs</code>（最近 1 小时）· 标题队列来自 <code>journal_title_zh_status.json</code> · 只读展示
+</footer>
+
+<script>
+(function () {
+  var body = document.getElementById('body');
+  var badge = document.getElementById('badge');
+  var st = document.getElementById('st');
+  var timer = null;
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function num(v) { return (v == null) ? '—' : v; }
+  function fmtClock(ts) {
+    if (!ts) return '';
+    var d = new Date(ts * 1000);
+    function p(n) { return n < 10 ? '0' + n : '' + n; }
+    return p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+  function fmtDur(s) {
+    if (s == null) return '—';
+    s = Number(s);
+    if (s < 60) return s.toFixed(0) + 's';
+    var m = Math.floor(s / 60), r = Math.round(s % 60);
+    return m + 'm' + (r ? r + 's' : '');
+  }
+  function metric(k, v, sub) {
+    return '<div class="m"><div class="k">' + esc(k) + '</div><div class="v">'
+      + esc(v) + (sub ? ' <small>' + esc(sub) + '</small>' : '') + '</div></div>';
+  }
+
+  /* ── 文献翻译队列（当前文件队列） ───────────────────── */
+
+  var DOC_LBL = { queued: '排队中', translating: '翻译中', done: '已完成',
+                  failed: '失败', cancelled: '已取消' };
+
+  function jobRow(j) {
+    var s = j.status || '';
+    var pct = Number(j.progress) || 0;
+    var cls = ['queued', 'translating', 'done', 'failed', 'cancelled'].indexOf(s) >= 0 ? s : 'cancelled';
+    var lbl = DOC_LBL[s] || s;
+
+    var meta = [];
+    if (s === 'queued' && j.queue_position) meta.push('第 ' + j.queue_position + ' 位');
+    if (s === 'translating') meta.push(pct + '%');
+    if (j.elapsed) meta.push('已用 ' + fmtDur(j.elapsed));
+    if (j.created_at) meta.push(fmtClock(j.created_at) + ' 提交');
+    var errHtml = j.error ? '<div class="jmeta"><span class="jerr">错误：' + esc(j.error) + '</span></div>' : '';
+
+    var links = [];
+    if (j.original_url) links.push('<a href="' + esc(j.original_url) + '" target="_blank">原文</a>');
+    if (j.mono_url) links.push('<a href="' + esc(j.mono_url) + '" target="_blank">中文</a>');
+    if (j.dual_url) links.push('<a href="' + esc(j.dual_url) + '" target="_blank">双语</a>');
+
+    var showBar = (s === 'translating' || s === 'queued' || s === 'done');
+
+    return '<div class="job">'
+      + '<div class="jtop"><span class="jname" title="' + esc(j.name) + '">' + esc(j.name || '(未命名)') + '</span>'
+      + '<span class="jbadge ' + cls + '">' + esc(lbl) + (s === 'translating' ? ' ' + pct + '%' : '') + '</span></div>'
+      + (showBar ? '<div class="bar bar-s"><i style="width:' + (s === 'done' ? 100 : pct) + '%"></i></div>' : '')
+      + '<div class="jmeta"><span>' + (meta.length ? meta.map(esc).join(' · ') : esc(j.message || '')) + '</span>'
+      + (links.length ? '<span class="jlinks">' + links.join('') + '</span>' : '')
+      + '</div>' + errHtml + '</div>';
+  }
+
+  function renderDoc(doc) {
+    var html = '<div class="sec-title">文献翻译队列<span class="sec-sub">当前文件队列</span></div>';
+
+    if (!doc || doc.unavailable) {
+      return html + '<div class="panel"><div class="empty">'
+        + esc((doc && doc.message) || '文献翻译队列暂不可用') + '</div></div>';
+    }
+
+    var s = doc.stats || {};
+    var items = doc.items || [];
+
+    html += '<div class="grid">'
+      + metric('排队中', num(s.queued), '个')
+      + metric('翻译中', num(s.translating), '个')
+      + metric('已完成', num(s.done), '个')
+      + metric('失败', num(s.failed), '个')
+      + metric('队列长度', num(doc.queue_size), '个')
+      + '</div>';
+
+    if (!items.length) {
+      html += '<div class="panel"><div class="empty">当前没有翻译任务 —— 去「PDF 翻译」上传文件即会出现在这里</div></div>';
+    } else {
+      html += '<div class="jobs">' + items.map(jobRow).join('') + '</div>';
+    }
+    return html;
+  }
+
+  /* ── 标题翻译队列 ───────────────────────────────────── */
+
+  function renderTitle(d) {
+    var html = '<div class="sec-title">标题翻译队列<span class="sec-sub">英文标题 → 中文小字</span></div>';
+
+    if (!d || d.state === 'never' || d.state === 'error') {
+      return html + '<div class="panel"><div class="empty">'
+        + esc((d && d.message) || '尚未运行过标题翻译') + '</div></div>';
+    }
+
+    var pr = d.progress || {};
+    var pct = (pr.total && pr.total > 0) ? Math.round(100 * pr.done / pr.total) : 0;
+
+    html += '<div class="grid">'
+      + metric('最后运行', d.last_run || d.last_finished || '—')
+      + metric('本轮用时', d.duration_sec == null ? '—' : d.duration_sec + ' s')
+      + metric('批次大小', '每批 ' + num(d.batch_size) + ' 条')
+      + metric('覆盖率', (d.coverage_pct == null ? '—' : d.coverage_pct + '%'))
+      + metric('累计缓存', num(d.cached) + ' 条')
+      + metric('待翻译', num(d.pending) + ' 条')
+      + metric('本轮新增', num(d.translated_this_run))
+      + metric('本轮失败', num(d.failed_this_run))
+      + '</div>';
+
+    if (d.running) {
+      html += '<div class="panel"><h2>本轮进度</h2>'
+        + '<div class="bar"><i style="width:' + pct + '%"></i></div>'
+        + '<div class="bar-label">' + pct + '%  ·  ' + num(pr.done) + ' / ' + num(pr.total) + ' 条</div></div>';
+    } else if (d.message) {
+      html += '<div class="panel"><div class="note">' + esc(d.message) + '</div></div>';
+    }
+
+    var rf = d.recent_failed || [];
+    if (rf.length) {
+      html += '<div class="panel"><h2>本轮失败样例（最近 ' + rf.length + ' 条）</h2><ul class="failed">'
+        + rf.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></div>';
+    }
+
+    html += '<div class="panel"><h2>术语一致性</h2>'
+      + '<div class="note">标题以每批 <code>' + num(d.batch_size) + '</code> 条一并发给模型，'
+      + '同一批次内共享上下文，保证同一英文术语在本批内译成同一中文词；'
+      + '已翻过的标题走 <code>journal_title_zh.json</code> 缓存，永不重翻。'
+      + (d.engine_url ? '<br>引擎：<code>' + esc(d.engine_url) + '</code>' : '') + '</div></div>';
+
+    return html;
+  }
+
+  /* ── 总装 ───────────────────────────────────────────── */
+
+  function render(d) {
+    var doc = d.doc || {};
+    var title = d.title || {};
+    var ds = doc.stats || {};
+    var busy = (ds.translating || 0) + (ds.queued || 0);
+    var titleRunning = !!title.running;
+
+    st.textContent = busy ? (busy + ' 个进行中')
+      : (titleRunning ? '标题翻译中' : '空闲');
+
+    if (busy) { badge.className = 'badge run'; badge.textContent = '进行中'; }
+    else if (titleRunning) { badge.className = 'badge run'; badge.textContent = '标题翻译中'; }
+    else { badge.className = 'badge ok'; badge.textContent = '空闲'; }
+
+    body.innerHTML = renderDoc(doc) + renderTitle(title);
+  }
+
+  var fail = 0;
+
+  // 统一调度：任何分支（成功/失败）都必须安排下一次轮询，否则页面会永久停摆
+  function schedule(ms) {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(load, ms);
+  }
+
+  function load() {
+    fetch('/api/translate/queue', { cache: 'no-store' })
+      .then(function (r) {
+        // 只在明确失败时抛：写作 `!r.ok` 会在桩对象没有 ok 属性时误判为失败
+        if (r.ok === false) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function (d) {
+        fail = 0;
+        render(d);
+        // 有活儿就 2s 刷新（进度条要跟手），空闲则 15s 慢速保活
+        schedule(d.active ? 2000 : 15000);
+      })
+      .catch(function () {
+        // ⚠️ 原来这里不重新调度：一次网络抖动或服务重启，页面就永久停在
+        //「读取队列状态失败」再也不刷新 —— 用户看到的就是「卡死」。
+        // 改成退避重试（2s→4s→6s…→30s 封顶），保证一定能自愈。
+        fail++;
+        body.innerHTML = '<div class="loading">读取队列状态失败，正在重试…（第 '
+          + fail + ' 次）</div>';
+        st.textContent = '读取失败，重试中';
+        schedule(Math.min(30000, 2000 * fail));
+      });
+  }
+  load();
+})();
+</script>
+
+</body>
+</html>

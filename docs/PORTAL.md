@@ -11,14 +11,14 @@
 | 路径 | 内容 |
 | --- | --- |
 | `http://kust.work/` | **欢迎主页（工作台）**，9 张卡片 · 3 个分组 · 5 个可用入口 |
-| `http://kust.work/today` | **今日早报** → 302 跳转当日飞书早报文档（无链接时落 `/daily`） |
-| `http://kust.work/daily` | 今日早报详情页：当日新闻列表 + 日报海报 + 飞书按钮 |
-| `http://kust.work/journals` | **期刊列表**：14 种目标期刊，标题直达官网，卡内是本地抓取的最新文章 |
-| `http://kust.work/palette` | **科研配色**：21 组 / 199 个色值，点击即复制色号 |
-| `http://kust.work/translate` | 文献翻译（原 GeoTranslate，功能完全不变） |
-| `http://kust.work/archive` | **译文归档**：近 48 小时论文按原文标题聚合，点版本按钮即开 PDF |
+| `http://<nas-host>/<share>` | **今日早报** → 302 跳转到 `/daily` 详情页（左新闻标题+链接、右海报，不再直跳飞书） |
+| `http://<nas-host>/<share>` | 今日早报详情页：当日新闻列表 + 日报海报 + 飞书按钮 |
+| `http://<nas-host>/<share>` | **期刊列表**：14 种目标期刊，标题直达官网，卡内是本地抓取的最新文章 |
+| `http://<nas-host>/<share>` | **科研配色**：21 组 / 199 个色值，点击即复制色号 |
+| `http://<nas-host>/<share>` | 文献翻译（原 GeoTranslate，功能完全不变） |
+| `http://<nas-host>/<share>` | **译文归档**：近 48 小时论文按原文标题聚合，点版本按钮即开 PDF |
 
-NAS Apache 反代**一行没动**，仍是 `ProxyPass / → http://192.168.10.100:5555/`。
+NAS Apache 反代**一行没动**，仍是 `ProxyPass / → http://<lan-ip>:5555/`。
 
 ---
 

@@ -109,6 +109,24 @@
 
   .loading { padding: 60px 0; text-align: center; color: var(--muted); font-size: 13px; }
 
+  /* 复制格式悬浮窗（右下角）：单选色彩编码格式，点击复制按所选格式输出 */
+  .fmt-panel { position: fixed; left: 16px; bottom: 16px; z-index: 60;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--sw-shadow); width: 172px; overflow: hidden; }
+  .fmt-panel.collapsed .fmt-body { display: none; }
+  .fmt-head { display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 11px; background: var(--surface-2); border-bottom: 1px solid var(--border);
+    font-size: 11px; color: var(--muted); letter-spacing: .5px; }
+  .fmt-toggle { background: transparent; border: 1px solid var(--border); color: var(--muted);
+    width: 20px; height: 18px; line-height: 1; border-radius: 3px; cursor: pointer; font-size: 13px; }
+  .fmt-toggle:hover { color: var(--text); border-color: var(--border-hover); }
+  .fmt-body { padding: 8px 11px 10px; }
+  .fmt-opt { display: flex; align-items: center; gap: 7px; padding: 4px 0; cursor: pointer; color: var(--text); }
+  .fmt-opt code { font-family: ui-monospace, Consolas, monospace; color: var(--muted); font-size: 11px; }
+  .fmt-opt input { accent-color: var(--accent); }
+  .fmt-prev { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border);
+    font-size: 11px; color: var(--muted); font-family: ui-monospace, Consolas, monospace; word-break: break-all; }
+
   /* 复制提示 */
   #toast { position: fixed; left: 50%; bottom: 34px; transform: translate(-50%, 18px);
     background: var(--toast-bg); border: 1px solid var(--accent-dim); color: var(--text);
@@ -144,7 +162,7 @@
 <main>
   <div class="head">
     <h1>科研配色色卡</h1>
-    <p>点击任意色块或色号即可复制 HEX 值，可直接粘进 matplotlib / Origin / AI / PPT</p>
+    <p>点击任意色块或色号即可复制色值，可直接粘进 matplotlib / Origin / AI / PPT；右下角悬浮窗可切换 Hex / RGB / HSL 等编码格式</p>
   </div>
 
   <div class="bar" id="bar">
@@ -160,11 +178,72 @@
   国际年代地层表 ICS / CGMW 官方色码 · matplotlib 连续色阶 · ColorBrewer
 </footer>
 
+<div id="fmtPanel" class="fmt-panel">
+  <div class="fmt-head">
+    <span>复制格式</span>
+    <button type="button" id="fmtToggle" class="fmt-toggle" aria-label="折叠/展开">－</button>
+  </div>
+  <div class="fmt-body" id="fmtBody">
+    <label class="fmt-opt"><input type="radio" name="fmt" value="hex6"> <code>#RRGGBB</code></label>
+    <label class="fmt-opt"><input type="radio" name="fmt" value="hex3"> <code>#RGB</code></label>
+    <label class="fmt-opt"><input type="radio" name="fmt" value="rgb"> <code>rgb(r,g,b)</code></label>
+    <label class="fmt-opt"><input type="radio" name="fmt" value="hsl"> <code>hsl(h,s%,l%)</code></label>
+    <div class="fmt-prev" id="fmtPrev">示例：#ffffff</div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
 (function () {
   var DATA = null, GROUP = 'all';
+  // 复制格式：默认 #RRGGBB（六位十六进制），选择持久化到 localStorage
+  var FMT = (function () {
+    try { return localStorage.getItem('palette_fmt') || 'hex6'; } catch (e) { return 'hex6'; }
+  })();
+
+  // ── 色值编码格式转换 ──
+  function hexToRgb(hex) {
+    var h = (hex || '').replace('#', '').trim();
+    if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+    if (h.length !== 6 || /[^0-9a-f]/i.test(h)) return null;
+    var n = parseInt(h, 16);
+    return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+  }
+  function rgbStr(c) { return 'rgb(' + c.r + ',' + c.g + ',' + c.b + ')'; }
+  function hex6(c) {
+    function x(v) { var s = v.toString(16); return s.length < 2 ? '0' + s : s; }
+    return '#' + x(c.r) + x(c.g) + x(c.b);
+  }
+  // 仅当三通道各自成对（如 #ffffff→#fff）才缩短，否则回落六位
+  function hex3(hex, c) {
+    function x(v) { var s = v.toString(16); return s.length < 2 ? '0' + s : s; }
+    var r = x(c.r), g = x(c.g), b = x(c.b);
+    if (r[0] === r[1] && g[0] === g[1] && b[0] === b[1]) return '#' + r[0] + g[0] + b[0];
+    return '#' + r + g + b;
+  }
+  function rgbToHsl(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    var mx = Math.max(r, g, b), mn = Math.min(r, g, b), h, s, l = (mx + mn) / 2;
+    if (mx === mn) { h = s = 0; }
+    else {
+      var d = mx - mn;
+      s = l > 0.5 ? d / (2 - mx - mn) : d / (mx + mn);
+      if (mx === r) h = (g - b) / d + (g < b ? 6 : 0);
+      else if (mx === g) h = (b - r) / d + 2;
+      else h = (r - g) / d + 4;
+      h /= 6;
+    }
+    return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+  }
+  function fmtOf(hex) {
+    var c = hexToRgb(hex);
+    if (!c) return hex;
+    if (FMT === 'hex3') return hex3(hex, c);
+    if (FMT === 'rgb') return rgbStr(c);
+    if (FMT === 'hsl') { var h = rgbToHsl(c.r, c.g, c.b); return 'hsl(' + h.h + ',' + h.s + '%,' + h.l + '%)'; }
+    return hex6(c);
+  }
   var body = document.getElementById('body');
   var sum = document.getElementById('sum');
   var st = document.getElementById('st');
@@ -276,16 +355,43 @@
     body.innerHTML = html;
   }
 
-  // 事件委托：色块 / 色号 / 整组复制
+  // 事件委托：色块 / 色号 / 整组复制（按悬浮窗所选格式输出）
   body.addEventListener('click', function (e) {
     var sw = e.target.closest('[data-hex]');
-    if (sw) { copy(sw.getAttribute('data-hex'), sw.getAttribute('data-hex')); return; }
+    if (sw) {
+      var hx = sw.getAttribute('data-hex');
+      copy(fmtOf(hx), hx);
+      return;
+    }
     var btn = e.target.closest('[data-all]');
     if (btn) {
-      var all = btn.getAttribute('data-all');
-      copy(all, all.split(' ').length + ' 色');
+      var arr = (btn.getAttribute('data-all').split(' ').filter(Boolean)).map(fmtOf);
+      copy(arr.join('\n'), arr.length + ' 色');
     }
   });
+
+  // ── 复制格式悬浮窗：单选 + 折叠 + 持久化 ──
+  (function initFmt() {
+    var panel = document.getElementById('fmtPanel');
+    var toggle = document.getElementById('fmtToggle');
+    var prev = document.getElementById('fmtPrev');
+    var radios = panel.querySelectorAll('input[name="fmt"]');
+    function apply() { prev.textContent = '示例：' + fmtOf('#ffffff'); }
+    Array.prototype.forEach.call(radios, function (r) {
+      if (r.value === FMT) r.checked = true;
+      r.addEventListener('change', function () {
+        if (!r.checked) return;
+        FMT = r.value;
+        try { localStorage.setItem('palette_fmt', FMT); } catch (e) {}
+        apply();
+      });
+    });
+    toggle.addEventListener('click', function () {
+      panel.classList.toggle('collapsed');
+      toggle.textContent = panel.classList.contains('collapsed') ? '＋' : '－';
+    });
+    apply();
+  })();
 
   fetch('/api/palette/list', { cache: 'no-store' })
     .then(function (r) { return r.json(); })
