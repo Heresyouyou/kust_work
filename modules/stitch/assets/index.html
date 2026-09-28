@@ -1,0 +1,188 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="0000stitch">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>图像拼合 · kust.work</title>
+<link rel="stylesheet" href="/api/stitch/assets/styles.css">
+<script src="/theme.js"></script>
+</head>
+<body>
+
+<header>
+  <a class="back" href="/">&larr; 工作台</a>
+  <span class="logo">ku</span>
+  <span class="brand">图像拼合</span>
+  <span class="spacer"></span>
+  <span class="stat"><span class="dot" id="stDot"></span><span id="stText">准备就绪</span></span>
+</header>
+
+<main>
+
+  <!-- 上传区 -->
+  <section class="stage">
+    <div id="dropZone" class="drop-zone">
+      <input id="fileInput" type="file" accept="image/*" multiple hidden />
+      <svg class="dz-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="17 8 12 3 7 8"/>
+        <line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      <div class="dz-text">
+        <p class="dz-title">拖入显微照片，或点击选择</p>
+        <p class="dz-sub">支持 JPG / PNG · 至少 2 张 · 按拍摄顺序上传效果更好</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 图片列表 -->
+  <section id="listSection" class="hidden">
+    <div class="list-head">
+      <h2>已选 <span id="countBadge" class="badge">0</span> 张</h2>
+      <button id="clearBtn" class="btn-text">清空</button>
+    </div>
+    <div id="thumbs" class="thumbs"></div>
+  </section>
+
+  <!-- 设置 -->
+  <section id="setSection" class="hidden">
+    <div class="panel">
+      <h2>参数设置</h2>
+      <div class="grid2">
+        <div class="field">
+          <label>羽化边缘 <span class="hint">px</span>
+            <span id="featherV" class="val">0（不羽化）</span></label>
+          <input id="feather" type="range" min="0" max="10" step="1" value="0">
+          <p class="field-note"><b>默认 0 = 不羽化，保留真实矿物纹理。</b>
+            羽化是在重叠区把两张亚像素错位的图做加权平均 → <b>细节必然发糊</b>，
+            显微图反而丢失颗粒感。消缝已由「内容边界复制 + 多频带融合」完成，
+            无需羽化。若确要启用，上限 10px。</p>
+        </div>
+        <div class="field">
+          <label>匹配缩放（输入最长边）
+            <span id="maxV" class="val">原尺寸</span></label>
+          <select id="maxSide">
+            <option value="0" selected>原尺寸（推荐）</option>
+            <option value="2048">2048（快）</option>
+            <option value="1600">1600</option>
+            <option value="1200">1200（最快）</option>
+          </select>
+          <p class="field-note">匹配前统一缩小源图。只加快特征匹配，结果仍按原图出。
+            图幅请用右边的「输出图幅」控制。</p>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label>输出图幅（全景最长边上限）
+            <span id="outV" class="val">自动</span></label>
+          <select id="outSide">
+            <option value="0" selected>自动（按可用内存）</option>
+            <option value="-2">推荐（按张数与帧宽自动）</option>
+            <optgroup label="大图 · 定量测量">
+              <option value="16384">16384 px（16K）</option>
+              <option value="12288">12288 px（12K）</option>
+              <option value="10240">10240 px（10K）</option>
+              <option value="8192">8192 px（8K）</option>
+            </optgroup>
+            <optgroup label="中等 · 观察 + 局部测量">
+              <option value="6144">6144 px（6K）</option>
+              <option value="5120">5120 px（5K）</option>
+              <option value="4096">4096 px（4K）</option>
+              <option value="3072">3072 px（3K）</option>
+            </optgroup>
+            <optgroup label="轻量 · 目视 / 预览">
+              <option value="2560">2560 px（2.5K）</option>
+              <option value="2048">2048 px（2K）</option>
+              <option value="1536">1536 px（1.5K）</option>
+              <option value="1280">1280 px（1.25K）</option>
+              <option value="1024">1024 px（1K）</option>
+            </optgroup>
+            <option value="-1">自定义…</option>
+          </select>
+          <input id="outSideCustom" type="number" min="1024" max="65536" step="64"
+                 value="6000" hidden style="display:none"
+                 placeholder="1024 ~ 65536">
+          <p class="field-note rec" id="outRec"></p>
+          <p class="field-note">拼接结果的最长边不会超过这个值，超出则整体等比缩小。
+            档位越小越快、越省内存、文件越小。选「自动」则按可用内存尽量出大图，
+            并把结果放回原尺寸网格以保持比例标定；指定档位时<b>按所选的尺寸出图，
+            不再放大</b>（放大只会插出假像素），等效像素尺度见结果里的「缩放」。
+            档位按 ~1.25 倍细分（16K→1K），不够用可选「自定义」直接填最长边像素
+            （1024~65536）；拿不准就选<b>「推荐」</b>，按张数与帧宽自动定档（依据见上一行）。</p>
+        </div>
+        <div class="field">
+          <label>拼接引擎</label>
+          <select id="engine">
+            <option value="auto" selected>自动（推荐）</option>
+            <option value="fallback">内置引擎（纯 OpenCV）</option>
+            <option value="openstitching">OpenStitching（实验）</option>
+          </select>
+          <p class="field-note">内置引擎用 SIFT 匹配 + 全局最小二乘优化 + 多频带融合，
+            是显微图的默认选择。OpenStitching 在本机数据上出现过相机参数退化
+            （放射状拖影），仅作对比用。</p>
+        </div>
+      </div>
+      <div class="toggles">
+        <label><input id="tScale" type="checkbox" checked> 抑制白色比例尺/标签</label>
+        <label><input id="tInpaint" type="checkbox"> 孔洞修补 <span class="muted-note">(显微图建议关闭)</span></label>
+        <label><input id="tAsync" type="checkbox" checked> 异步（百分比进度条）</label>
+      </div>
+      <div class="actions">
+        <button id="runBtn" class="btn-primary">开始拼合</button>
+        <span id="runHint" class="muted">需至少 2 张图像</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 进度 -->
+  <section id="progSection" class="hidden">
+    <div class="panel">
+      <div class="prog-head">
+        <div class="spinner" id="spinner"></div>
+        <span id="progTitle" class="title">正在处理…</span>
+        <span id="progPct" class="muted"></span>
+      </div>
+      <div class="bar"><div id="barFill"></div></div>
+      <pre id="logBox" class="log"></pre>
+    </div>
+  </section>
+
+  <!-- 结果 -->
+  <section id="resSection" class="hidden">
+    <div class="panel">
+      <div class="res-head">
+        <h2>拼合结果</h2>
+        <div class="res-meta">
+          <span id="resInfo" class="muted"></span>
+          <a id="dlLink" class="btn-primary" target="_blank">下载</a>
+        </div>
+      </div>
+      <div id="resDiag" class="diag hidden"></div>
+      <div class="res-img-wrap">
+        <img id="resImg" alt="拼合结果">
+      </div>
+      <details id="resDetail" class="hidden">
+        <summary>匹配详情</summary>
+        <div id="resDetailBody" class="detail-body"></div>
+      </details>
+    </div>
+  </section>
+
+  <!-- 错误 -->
+  <section id="errSection" class="hidden">
+    <div class="err-box">
+      <h3>拼合失败</h3>
+      <p id="errMsg"></p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  显微图像自动拼合 · SIFT 特征匹配 + RANSAC 几何校验 + 全局最小二乘位姿优化 + 多频带融合
+</footer>
+
+<script src="/api/stitch/assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF 阅读器 · kust.work</title>
+<!-- 主题引擎：必须同步加载（勿加 defer/async），否则会先闪深色再变浅色。
+     注意：PDF 纸面、文本层高亮保持原色，不随主题变化。 -->
+<script src="/theme.js"></script>
+<link rel="stylesheet" href="/api/reader/assets/reader.css">
+<style>
+  /* 只有「撑满整屏」这一件事放在页面里：阅读器的骨架尺寸必须由宿主决定 */
+  html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+  body { background: var(--bg, #2b2b2b); color: var(--text, #e8e4df);
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; }
+  #reader { width: 100%; height: 100%; }
+  /* 顶部「返回工作台」浮条：浮在阅读器之上，所以用半透明底 + 自身可点 */
+  .kust-back {
+    position: fixed; top: 9px; left: 10px; z-index: 60;
+    padding: 3px 9px; border-radius: 12px; font-size: 11px;
+    text-decoration: none;
+    /* 主题化磨砂底：dark 暗色玻璃 / light 浅色玻璃（color-mix 让主题色随主题变） */
+    background: color-mix(in srgb, var(--surface-2) 78%, transparent);
+    color: var(--text);
+    backdrop-filter: blur(6px);
+    border: 1px solid var(--border);
+  }
+  .kust-back:hover { color: var(--accent); border-color: var(--accent-line); }
+  /* 返回条浮在工具栏左上角，给工具栏让出位置，避免压住侧栏/目录按钮 */
+  .kp-toolbar { padding-left: 96px; }
+</style>
+</head>
+<body>
+
+<a class="kust-back" href="/">&larr; 工作台</a>
+<div id="reader"></div>
+
+<!-- 自研阅读器：零构建 ES Module，直接由浏览器按模块图加载。
+     静态资源走根路径 /api/reader/assets/，与页面路径前缀解耦。 -->
+<script type="module">
+  import './api/reader/assets/reader-page.js';
+</script>
+</body>
+</html>

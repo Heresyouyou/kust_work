@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>kust.work · 工作台</title>
+<title>kust.work · 工作台 - 三江成矿</title>
 <style>
   /* 深色为默认值（theme.js 加载失败也完整可读）；
      浅色由 /theme.js 注入的 :root[data-theme="light"] 覆盖。
@@ -22,6 +22,7 @@
     --meta-key: #5f7d69;
     /* 语义 */
     --warn: #f0a030; --warn-border: #6a4a15; --err: #c0524a;
+    --info: #4a90d9;
     /* 相关度分档 */
     --tier-strong-bg: #23402e; --tier-strong-fg: #79d39b; --tier-strong-bd: #2f5a3e;
     --tier-mid-bg: #23323f; --tier-mid-fg: #7fb5d8; --tier-mid-bd: #2f4757;
@@ -58,6 +59,16 @@
   .dot.ok { background: var(--accent); }
   .dot.warn { background: var(--warn); }
   .dot.down { background: var(--err); }
+  .dot.blue { background: var(--info); }
+  /* 通路灯：内网访问=绿，公网访问=橙（后端按对端是否回环判定） */
+  .dot.lan { background: var(--accent); }
+  .dot.wan { background: var(--warn); }
+  /* 状态区整体可点（离线走 DeepSeek 云端时 → 用量页）；
+     仅 blue 态挂 href，其余状态无链接、无手型、无 hover 反馈。 */
+  .stat-link { display: flex; align-items: center; gap: 7px; color: inherit;
+               text-decoration: none; border-radius: 5px; padding: 2px 6px;
+               margin: -2px -6px; }
+  .stat-link[href]:hover { background: var(--surface-2); color: var(--text); }
 
   /* ── 主体 ── */
   main { flex: 1; width: 100%; max-width: 1100px; margin: 0 auto; padding: 44px 20px 40px; }
@@ -97,6 +108,13 @@
   footer b { color: var(--text); font-weight: 400; }
   footer .sep { color: var(--border); }
 
+  /* ── 强制刷新提示 ── */
+  #kustToast { position: fixed; left: 50%; top: 64px; transform: translateX(-50%);
+    background: var(--toast-bg); color: var(--text); border: 1px solid var(--border);
+    padding: 9px 16px; border-radius: 6px; font-size: 13px; z-index: 9999;
+    box-shadow: var(--sw-shadow); opacity: 0; pointer-events: none; transition: opacity .25s; }
+  #kustToast.show { opacity: 1; }
+
   @media (max-width: 560px) {
     main { padding: 28px 16px 28px; }
     .hero h1 { font-size: 19px; }
@@ -113,12 +131,13 @@
   <div class="logo">ku</div>
   <span class="brand">kust.work</span>
   <span class="spacer"></span>
-  <div class="stat"><span class="dot" id="dotSvc"></span><span id="txtSvc">检测中</span></div>
+  <div class="stat"><a class="stat-link" id="svcLink"><span class="dot" id="dotSvc"></span><span id="txtSvc">检测中</span></a></div>
+  <div class="stat"><span class="dot" id="dotNet"></span><span id="txtNet">通路检测中</span></div>
 </header>
 
 <main>
   <div class="hero">
-    <h1>工作台</h1>
+    <h1>工作台 - 三江成矿</h1>
     <p>选择一个功能开始</p>
   </div>
 <!--PORTAL_CARDS-->
@@ -138,15 +157,48 @@
 (function () {
   var dot = document.getElementById('dotSvc');
   var txt = document.getElementById('txtSvc');
+  var link = document.getElementById('svcLink');
+  var dotNet = document.getElementById('dotNet');
+  var txtNet = document.getElementById('txtNet');
   var fLlama = document.getElementById('fLlama');
   var fActive = document.getElementById('fActive');
   var fTime = document.getElementById('fTime');
 
+  // 离线态（蓝色 DeepSeek在线）时状态区可点，跳 DeepSeek 用量页；
+  // 其余状态移除 href，避免误点跳到无关页面。
+  var DEEPSEEK_USAGE = 'https://platform.deepseek.com/usage';
+
   var LEVEL = {
     ok:      ['ok',   '推理服务正常', '正常'],
     loading: ['warn', '模型加载中',   '加载中'],
-    down:    ['down', '推理服务离线', '离线']
+    down:    ['blue', 'DeepSeek在线', 'DeepSeek']
   };
+
+  // 通路灯：后端据对端地址判定（回环→公网隧道；私网→内网反代）。
+  var PATH = {
+    lan: ['lan', '内网访问'],
+    wan: ['wan', '公网访问']
+  };
+
+  function setPath(p) {
+    var v = PATH[p] || ['', '通路未知'];
+    dotNet.className = 'dot' + (v[0] ? ' ' + v[0] : '');
+    txtNet.textContent = v[1];
+  }
+
+  function setLink(on) {
+    if (on) {
+      link.setAttribute('href', DEEPSEEK_USAGE);
+      link.setAttribute('target', '_blank');
+      link.setAttribute('rel', 'noopener noreferrer');
+      link.setAttribute('title', '查看 DeepSeek 用量');
+    } else {
+      link.removeAttribute('href');
+      link.removeAttribute('target');
+      link.removeAttribute('rel');
+      link.removeAttribute('title');
+    }
+  }
 
   function stamp() {
     var d = new Date();
@@ -161,13 +213,17 @@
         var lv = LEVEL[d.llama] || LEVEL.down;
         dot.className = 'dot ' + lv[0];
         txt.textContent = lv[1];
+        setLink(d.llama === 'down');
         fLlama.textContent = lv[2];
         fActive.textContent = (d.active === null || d.active === undefined) ? '—' : d.active;
+        setPath(d.path);
         stamp();
       })
       .catch(function () {
         dot.className = 'dot down';
         txt.textContent = '门户后端异常';
+        setLink(false);
+        setPath(null);
         fLlama.textContent = '离线';
         fActive.textContent = '—';
       });
@@ -245,6 +301,59 @@
   bindJournals();
   document.addEventListener('visibilitychange', function () {
     if (!document.hidden) { bindDaily(); bindJournals(); }
+  });
+})();
+
+/* ── 系统栏「强制清缓存」：等效 Ctrl+Shift+R 的强制刷新 ──
+   行为对齐 Ctrl+Shift+R：跳过浏览器缓存重新拉取资源，但不清空 localStorage
+   （Ctrl+Shift+R 本身只绕过 HTTP 缓存、不动本地存储）。 */
+(function () {
+  function toast(msg) {
+    var t = document.getElementById('kustToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'kustToast';
+      document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(function () { t.classList.remove('show'); }, 1800);
+  }
+
+  function hardReload() {
+    toast('正在跳过缓存，重新拉取…');
+    var go = function () {
+      // 给 toast 一帧渲染时间后再跳转
+      setTimeout(function () {
+        var sep = location.search ? '&' : '?';
+        // 加时间戳做缓存粉碎：强制文档与由其重新请求的所有子资源都回源
+        location.href = location.pathname + location.search + sep + '_=' + Date.now() + location.hash;
+      }, 140);
+    };
+    // 清掉 Cache API（PWA / fetch 资源缓存），最接近 Ctrl+Shift+R 的「跳过缓存」语义
+    if (window.caches && caches.keys) {
+      try {
+        caches.keys()
+          .then(function (keys) {
+            return Promise.all(keys.map(function (k) { return caches.delete(k); }));
+          })
+          .then(go)
+          .catch(go);
+      } catch (e) { go(); }
+    } else {
+      go();
+    }
+  }
+
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest ? e.target.closest('[data-action]') : null;
+    if (!el) return;
+    var act = el.getAttribute('data-action');
+    if (act === 'hardreload') {
+      e.preventDefault();   // 阻止 <a href="#"> 跳到页顶
+      hardReload();
+    }
   });
 })();
 </script>

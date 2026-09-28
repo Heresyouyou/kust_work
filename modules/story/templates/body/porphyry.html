@@ -1,0 +1,150 @@
+<!-- 正文片段：大型与小型安第斯斑岩铜矿的成因分野（/story/porphyry-zircon）
+     与外层 story.html 共用同一套 CSS，因此保留了原版式的目录胶囊、逐页要点卡、
+     图件 lightbox 等结构；数据与渲染由 docs/porphyry-zircon/story.js 提供。 -->
+
+<nav class="toc">
+  <a href="#s5">① 数据索引</a>
+  <a href="#s-ref">② 参考文献</a>
+  <a href="#s-gal">③ 配图看板</a>
+  <a href="#s-vis">④ 视觉体系</a>
+  <a href="#s3">⑤ 逐页要点</a>
+  <a href="#s-concl">⑥ 核心结论</a>
+</nav>
+
+<!-- ══════════ 01 数据索引（硬核先行：每个数字都能回到原文）══════════ -->
+<section id="s5">
+  <div class="sec-h">
+    <span class="sec-n">01</span>
+    <h2>关键数据索引</h2>
+    <span class="sec-t">14 项 · 全部标出原文出处</span>
+  </div>
+  <p class="lead">页面上的每个数字都能回到原文。这里同时保留了两个口径：结论段的判定阈值与 Fig. 7 讨论中的实测区间，未简化成单一数值。</p>
+  <div class="search">
+    <input id="q" type="search" placeholder="搜索数据项、数值或出处…" autocomplete="off">
+    <span class="cnt" id="qcnt">14 项</span>
+  </div>
+  <div class="tw">
+    <table>
+      <thead><tr><th style="width:26%">数据</th><th style="width:40%">值</th><th style="width:34%">出处</th></tr></thead>
+      <tbody id="dt"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════ 02 参考文献 ══════════ -->
+<section id="s-ref">
+  <div class="sec-h">
+    <span class="sec-n">02</span>
+    <h2>参考文献</h2>
+    <span class="sec-t">本次研读主要依据 · 按用途分 4 类</span>
+  </div>
+  <p class="lead">节选自原文 Reference 列表（12 篇主引 + 3 篇延伸），完整文献表见论文原文。编号与汇报第 15 页一致。</p>
+  <div class="ref-cat">A · 原文与区域成矿</div>
+  <ul class="ref-list">
+    <li data-n="1">Tapia MJ et al. (2025) <i>Mineralium Deposita</i> 60:1569–1594.</li>
+    <li data-n="2">Maksaev V et al. (2010) <i>Andean Geol</i> 37:144–176.</li>
+    <li data-n="3">Creixell C et al. (2020) <i>Andean Geol</i> 47:469–507.</li>
+  </ul>
+  <div class="ref-cat">B · 锆石肥力指标方法学</div>
+  <ul class="ref-list">
+    <li data-n="4">Ballard JR et al. (2002) <i>Contrib Mineral Petrol</i> 144:347–364.</li>
+    <li data-n="5">Dilles JH et al. (2015) <i>Econ Geol</i> 110:241–251.</li>
+    <li data-n="6">Loader MA et al. (2017) <i>Earth Planet Sci Lett</i> 472:107–119.</li>
+  </ul>
+  <div class="ref-cat">C · 成因机制与规模控制</div>
+  <ul class="ref-list">
+    <li data-n="7">Loucks RR (2021) <i>Earth Sci Rev</i> 220:103744.</li>
+    <li data-n="8">Hao H et al. (2024) <i>J Petrol</i> 65:egae058.</li>
+    <li data-n="9">Richards J (2003) <i>Econ Geol</i> 98:1515–1533.</li>
+  </ul>
+  <div class="ref-cat">D · 温度计·氧逸度·标准化基础</div>
+  <ul class="ref-list">
+    <li data-n="10">Watson EB et al. (2006) <i>Contrib Mineral Petrol</i> 151:413–433.</li>
+    <li data-n="11">Ferry JM, Watson EB (2007) <i>Contrib Mineral Petrol</i> 154:429–437.</li>
+    <li data-n="12">McDonough WF, Sun S (1995) <i>Chem Geol</i> 120:223–253.</li>
+  </ul>
+  <p class="ref-extra">另参：Sillitoe RJ, Perelló J (2005) <i>SEG 100th Anniversary Volume</i>: 845–890；Loucks RR, Fiorentini ML (2023) 锆石微量元素记录岩浆加水与失水；Cottrell E et al. (2021) <i>Magma Redox Geochemistry</i>: 33–61。</p>
+</section>
+
+<!-- ══════════ 03 配图看板 ══════════ -->
+<section id="s-gal">
+  <div class="sec-h">
+    <span class="sec-n">03</span>
+    <h2>配图看板</h2>
+    <span class="sec-t">11 张 · 全部取自原文图表 · 点击放大</span>
+  </div>
+  <p class="lead">大图存 <code>img/&lt;key&gt;.jpg</code>，本页用 <code>_s.jpg</code> 缩略图加载，点击进 lightbox 看原图（Esc 或点背景关闭）。灰显的三张为备选图，结论已并入正文。</p>
+  <div id="gal"></div>
+</section>
+
+<!-- ══════════ 04 视觉体系 ══════════ -->
+<section id="s-vis">
+  <div class="sec-h">
+    <span class="sec-n">04</span>
+    <h2>视觉体系</h2>
+    <span class="sec-t">昆工红土色系 · 点击色块复制 hex</span>
+  </div>
+  <p class="lead">本页与放映台共用一套配色，全部走 CSS 变量（浅色 / 深色各一档），页面本身不出现硬编码色值。色板为调色板数据，点击即复制。</p>
+  <div class="swatches" id="swatches">
+    <button class="sw" type="button" data-hex="#6F3E34"><i style="background:#6F3E34"></i><span>校标准色 · 红土色</span><code>#6F3E34</code></button>
+    <button class="sw" type="button" data-hex="#C3907A"><i style="background:#C3907A"></i><span>红土色提亮</span><code>#C3907A</code></button>
+    <button class="sw" type="button" data-hex="#D3A48E"><i style="background:#D3A48E"></i><span>深底上的文字 / 按钮底</span><code>#D3A48E</code></button>
+    <button class="sw" type="button" data-hex="#3F211B"><i style="background:#3F211B"></i><span>深底 · 封面与扉页</span><code>#3F211B</code></button>
+    <button class="sw" type="button" data-hex="#131010"><i style="background:#131010"></i><span>深底 · 放映框</span><code>#131010</code></button>
+    <button class="sw" type="button" data-hex="#F8F1EE"><i style="background:#F8F1EE"></i><span>浅底 · 卡片与图注</span><code>#F8F1EE</code></button>
+  </div>
+</section>
+
+<!-- ══════════ 05 逐页要点 ══════════ -->
+<section id="s3">
+  <div class="sec-h">
+    <span class="sec-n">05</span>
+    <h2>逐页要点</h2>
+    <span class="sec-t">4 章 15 页 · 节拍与版面</span>
+  </div>
+  <div class="rhythm-legend">
+    <span><i style="background:var(--ku)"></i>peak · 全页强视觉锚点</span>
+    <span><i style="background:var(--surface-3);border:1px solid var(--border)"></i>transition · 章节过渡</span>
+    <span><i style="background:var(--dim);opacity:.5"></i>valley · 信息承接</span>
+    <span><i style="background:var(--warn)"></i>section · 章节扉页</span>
+  </div>
+
+  <div id="chapters"></div>
+</section>
+
+<!-- ══════════ 06 核心结论 ══════════ -->
+<section id="s-concl">
+  <div class="sec-h">
+    <span class="sec-n">06</span>
+    <h2>听完要记住的三件事</h2>
+    <span class="sec-t">本文的核心结论</span>
+  </div>
+  <div class="note-grid">
+    <div class="note">
+      <h4>① 规模 = 分异深度，不是氧化态</h4>
+      <ul>
+        <li>本文用锆石微量元素把「矿床规模」翻译成「岩浆分异深度」</li>
+      </ul>
+    </div>
+    <div class="note">
+      <h4>② Eu/Eu* 只能答「含不含矿」</h4>
+      <ul>
+        <li>新比率 Yb<sub>N</sub>/Dy<sub>N</sub> 与 (Eu/Eu*)/(Dy<sub>N</sub>/Yb<sub>N</sub>) 才能回答「矿有多大」</li>
+      </ul>
+    </div>
+    <div class="note">
+      <h4>③ 方法学复现式学习</h4>
+      <ul>
+        <li>用自建翻译系统、自研 PDF 阅读器与期刊追踪链路完成方法学复现</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 灯箱 + 提示条（story.js 的 initLightbox() / toast()）══════════ -->
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="图件大图">
+  <button class="lb-x" type="button" aria-label="关闭">&times;</button>
+  <img id="lbi" alt="">
+  <div class="lb-c" id="lbc"></div>
+</div>
+<div class="toast" id="ts" role="status" aria-live="polite"></div>

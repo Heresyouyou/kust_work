@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>翻译队列 · kust.work</title>
+<title>任务队列 · kust.work</title>
 <style>
   /* 深色为默认值（/theme.js 缺失也完整可读）；浅色由 theme.js 注入的
      :root[data-theme="light"] 覆盖。新增颜色一律走变量，勿写死色值。 */
@@ -91,6 +91,12 @@
      免得 theme.js 的浅色对照表漏配。 */
   .jbadge.failed { background: var(--surface-2); color: var(--err); border-color: var(--err); }
   .jbadge.cancelled { background: var(--surface-2); color: var(--muted); border-color: var(--border); }
+  /* 任务种类小徽标（翻译 / 拼合）—— 复用既有主题变量，不新增色值，
+     免得 theme.js 的浅色对照表漏配。 */
+  .kchip { font-size: 10.5px; padding: 2px 7px; border-radius: 3px; flex-shrink: 0;
+    background: var(--surface-3); color: var(--muted); border: 1px solid var(--border); }
+  .kchip.k-trans { background: var(--accent-soft); color: var(--meta-key);
+    border-color: var(--accent-line); }
   .jmeta { display: flex; align-items: center; gap: 10px; margin-top: 8px;
     font-size: 11.5px; color: var(--muted); flex-wrap: wrap; }
   .jmeta > span:first-child { flex: 1; min-width: 0; }
@@ -127,14 +133,14 @@
 <header>
   <a class="back" href="/">&larr; 工作台</a>
   <span class="logo">ku</span>
-  <span class="brand">翻译队列</span>
+  <span class="brand">任务队列</span>
   <span class="spacer"></span>
   <span class="stat" id="st">加载中…</span>
 </header>
 
 <main>
   <div class="head">
-    <h1>翻译队列</h1>
+    <h1>任务队列</h1>
     <span class="badge never" id="badge">—</span>
   </div>
 
@@ -142,7 +148,7 @@
 </main>
 
 <footer>
-  文献队列来自 Flask 内存 <code>jobs</code>（最近 1 小时）· 标题队列来自 <code>journal_title_zh_status.json</code> · 只读展示
+  统一串行队列（翻译 + 图像拼合，均吃 GPU ⇒ 同一时刻只跑一个）· 数据来自 Flask 内存 <code>jobs</code>（最近 1 小时）· 标题队列来自 <code>journal_title_zh_status.json</code> · 只读展示
 </footer>
 
 <script>
@@ -158,6 +164,15 @@
     });
   }
   function num(v) { return (v == null) ? '—' : v; }
+  /** 生成自研阅读器地址：file=主文档，peer=对照文档（可空）。
+   *  url 来自后端，已是编码好的路径 —— 不能再整体 encodeURIComponent，
+   *  否则 %20 会变成 %2520。只补编码裸字符并还原被误编码的 %25。 */
+  function readerUrl(file, peer) {
+    function enc(s) { return encodeURI(s || '').replace(/%25/g, '%'); }
+    var u = '/PDFreader?file=' + enc(file);
+    if (peer) u += '&peer=' + enc(peer);
+    return u + '&layout=continuous&sync=1';
+  }
   function fmtClock(ts) {
     if (!ts) return '';
     var d = new Date(ts * 1000);
@@ -176,33 +191,48 @@
       + esc(v) + (sub ? ' <small>' + esc(sub) + '</small>' : '') + '</div></div>';
   }
 
-  /* ── 文献翻译队列（当前文件队列） ───────────────────── */
+  /* ── 统一任务队列（翻译 + 图像拼合，同一串行通道） ───── */
 
   var DOC_LBL = { queued: '排队中', translating: '翻译中', done: '已完成',
                   failed: '失败', cancelled: '已取消' };
+  /* 任务种类短名。后端快照已带 display（中文名），这里只作兜底 */
+  var KIND_LBL = { translate: '翻译', stitch: '拼合' };
+  var KIND_CLS = { translate: 'k-trans' };
+
+  /* 「进行中」措辞随种类变：翻译跑的是 BabelDOC，拼合跑的是 OpenCV 特征匹配/融合 */
+  function runningLabel(kind) {
+    return kind === 'stitch' ? '拼合中' : '翻译中';
+  }
 
   function jobRow(j) {
     var s = j.status || '';
-    var pct = Number(j.progress) || 0;
+    var kind = j.kind || 'translate';
+    var kname = j.display || KIND_LBL[kind] || kind;
+    // 翻译的进度字段是 progress(0~100)，拼合是 percent；两者择一，缺省 0
+    var pct = Number(j.percent != null ? j.percent : j.progress) || 0;
     var cls = ['queued', 'translating', 'done', 'failed', 'cancelled'].indexOf(s) >= 0 ? s : 'cancelled';
-    var lbl = DOC_LBL[s] || s;
+    var lbl = (s === 'translating') ? runningLabel(kind) : (DOC_LBL[s] || s);
 
     var meta = [];
     if (s === 'queued' && j.queue_position) meta.push('第 ' + j.queue_position + ' 位');
     if (s === 'translating') meta.push(pct + '%');
     if (j.elapsed) meta.push('已用 ' + fmtDur(j.elapsed));
     if (j.created_at) meta.push(fmtClock(j.created_at) + ' 提交');
+    if (s === 'queued' && j.message) meta.push(j.message);
     var errHtml = j.error ? '<div class="jmeta"><span class="jerr">错误：' + esc(j.error) + '</span></div>' : '';
 
     var links = [];
-    if (j.original_url) links.push('<a href="' + esc(j.original_url) + '" target="_blank">原文</a>');
-    if (j.mono_url) links.push('<a href="' + esc(j.mono_url) + '" target="_blank">中文</a>');
-    if (j.dual_url) links.push('<a href="' + esc(j.dual_url) + '" target="_blank">双语</a>');
+    // 全部走自研阅读器（/PDFreader），不再交给浏览器原生 PDF。
+    // 点「中文」「双语」时若原文也在，直接进 原文+该版本 的双栏对照。
+    if (j.original_url) links.push('<a href="' + esc(readerUrl(j.original_url, '')) + '" target="_blank">原文</a>');
+    if (j.mono_url) links.push('<a href="' + esc(readerUrl(j.original_url || j.mono_url, j.original_url ? j.mono_url : '')) + '" target="_blank">中文</a>');
+    if (j.dual_url) links.push('<a href="' + esc(readerUrl(j.original_url || j.dual_url, j.original_url ? j.dual_url : '')) + '" target="_blank">双语</a>');
 
     var showBar = (s === 'translating' || s === 'queued' || s === 'done');
 
     return '<div class="job">'
-      + '<div class="jtop"><span class="jname" title="' + esc(j.name) + '">' + esc(j.name || '(未命名)') + '</span>'
+      + '<div class="jtop"><span class="kchip ' + (KIND_CLS[kind] || '') + '">' + esc(kname) + '</span>'
+      + '<span class="jname" title="' + esc(j.name) + '">' + esc(j.name || '(未命名)') + '</span>'
       + '<span class="jbadge ' + cls + '">' + esc(lbl) + (s === 'translating' ? ' ' + pct + '%' : '') + '</span></div>'
       + (showBar ? '<div class="bar bar-s"><i style="width:' + (s === 'done' ? 100 : pct) + '%"></i></div>' : '')
       + '<div class="jmeta"><span>' + (meta.length ? meta.map(esc).join(' · ') : esc(j.message || '')) + '</span>'
@@ -211,11 +241,12 @@
   }
 
   function renderDoc(doc) {
-    var html = '<div class="sec-title">文献翻译队列<span class="sec-sub">当前文件队列</span></div>';
+    var html = '<div class="sec-title">统一任务队列'
+      + '<span class="sec-sub">翻译与图像拼合共用同一条串行通道（都吃 GPU）</span></div>';
 
     if (!doc || doc.unavailable) {
       return html + '<div class="panel"><div class="empty">'
-        + esc((doc && doc.message) || '文献翻译队列暂不可用') + '</div></div>';
+        + esc((doc && doc.message) || '任务队列暂不可用') + '</div></div>';
     }
 
     var s = doc.stats || {};
@@ -223,14 +254,15 @@
 
     html += '<div class="grid">'
       + metric('排队中', num(s.queued), '个')
-      + metric('翻译中', num(s.translating), '个')
+      + metric('进行中', num(s.translating), '个')
       + metric('已完成', num(s.done), '个')
       + metric('失败', num(s.failed), '个')
       + metric('队列长度', num(doc.queue_size), '个')
       + '</div>';
 
     if (!items.length) {
-      html += '<div class="panel"><div class="empty">当前没有翻译任务 —— 去「PDF 翻译」上传文件即会出现在这里</div></div>';
+      html += '<div class="panel"><div class="empty">当前没有任务 —— 去「文献翻译」上传 PDF，'
+        + '或去「图像拼合」提交显微照片，都会排队出现在这里</div></div>';
     } else {
       html += '<div class="jobs">' + items.map(jobRow).join('') + '</div>';
     }
@@ -293,7 +325,7 @@
     var busy = (ds.translating || 0) + (ds.queued || 0);
     var titleRunning = !!title.running;
 
-    st.textContent = busy ? (busy + ' 个进行中')
+    st.textContent = busy ? (busy + ' 个任务进行中')
       : (titleRunning ? '标题翻译中' : '空闲');
 
     if (busy) { badge.className = 'badge run'; badge.textContent = '进行中'; }
@@ -312,7 +344,7 @@
   }
 
   function load() {
-    fetch('/api/translate/queue', { cache: 'no-store' })
+    fetch('/api/queue', { cache: 'no-store' })
       .then(function (r) {
         // 只在明确失败时抛：写作 `!r.ok` 会在桩对象没有 ok 属性时误判为失败
         if (r.ok === false) throw new Error('HTTP ' + r.status);

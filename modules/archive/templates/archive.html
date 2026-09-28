@@ -70,8 +70,6 @@
   .paper:hover { background: var(--surface-2); }
 
   .p-main { flex: 1; min-width: 0; }
-  .p-ttl { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .p-meta { font-size: 11px; color: var(--muted); margin-top: 4px; }
 
   .p-opts { display: flex; gap: 8px; flex-wrap: wrap; }
 
@@ -86,6 +84,35 @@
   a.vb:hover em { color: var(--vb-hover-fg); }
   a.vb:hover .arw { opacity: 1; color: var(--accent); }
   .vb.off { opacity: .32; cursor: not-allowed; }
+
+  /* 「在线阅读」：与版本按钮视觉差异——
+     边框/底色都换成 accent 绿，文字本身也用 accent，箭头更明显；
+     hover 时箭头向右滑 2px，作为「会跳页」的暗示。 */
+  a.vb-read {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11.5px; font-weight: 500;
+    padding: 5px 11px;
+    border: 1px solid var(--accent-line); border-radius: 5px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    white-space: nowrap;
+    transition: background .15s, border-color .15s, color .15s;
+  }
+  a.vb-read .arw { font-size: 14px; line-height: 1; opacity: 1;
+    transition: transform .18s ease; }
+  a.vb-read:hover { background: var(--accent-soft-hover); border-color: var(--accent); color: var(--logo-fg); }
+  a.vb-read:hover .arw { transform: translateX(2px); }
+  .vb-read.off { opacity: .32; cursor: not-allowed; background: transparent;
+    border-color: var(--border); color: var(--muted); }
+
+  /* 标题本身也是入口：cursor/hover 与按钮形成「可点」暗示 */
+  .p-ttl { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  a.p-ttl-link { color: inherit; text-decoration: none; display: block;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  a.p-ttl-link:hover { color: var(--accent); }
+  a.p-ttl-link:hover .p-ttl-meta { color: var(--accent-dim); }
+  .p-ttl-meta { font-size: 11px; color: var(--muted); margin-top: 4px;
+    transition: color .15s; }
 
   .msg { padding: 48px 20px; text-align: center; color: var(--muted); font-size: 13px; line-height: 1.9; }
   .msg a { color: var(--accent); }
@@ -144,28 +171,63 @@
     });
   }
 
-  // 可用版本 → 普通链接，由浏览器原生 PDF 阅读器打开（查看 / 下载都走浏览器自己）
+  /** 生成自研阅读器地址：file=主文档，peer=对照文档（可空）。
+   *  file/peer 来自后端，本身已是编码好的 URL 路径 —— 绝不能再整体
+   *  encodeURIComponent，否则 %20 会被二次编码成 %2520（实测踩过）。
+   *  只补编码裸字符，并把可能被误编码的 %25 还原回 %。 */
+  function readerUrl(file, peer) {
+    function enc(s) { return encodeURI(s || '').replace(/%25/g, '%'); }
+    var u = '/PDFreader?file=' + enc(file);
+    if (peer) u += '&peer=' + enc(peer);
+    return u + '&layout=continuous&sync=1';
+  }
+
+  // 可用版本 → 用自研阅读器单栏打开（不再交给浏览器原生 PDF）
   // 缺失版本 → 置灰不可点的 span
   function vbHtml(f) {
     if (!f.available) {
       return '<span class="vb off" title="该论文没有' + esc(f.label) + '版本">' +
         esc(f.label) + '<em>无</em></span>';
     }
-    return '<a class="vb" href="' + esc(f.url) + '" target="_blank" rel="noopener"' +
-      ' title="' + esc(f.label) + ' · ' + esc(f.name) + ' · 在浏览器中打开">' +
+    return '<a class="vb" href="' + esc(readerUrl(f.url, '')) + '" target="_blank" rel="noopener"' +
+      ' title="' + esc(f.label) + ' · ' + esc(f.name) + ' · 在阅读器中打开">' +
       esc(f.label) + '<em>' + fmtSize(f.size) + '</em><span class="arw">&#8599;</span></a>';
+  }
+
+  // 「在线阅读」按钮：原文 + 中文/双语 一键进入阅读器双栏同步；
+  // 没有原文时退化为置灰不可点。
+  // 视觉与三个版本按钮明显不同：accent 绿边框 + accent 浅底 + accent 文字 + 箭头。
+  function readHtml(p) {
+    if (!p.reader_url) {
+      var peer_label = p.reader_peer_kind === 'mono' ? '中文版'
+        : p.reader_peer_kind === 'dual' ? '双语版' : '译文';
+      return '<span class="vb-read off" title="没有原文 PDF，无法进入阅读器">' +
+        '在线阅读<span class="arw">&rarr;</span></span>';
+    }
+    var title = '原文 + ' + (p.reader_peer_kind === 'mono' ? '中文版'
+      : p.reader_peer_kind === 'dual' ? '双语版' : '无译文（仅原文）')
+      + ' · 在新阅读器中打开';
+    return '<a class="vb-read" href="' + esc(p.reader_url) + '" target="_blank" rel="noopener"' +
+      ' title="' + esc(title) + '">在线阅读<span class="arw">&rarr;</span></a>';
   }
 
   function paperHtml(p) {
     var raw = p.files.filter(function (f) { return f.available; })
                      .map(function (f) { return f.name; }).join('\n');
+    var titleHtml = '<div class="p-ttl" title="' + esc(raw) + '">' + esc(p.title) + '</div>' +
+      '<div class="p-ttl-meta">' + fmtTime(p.mtime) + ' · ' + p.file_count + ' 个版本 · ' +
+        fmtSize(p.total_size) + '</div>';
+    // 标题整体作为入口：可点击直接进入阅读器；没有 reader_url 时退化为静态文本。
+    var titleBlock = p.reader_url
+      ? '<a class="p-ttl-link" href="' + esc(p.reader_url) + '" target="_blank" rel="noopener"'
+          + ' title="点击标题直接进入阅读器">' + titleHtml + '</a>'
+      : titleHtml;
     return '<div class="paper">' +
-      '<div class="p-main">' +
-        '<div class="p-ttl" title="' + esc(raw) + '">' + esc(p.title) + '</div>' +
-        '<div class="p-meta">' + fmtTime(p.mtime) + ' · ' + p.file_count + ' 个版本 · ' +
-          fmtSize(p.total_size) + '</div>' +
+      '<div class="p-main">' + titleBlock + '</div>' +
+      '<div class="p-opts">' +
+        p.files.map(vbHtml).join('') +
+        readHtml(p) +
       '</div>' +
-      '<div class="p-opts">' + p.files.map(vbHtml).join('') + '</div>' +
     '</div>';
   }
 

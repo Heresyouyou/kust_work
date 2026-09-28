@@ -165,12 +165,29 @@ def _papers():
                 'mtime': f['mtime'] if f else 0,
                 'url': f['url'] if f else None,
             })
+        # 「在线阅读」直接进入阅读器双栏同步：必须有原文；优先中文，退路双语。
+        # URL 由前端在渲染时拼，这里只把双 URL 给出来；缺译文就退单栏。
+        original = next((f for f in files if f['kind'] == 'original' and f['available']), None)
+        peer = next((f for f in files if f['kind'] == 'mono' and f['available']), None) \
+               or next((f for f in files if f['kind'] == 'dual' and f['available']), None)
+        if original is not None:
+            qs = 'file=' + quote(original['url'], safe='/%')
+            if peer is not None:
+                qs += '&peer=' + quote(peer['url'], safe='/%') + '&layout=continuous&sync=1'
+            reader_url = '/PDFreader?' + qs
+            peer_kind = peer['kind'] if peer else None
+        else:
+            reader_url = None
+            peer_kind = None
+
         out.append({
             'title': g['orig_title'] or g['title'],
             'mtime': g['mtime'],
             'file_count': sum(1 for f in files if f['available']),
             'total_size': sum(f['size'] for f in files),
             'files': files,
+            'reader_url': reader_url,
+            'reader_peer_kind': peer_kind,   # 'mono' / 'dual' / None（用于前端文案）
         })
 
     out.sort(key=lambda x: x['mtime'], reverse=True)

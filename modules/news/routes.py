@@ -1,15 +1,23 @@
 # -*- coding: utf-8 -*-
-"""今日早报模块
+r"""今日早报模块
 
 数据来源（全部只读，绝不写入 PostNews 的业务文件）：
-  daily_push_state.json   → latest_daily 键（由 daily_run.py 推送后落盘）
-  news.json               → 当日新闻条目
-  output/daily_poster_*.png → 当日海报
+  daily_push_state.json     → latest_daily 键（由 daily_run.py 推送后落盘）
+  news.json                 → 当日新闻条目
+  海报目录**多处都扫，NAS 优先**（顺序即优先级，由 poster_store 统一给出）：
+    \<nas-host>\<share>  → 持久位置（daily_run.py 直接写这里）
+    daily_archive/posters/                          → NAS 掉线时的本地兜底
+    output/                                         → 迁移前的历史遗留
+
+⚠️ 只扫 output/ 时，当天海报一被删就会回退到很早的遗留海报，
+   表现为「海报一直是旧的」（2026-09-14 故障，页面长期显示 9 月 8 日的海报）。
+   所有海报路径统一由 PostNews 根的 `poster_store.py` 决定（NAS UNC / 本地兜底 /
+   445 端口探测 + TTL 缓存），**本模块不自己拼 NAS 路径**，改 NAS 只改一处。
 
 页面：
   GET /today          今日早报入口：302 → /daily 详情页（不再外跳飞书）
   GET /daily          今日早报详情页（新闻列表 + 海报 + 飞书按钮）
-  GET /daily/poster   代理输出最新一张日报海报 PNG
+  GET /daily/poster   代理输出「记录日期那天」的日报海报 PNG（缺图时退化为最新一张）
 
 接口：
   GET /api/news/latest  首页卡片动态绑定用：链接 / 日期 / 条数 / 状态
@@ -40,7 +48,16 @@ def init_news(app, data_dir=None):
     """注册今日早报模块。data_dir 指向 PostNews 根目录。"""
     _deps['data_dir'] = Path(data_dir) if data_dir else None
     app.register_blueprint(news_bp)
-    print('[模块] 今日早报 → GET /today（跳转飞书文档）, GET /daily（详情页）')
+    _hint = ''
+    mod = _load_poster_store()
+    if mod is not None:
+        try:
+            i = mod.info()
+            _hint = ' | 海报: ' + (i['nas_dir'] if i['nas_ok']
+                                   else i['write_dir'] + '（NAS 不可用，已降级本地）')
+        except Exception:
+            pass
+    print('[模块] 今日早报 → GET /today（跳转飞书文档）, GET /daily（详情页）' + _hint)
 
 
 # ── 取数 ──
@@ -70,28 +87,106 @@ def _latest_record():
     return rec if isinstance(rec, dict) else {}
 
 
-def _newest_poster():
-    """output/ 下最新一张日报海报（只认白名单命名）。"""
+# 与 daily_run.py 共用的海报存储配置（PostNews 根的 poster_store.py）。
+# ★ 用 importlib 按**文件路径**加载，而不是把 PostNews 根塞进 sys.path ——
+#   后者会让 PostNews 下的同名脚本（poster_template / news_filter / journal_* …）
+#   有机会遮蔽门户自己的导入，风险不值当。
+_ps_state = {'tried': False, 'mod': None}
+
+
+def _load_poster_store():
+    """载入 PosterNews 根的 poster_store.py；失败返回 None（调用方退回本地目录）。"""
+    st = _ps_state
+    if st['tried']:
+        return st['mod']
+    st['tried'] = True
     root = _root()
     if not root:
         return None
-    out = root / 'output'
-    if not out.is_dir():
+    f = Path(root) / 'poster_store.py'
+    if not f.is_file():
+        print('[news] 未找到 %s，海报只扫本地目录' % f)
         return None
-    best, best_m = None, -1.0
     try:
-        for p in out.iterdir():
-            if not p.is_file() or not _POSTER_RE.match(p.name):
-                continue
-            try:
-                m = p.stat().st_mtime
-            except OSError:
-                continue
-            if m > best_m:
-                best, best_m = p, m
-    except OSError:
-        return None
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('poster_store_news', str(f))
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        st['mod'] = mod
+    except Exception as e:
+        print('[news] poster_store 载入失败，海报只扫本地目录: %s' % e)
+    return st['mod']
+
+
+def _poster_dir_hint():
+    """诊断用：当前海报存储快照（NAS 是否可用 / 实际写入目录）。"""
+    mod = _load_poster_store()
+    if mod is None:
+        return {}
+    try:
+        return mod.info()
+    except Exception:
+        return {}
+
+
+def _is_remote(p):
+    """路径是否在 NAS/UNC 上（无 poster_store 时按 \\\\ 前缀判断）。"""
+    if not p:
+        return False
+    mod = _load_poster_store()
+    try:
+        if mod is not None:
+            return bool(mod.is_remote(str(p)))
+    except Exception:
+        pass
+    return str(p).startswith('\\\\')
+
+
+def _poster_dirs():
+    r"""海报目录列表，**顺序即优先级**（NAS 持久位置在最前）：
+      \<nas-host>\<share> → 持久位置（daily_run.py 直接写这里）
+      daily_archive/posters/                        → NAS 掉线时的本地兜底
+      output/                                       → 迁移前的历史遗留
+    只扫 output/ 会导致当天海报被删后回退到很早的遗留海报（历史故障：
+    页面长期显示 9 月 8 日的旧海报）。
+    路径来源统一交给 poster_store（含 445 探测 + TTL 缓存），本模块不自己拼 UNC。
+    """
+    mod = _load_poster_store()
+    if mod is not None:
+        try:
+            return [Path(d) for d in mod.read_dirs()]
+        except Exception:
+            pass
+    # 兜底：poster_store 载入失败时也要保证本地两处可读，页面不能空
+    root = _root()
+    if not root:
+        return []
+    cand = [root / 'daily_archive' / 'posters', root / 'output']
+    return [d for d in cand if d.is_dir()]
+
+
+def _pick_poster(pat):
+    """在所有海报目录里按 mtime 取最新一张匹配 pat 的海报。"""
+    best, best_m = None, -1.0
+    for d in _poster_dirs():
+        try:
+            for p in d.iterdir():
+                if not p.is_file() or not pat.match(p.name):
+                    continue
+                try:
+                    m = p.stat().st_mtime
+                except OSError:
+                    continue
+                if m > best_m:
+                    best, best_m = p, m
+        except OSError:
+            continue
     return best
+
+
+def _newest_poster():
+    """所有海报目录里最新的一张日报海报（只认白名单命名）。"""
+    return _pick_poster(_POSTER_RE)
 
 
 def _today_str():
@@ -99,11 +194,20 @@ def _today_str():
 
 
 def _age_days(date_str):
-    """记录日期距今多少天；解析失败返回 None。"""
+    """记录日期距今多少天；兼容 'YYYY-MM-DD' 与 'YYYYMMDD'；解析失败返回 None。
+
+    daily_run.py 落盘的 latest_daily.date 是 'YYYYMMDD'（如 20260914），
+    而归档快照里是 'YYYY-MM-DD' —— 两种都要认，否则 age_days=None、
+    is_today 恒为 False，页面顶部会误显示「非今日记录」。
+    """
     if not date_str:
         return None
+    digits = re.sub(r'\D', '', str(date_str))
     try:
-        d = datetime.strptime(date_str[:10], '%Y-%m-%d').date()
+        if len(digits) >= 8:
+            d = datetime.strptime(digits[:8], '%Y%m%d').date()
+        else:
+            d = datetime.strptime(str(date_str)[:10], '%Y-%m-%d').date()
     except (ValueError, TypeError):
         return None
     return (datetime.now().date() - d).days
@@ -140,7 +244,7 @@ def _latest_payload():
     date_str = rec.get('date') or ''
     url = rec.get('doc_url') or ''
     age = _age_days(date_str)
-    poster = _newest_poster()
+    poster = _latest_poster()
     news = _news_payload()
 
     # 记录是否属于「今天」：优先按记录日期判断，缺日期时退化为按新闻文件判断
@@ -158,6 +262,14 @@ def _latest_payload():
         'feishu_sent': rec.get('feishu_sent') or '',
         'poster_ok': bool(rec.get('poster_ok')),
         'poster_url': '/daily/poster' if poster else '',
+        # 实际命中的海报文件名与日期：便于自查「页面这张是不是今天的」
+        'poster_name': poster.name if poster else '',
+        'poster_date8': (_date8(poster.name) if poster else ''),
+        'poster_is_record_date': bool(
+            poster and _date8(poster.name) == _date8(date_str)),
+        # 这张图是不是从 NAS 上取的（自查"海报到底存在哪"）
+        'poster_remote': _is_remote(poster),
+        'poster_store': _poster_dir_hint(),
         'news_date_text': news['date'],
         'news_total': news['count'],
     }
@@ -185,24 +297,19 @@ def _poster_for_date8(date8):
     """output/ 下匹配 daily_poster_<date8>(_N)?.png 的最新一张。"""
     if not date8:
         return None
-    root = _root()
-    if not root:
-        return None
-    out = root / 'output'
-    if not out.is_dir():
-        return None
     pat = re.compile(r'^daily_poster_' + re.escape(date8) + r'(_\d+)?\.png$', re.IGNORECASE)
-    best, best_m = None, -1.0
-    try:
-        for p in out.iterdir():
-            if not p.is_file() or not pat.match(p.name):
-                continue
-            m = p.stat().st_mtime
-            if m > best_m:
-                best, best_m = p, m
-    except OSError:
-        return None
-    return best
+    return _pick_poster(pat)
+
+
+def _latest_poster():
+    """「最新早报」该配哪张海报。
+
+    优先取 latest_daily 记录日期那天的海报（当天海报被删/未生成时，
+    退化为所有目录里最新的一张，避免整块空白）。
+    """
+    rec = _latest_record()
+    p = _poster_for_date8(_date8(rec.get('date') or ''))
+    return p or _newest_poster()
 
 
 def _write_snapshot():
@@ -237,21 +344,24 @@ def _write_snapshot():
 
 def _archive_entries():
     """归档列表：扫描历史海报 + 已落盘快照，合并去重，按日期倒序。"""
-    root = _root()
     entries = {}
     # 1. 历史海报（优先，保证能看到过去的海报）
-    if root:
-        out = root / 'output'
-        if out.is_dir():
-            for p in out.iterdir():
-                m = re.match(r'^daily_poster_(\d{8})(_\d+)?\.png$', p.name, re.IGNORECASE)
-                if not m:
-                    continue
-                d8 = m.group(1)
-                entries.setdefault(d8, {
-                    'date8': d8, 'date': d8[:4] + '-' + d8[4:6] + '-' + d8[6:],
-                    'poster': p.name, 'news_count': 0, 'has_snapshot': False, 'doc_url': '',
-                })
+    #    _poster_dirs() 把归档目录排在前面 → 同一天在归档与 output/ 都有残片时，
+    #    setdefault 会留下长期留存的那份。
+    for d in _poster_dirs():
+        try:
+            names = sorted(d.iterdir())
+        except OSError:
+            continue
+        for p in names:
+            m = re.match(r'^daily_poster_(\d{8})(_\d+)?\.png$', p.name, re.IGNORECASE)
+            if not m:
+                continue
+            d8 = m.group(1)
+            entries.setdefault(d8, {
+                'date8': d8, 'date': d8[:4] + '-' + d8[4:6] + '-' + d8[6:],
+                'poster': p.name, 'news_count': 0, 'has_snapshot': False, 'doc_url': '',
+            })
     # 2. 快照（补充新闻条数，标记 has_snapshot）
     adir = _archive_dir()
     if adir and adir.is_dir():
@@ -301,7 +411,7 @@ def daily_archive_page():
 
 @news_bp.route('/daily/poster')
 def daily_poster():
-    p = _newest_poster()
+    p = _latest_poster()
     if not p:
         return jsonify({'error': 'no poster'}), 404
     return send_file(str(p), mimetype='image/png')

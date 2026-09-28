@@ -69,7 +69,7 @@
 
 **要点**
 
-- **Flask 不是翻译服务本身**，它同时是门户、是模块宿主、也是翻译队列的宿主。
+- **Flask 不是翻译服务本身**，它同时是门户、是模块宿主、也是**任务队列**（文献翻译 + 图像拼合共用一条串行通道）的宿主。
 - **llama-server 是独立进程**，Flask 通过 HTTP 调它；它挂掉由引擎的 watchdog 负责拉起。
 - **门户与模块都可能失败但服务不垮**：`web_app.py` 用两个独立 `try/except` 包住
   `portal.init_portal()` 与 `modules.register_all()`，任一抛异常只降级自身。
@@ -179,7 +179,7 @@ D:\PostNews\                     ← 数据根（门户只读它，绝不写入�
     │   │   journals/ 期刊列表
     │   │   news/     今日早报 + 归档
     │   │   palette/  科研配色（含 palettes.json）
-    │   │   queue/    翻译队列（双队列聚合）
+    │   │   queue/    任务队列（统一队列的展示页）
     │   │   share/    内网共享（含 assets/KustNasTool.exe）
     │   tools/                   可复用工具（见 §9）
     │   *_dom_test.js            DOM 回归测试（node 跑）
@@ -357,13 +357,22 @@ queued ──(取消 API)──────────────────�
 色板数据来自 `modules/palette/palettes.json`（定值快照，不依赖运行时绘图库）。
 扩充必须跑 `_build_palettes.py`（§10.3）。
 
-### 3.7 `modules/queue` 翻译队列（双队列）
+### 3.7 `modules/queue` **任务队列**（2026-09-28 由「翻译队列」改名）
+
+> 该模块本身只是**展示页**；真正的队列内核在 `web_app.py`
+> （`jobs` 表 / FIFO `QUEUE` / 单 `_queue_worker` 线程 / `TASK_LANE = Semaphore(1)`）。
+> 文献翻译与图像拼合**共用同一条串行通道**（任务带 `kind`）—— 两者都吃 GPU/内存，并跑会互抢。
+> ★ 给队列新增一个 `kind` 时，`submit_task` **必须**配 `register_runner(kind, fn)`：
+> 只注入前半段 = **入了队但没人执行**，接口照样返回 `queued:true`，队列随后标
+> `failed`「未注册的任务种类（kind=xxx）」。
 
 | 方法 | 路径 | 出参 |
 |---|---|---|
-| GET | `/translate/queue` | HTML |
-| GET | `/api/translate/queue` | `{"ok":true,"doc":{…},"title":{…},"active":bool}` |
-| GET | `/translate/title-status` | `302 → /translate/queue`（旧入口兼容） |
+| GET | `/queue` | HTML（**规范入口**） |
+| GET | `/api/queue` | `{"ok":true,"doc":{…},"title":{…},"active":bool}` |
+| GET | `/translate/queue` | `302 → /queue`（旧入口兼容） |
+| GET | `/api/translate/queue` | 旧接口兼容 |
+| GET | `/translate/title-status` | 旧入口兼容 |
 | GET | `/api/translate/title-status` | 仅标题队列负载（旧接口兼容） |
 
 ```jsonc
@@ -413,6 +422,88 @@ queued ──(取消 API)──────────────────�
   （cmd 代码页 936）。
 - 挂载动作在**用户本机**执行（`net use`），服务端做不了，页面只提供脚本/命令/排错。
 - ⚠️ 页面与脚本含**明文内网凭据**，仅限内网使用。
+
+---
+
+### 3.9 `modules/tasks` 任务打卡（多角色 · 团队共享）
+
+★ 本模块的 `assets/` 是**生成物**（由 `tools/tasks_build/` 从上游复刻页面生成，**不要手改**），
+深度文档见 `tools/tasks_build/NOTES.md`。
+
+**命名约定（2026-09-21）**：对外一律称 **RPG 时间轴**（上游原件标题里的字样是 NPC）。
+重命名做在 `build_module.py` 里（§2e 脚本 / §4b+§4e 模板），所以重新下载 `extract/` 也不会退回。
+视图内部名随之为 `rpg`（`data-view="rpg"` / `#view-rpg` / `renderRPGView()`）；
+`LS_VIEW` 存的是视图名且是**本机态不同步**，所以 `app.js` 里用
+`VIEWS = ['rpg','stage','focus','pet']` 做白名单校验，旧值自动回落默认视图（否则内容区会整块空掉）。
+
+| 方法 | 路径 | 出参 |
+|---|---|---|
+| GET | `/tasks` | HTML 工作台（角色条 + 四视图：**RPG 时间轴** / 阶段打卡 / 番茄钟 / 桌宠） |
+| GET | `/api/tasks/assets/<path:rel>` | 白名单式静态资源（`tasks.css` / `app.js` / `roles.js`） |
+| GET | `/api/tasks/roles` | `{ok, roles:[{id,name,avatar,demo,createdAt,updatedAt,rev,nodes,checkins}], active}` —— `active` 由 cookie 决定，为空 = 需要弹「创建角色」；`demo:true` 即示例角色 |
+| POST | `/api/tasks/roles` | 建角色 `{name, avatar}` → `{ok, role, roles}`，并 `Set-Cookie: kust_tasks_role` |
+| POST | `/api/tasks/roles/<id>/active` | 记住当前角色（写 cookie） |
+| PATCH | `/api/tasks/roles/<id>` | 改名 / 换头像 `{name?, avatar?}` |
+| DELETE | `/api/tasks/roles/<id>` | 删角色（连带删数据）；若删的是本机当前角色则顺手清 cookie |
+| POST | `/api/tasks/demo` | 恢复 / 重置示例角色 `{force?}` → `{ok, created, reset, role, roles}`。**不写 cookie**（恢复完还要用户自己去角色条点） |
+| GET | `/api/tasks/state?role=&rev=` | `{ok, changed, rev, data}`；`rev` 与库一致时只回 `changed:false` |
+| PUT | `/api/tasks/state` | 整份快照回写 `{role, rev, data, removed}` → `{ok, rev, merged, data}` |
+| GET | `/api/tasks/health` | `{ok, roles, demo, store, exists, bytes}` |
+
+**关键性质**
+
+- 角色清单**是全局的**（kust.work 内网免登录）：同一团队任何人打开 `/tasks` 都能看到全部角色并切过去看同一份数据。
+- `cookie: kust_tasks_role` 只决定「这台浏览器在哪个角色」；cookie 空 / 指向已删角色 →
+  前端弹创建角色引导，**看板脚本 `app.js` 不注入**（它是被 `roles.js` 动态注入的，
+  静态引入会先渲染一版错数据）。
+- 同步的只有 5 个键 `nodes / checkins / badges / focus / pet`；`tab / view / form_draft`
+  是「本机视图状态」，**故意不同步**。
+- 推送靠**拦截 `localStorage.setItem`** + 700ms 防抖；拉取靠 15s 轮询 + 切回前台补一次；
+  离线时降级为纯本地缓存，`dirty` 标记留着，恢复后自动补传。
+- 冲突合并：`rev` 一致直接采纳；`rev` 落后 → 按 `_id` 求并集（同 id 客户端优先）；
+  `removed` 里的 id 落进**墓碑**（防另一端旧快照复活已删条目，30 天回收）。
+- **示例角色 `id='demo'`**（「示例角色 · 参考」）：库里常驻一份填满内容的工作台供参考，
+  但**不写 cookie、不参与任何自动跳转** —— cookie 为空时照旧弹创建引导，它只列在弹窗的
+  「或进入已有角色」里（带「示例」小标 + 「看样例 →」）与角色条最右边（虚线弱化）。
+  被删后下次启动会由 `store.ensure_demo()` 补回；被改乱可在管理弹窗点「恢复示例角色」重置。
+  `list_roles()` 把它固定排在最后。它的 `rev` 从 **1** 起（若为 0，客户端首拉会命中
+  `changed:false` 快路径而拿到空数据）。
+- 数据落 `modules/tasks/data/store.json`（与 `modules/story/stories.json` 同规矩：
+  `RLock` + 临时文件 + `os.replace`）。想全员清空 → 置成 `{"version":2,"roles":[]}`
+  （重启后示例角色会自动补回；不留它就在 `init_tasks` 里跳过 `ensure_demo()`）。
+
+### 3.10 `modules/stitch` 显微图像拼合（★ 与文献翻译共用任务队列）
+
+> 算法细节（几何约束 / 判据 / 提速开关 / 逐位验证）见 skill `postnews-web-ops` §3c，
+> 以及 `modules/stitch/.workbuddy/memory/MEMORY.md`。本节只列 API 与数据流。
+
+| 方法 | 路径 | 出参 |
+|---|---|---|
+| GET | `/stitch` | HTML（**注意：无尾斜杠**，`/stitch/` 会 404） |
+| POST | `/api/stitch/run` | **同步**拼接（不进队列，但走同一个 `TASK_LANE`） |
+| POST | `/api/stitch/submit` | **异步**提交 → `{"ok":true,"queued":true,"task_id":"…"}`；入**统一任务队列**（`kind='stitch'`） |
+| GET | `/api/stitch/task/<id>` | 任务查询。状态以**队列**为准，结果 payload 留在本模块有界的 `tasks` 表 |
+| GET | `/api/stitch/result/<fname>` | 预览 |
+| GET | `/api/stitch/result/<fname>/dl` | 下载 |
+| GET | `/api/stitch/assets/<path:rel>` | 静态资源（白名单式） |
+| GET | `/api/stitch/health` | 健康 + **加速栈自述**（`accel`：`use_gpu` / `coarse_screen` / `warm_workers` / `warp_roi`）+ `results_on_nas` |
+
+**存储**：上传原图 → 本地 `modules/stitch/uploads/`（过程性临时件，`finally` 删 + 启动兜底清扫）；
+拼接结果 → **NAS 优先**（UNC `\\<nas-host>\<share>
+失败降级本地 `results/`），默认 **PNG 无损**。
+
+**数据流**：
+```
+POST /api/stitch/submit ─▶ 落 uploads/ ─▶ submit_task('stitch', …, job_id=task_id)
+   │                                          │
+   │  ← ─ ─ ─ 未注入 submit_task 时退回自跑 ─ ─ ┘
+   ▼
+web_app._queue_worker（与文献翻译**同一条串行通道** TASK_LANE）─▶ _stitch_runner(job_id, ctx)
+   └─ Stitcher.stitch(paths) ─▶ 匹配(SIFT+几何验证) → 位姿(最小二乘) → 融合(多频带) → _save()
+```
+
+★ **`register_runner('stitch', _stitch_runner)` 必须被注入**（经 `modules/__init__.register_all`
+→ `routes.init_stitch`），否则任务入队后立刻 `failed`「未注册的任务种类（kind=stitch）」。
 
 ---
 
@@ -753,7 +844,7 @@ BabelDOC 产出的 mono（纯中文）
               └─ 写 data/nas_index.json（原子写 + 索引锁），供「命中缓存直出 NAS」用
 
 上传时   ─▶ _find_cache → nas_archive.lookup(name) 命中 ─▶ restore() 从 NAS 取回本地
-                            （翻译队列 / 译文归档依旧只读本地，规则不变）
+                            （任务队列页面 / 译文归档依旧只读本地，规则不变）
 
 定时回收 ─▶ 任务计划程序 PostNews-NASReaper（每日 09:00 / 21:00，详见 10.7）
               └─ tools/nas_reaper.py
@@ -794,6 +885,7 @@ BabelDOC 产出的 mono（纯中文）
 | `Translate/modules/palette/palettes.json` | `_build_palettes.py` | `modules/palette` | 扩充色卡唯一入口 |
 | `Translate/_probe_data.jsonl` | 引擎每次 HTTP | 分析脚本 | 埋点，行式 JSON |
 | `Translate/_babel_callback.log` | `run_babeldoc._babel_callback` | 人工排查 | 每次翻译**覆盖写** |
+| `Translate/modules/tasks/data/store.json` | **`modules/tasks`**（PUT `/api/tasks/state` 时落盘） | `modules/tasks` | 任务打卡的角色与工作台数据（多角色共享）。`RLock` + 临时文件 + `os.replace`；含常驻示例角色 `demo`（`ensure_demo()` 启动时补齐）；置成 `{"version":2,"roles":[]}` = 清空用户角色（示例角色重启后自动回来） |
 
 ---
 
@@ -991,7 +1083,7 @@ py-spy 抓栈实锤 5 个 worker 卡在 `Semaphore.acquire`。
 NODE="C:/Users/youyo/.workbuddy/binaries/node/versions/22.22.2-2/node.exe"
 cd /d/PostNews/Translate
 $NODE theme_dom_test.js                 # 主题：73 断言
-$NODE queue_dom_test.js                 # 翻译队列页：35 断言
+$NODE queue_dom_test.js                 # 任务队列页：39 断言
 
 # 期刊页：先取回真实页面与接口，再喂给测试
 curl -s --noproxy '*' http://127.0.0.1:5555/journals            -o _j.html
@@ -1015,12 +1107,15 @@ rm -f _j.html _j.json
 | `verify_queue_timeout.py` | 队列超时/看门狗行为验证 |
 | `nas_tool.py` | NAS exe 的 GUI 源码与地址探测（`CANDIDATES`） |
 | `build_nas_exe.py` | PyInstaller 打包 → `modules/share/assets/KustNasTool.exe`（`--noconsole --onefile`） |
+| `verify_tasks_module.py` | 任务打卡**离线断言 147 条**：路由 / 静态资源 MIME+no-cache / 目录穿越防护 / 脚本关键点 / CSS 主题 / **RPG 改名（页面与脚本零 `NPC`、视图名白名单）** / **示例角色（常驻、重置清墓碑、不写 cookie、排序）** / 同步接口全流程。接口段把 `store.STORE` 重定向到临时目录，跑完对比确认真实库没被动过 |
+| `verify_tasks_visual.py` | 任务打卡**浏览器验收 100 条**（独立实例 @5601 + 临时库）：无 cookie 弹窗 / 空角色 / 旧数据清理 / 双向同步 / 多角色隔离 / 绿浅深主题 / 375px 窄屏 / 零 JS 报错 / **示例角色闭环（不被自动选中 → 点进去有内容 → 恢复重置 → 退出不被缓存拉回）** / 导航与视图标题为「RPG 时间轴」且整页零 `NPC` |
+| `check_tasks_live.py` | 任务打卡**线上端到端 31 条**（真写 5555 的库；开头与结尾都清掉所有非示例角色，只留 `demo`，可反复跑） |
 
 ### 9.3 接口巡检（curl）
 
 ```bash
 for p in / /translate /daily /journals /palette /archive /share \
-         /api/check /api/news/latest /api/translate/queue /api/portal/health; do
+         /api/check /api/news/latest /api/queue /api/portal/health; do
   printf "%s  %s\n" "$(curl -s -o /dev/null -w '%{http_code}' --noproxy '*' \
                           "http://127.0.0.1:5555$p" --max-time 10)" "$p"
 done
@@ -1091,7 +1186,7 @@ python tools/clear_pdf_cache.py --older 48             # 只清 48 小时前的
    （不重启则要等 3600s 自动清理）。
 4. **范围默认最小**。只清 `translated/` 顶层；`--backup` / `--uploads` 必须显式加。
 
-> 清理后 `/api/archive/list?kind=dual|mono` 应返回 0 条，`/api/translate/queue` 的
+> 清理后 `/api/archive/list?kind=dual|mono` 应返回 0 条，`/api/queue` 的
 > `items` 应为 0（重启后）。
 
 ### 10.3 扩充色卡

@@ -76,6 +76,6 @@ NAS 不可达时直接跳过，本地文件**一个都不动**。
 1. 手动跑 `reap_daily.bat`，看终端报什么错 —— 绝大多数问题在这一步就能复现
 2. `0x1` 多为脚本执行失败；`0x41301` 表示任务正在运行；`0x8007010B` 多为路径/参数问题
 3. 确认 Python 可用：设置环境变量 `POSTNEWS_PYTHON` 指向 `python.exe` 后重新安装
-4. 确认 NAS 盘符 `S:` 已映射（UNC 路径 `\\<nas-host>\<share>` 也可自动兜底）
+4. 确认 NAS 盘符 `S:` 已映射（UNC 路径 `\\<nas-host>\<share> 也可自动兜底）
 
 重新注册（改完任何配置后都要重装才生效）：先 `uninstall_task.bat`，再 `install_task.bat`。

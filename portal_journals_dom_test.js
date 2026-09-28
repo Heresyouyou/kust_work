@@ -138,6 +138,11 @@ const countArt = h => (h.match(/class="art"/g) || []).length;
   ok(h.length > 1000, '渲染出内容', 'len=' + h.length);
   ok(!/undefined|NaN/.test(h), '无 undefined / NaN 泄漏');
 
+  // ★ 回归守卫：artRow 曾写成 artRow(a, jname)，而 `shown.map(artRow)` 会把数组**下标**
+  //   当第二实参传进去 → 卡片条目右侧凭空冒出 1/2/3/4/5 的灰色标签（实测 70 个）。
+  //   单条断言守住：卡片区不允许出现 .tj（来源刊名只归「今日更新」的组头）。
+  ok(!/class="tj"/.test(h), '卡片条目不含下标冒充的刊名标签（.tj 回归守卫）');
+
   const cards = (h.match(/class="card/g) || []).length;
   ok(cards === api.total_journals, `卡片数 = ${api.total_journals}`, '实际 ' + cards);
 
@@ -170,23 +175,67 @@ const countArt = h => (h.match(/class="art"/g) || []).length;
   ok(!h.includes(esc(bigJ.articles[api.max_per_card].title).slice(0, 30)),
      '被折叠的条目默认不渲染');
 
-  console.log('\n【今日更新 · 页顶板块】');
-  const T = api.today || { total: 0, items: [] };
+  console.log('\n【今日更新 · 页顶板块（按刊分组）】');
+  const T = api.today || { total: 0, items: [], journal_count: 0 };
   if (T.total) {
     const th = els.today._html;
     ok(th.includes('今日更新'), '今日板块已渲染');
     ok(th.includes(T.date), '板块标注当天日期', T.date);
+    ok(th.includes('today-date'), '日期做成胶囊样式（与标题同行、视觉降级）');
     const tCount = (th.match(/class="art"/g) || []).length;
     ok(tCount === T.items.length, `今日条目数 = ${T.items.length}`, '实际 ' + tCount);
     ok(th.includes(esc(T.items[0].title).slice(0, 30)), '今日首条标题已渲染');
     ok(th.includes(esc(T.items[0].journal)), '今日条目带来源刊名', T.items[0].journal);
-    ok(th.includes('class="ob"'), '今日条目同样带获取日期（与下方同口径）');
+    // 当天条目全是"今天"，MM-DD 无信息量 → 改渲染时刻
+    ok(th.includes('class="hm"'), '今日条目改用时刻 HH:MM');
+    ok(th.includes('class="hm" title="本地获取时间 ') && th.includes('>' + T.items[0].obtained_hm + '<'),
+       '时刻取值 = obtained_hm', T.items[0].obtained_hm);
+    ok(!th.includes('class="ob"'), '今日条目不再重复 MM-DD 日期');
     ok(th.includes(T.items.length + ' 篇 · ' + T.journal_count + ' 种期刊'),
        '徽章显示篇数与期刊数');
+    // ★ 分组：一组一刊，组头给 刊名 + 条数
+    const tgCount = (th.match(/class="tgroup"/g) || []).length;
+    ok(tgCount === T.journal_count, `分「刊」组数 = ${T.journal_count}`, '实际 ' + tgCount);
+    ok(th.includes('class="tg-head"') && th.includes('class="tg-n"'), '组头含刊名行与「N 篇」');
+    ok(T.items.every(a => th.includes(esc(a.journal))) || T.journal_count === 0,
+       '当天涉及的每种刊都在组头出现');
     // 计数守卫：蹭用 .card 类名会让上面「卡片数 = total_journals」那条断言误伤
     ok(!/class="card/.test(th), '未蹭用 .card 类名（不干扰下方卡片计数）');
   } else {
     ok(els.today._html === '', '当天无获取时不渲染今日板块');
+  }
+
+  console.log('\n【卡片排序 · 今日优先】');
+  {
+    // 服务端已按 (当天有更新, 最新获取时间倒序) 排好；前端不再重排，
+    // 所以断言「同一区域内，带 has_today 的卡片一定排在不带的之前」。
+    const groups = (api.groups || []).slice();
+    let checked = 0;
+    groups.forEach(g => {
+      const js = g.journals || [];
+      const seenNoToday = js.findIndex(j => !j.has_today);
+      if (seenNoToday >= 0) {
+        const late = js.slice(seenNoToday).some(j => j.has_today);
+        ok(!late, `${g.region}：今日有更新的刊全部排在无更新之前`);
+        checked++;
+      }
+      // 同一档位内按「最近获取时间」倒序
+      const within = js.filter(j => !j.has_today).map(j => j.article_newest_ts || 0);
+      const sorted = within.every((v, i) => i === 0 || within[i - 1] >= v);
+      ok(sorted, `${g.region}：无更新的刊按最近获取时间倒序`);
+      checked++;
+    });
+    ok(checked > 0, '存在可校验的区域分组', checked + ' 项');
+    // 每个区域内只要当天有更新的刊，首位就必须是其中之一
+    (api.groups || []).forEach(g => {
+      const js = g.journals || [];
+      if (js.some(j => j.has_today)) {
+        ok(!!js[0].has_today, `${g.region}：首位是当天有更新的刊`, js[0] && js[0].name);
+      }
+    });
+    if (flat(api).some(j => j.has_today)) {
+      ok(els.body._html.includes('chip-today'), '卡片带「今日 +N」标记（解释为何排前面）');
+    }
   }
 
   console.log('\n【展开 / 收起 交互】');

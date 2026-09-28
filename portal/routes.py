@@ -12,7 +12,7 @@ from html import escape
 from pathlib import Path
 
 import requests
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 
 from .assets import asset_response
 from .registry import get_groups
@@ -59,6 +59,7 @@ def _card(m):
     天天变的文案不进模板，前端结构不需要跟着改。
     """
     status = m.get('status') or 'coming'
+    action = m.get('action')
     _, tag_cls, card_extra = _LEVEL.get(status, _LEVEL['coming'])
 
     accent = ' accent' if m.get('accent') and status in ('online', 'beta') else ''
@@ -73,8 +74,14 @@ def _card(m):
             f'<span class="{tag_cls}"{tag_id}>{tag}</span></div>'
             f'<p class="card-d">{desc}</p>')
 
-    if status == 'coming' or not url:
+    if status == 'coming' or (not url and not action):
         return f'<div class="card{card_extra}" data-mod="{mod}">{head}</div>'
+
+    # action 型卡片：点击触发前端动作（如强制清缓存），不跳转、不导航
+    if action:
+        return (f'<a class="card{accent}" data-mod="{mod}" '
+                f'data-action="{escape(action, quote=True)}" href="#" role="button">{head}'
+                f'<p class="card-p">点击强制刷新 &rarr;</p></a>')
 
     href = escape(url, quote=True)
     return (f'<a class="card{accent}" data-mod="{mod}" href="{href}">{head}'
@@ -110,6 +117,23 @@ def theme_js():
     return asset_response('theme.js')
 
 
+def _request_path():
+    """判定本次请求走的是内网通路还是公网通路（供首页第二盏状态灯）。
+
+    两条通路最终都从本机回环进入 Flask，remote_addr 区分不了：
+      内网: 浏览器 → NAS DNAT → <lan-ip>:5555 → Windows portproxy
+            → 127.0.0.1:5555。NAS 侧反代只写 X-Forwarded-Server，不写 X-Real-IP。
+      公网: 浏览器 → <server-ip> nginx(basic auth) → SSH 反向隧道
+            → 127.0.0.1:5555。nginx 的 kust.work vhost 必定写
+            `proxy_set_header X-Real-IP $remote_addr;`。
+
+    故以「nginx 注入的 X-Real-IP 是否存在」为判据：有 → 公网，无 → 内网。
+    该头由 nginx 覆盖写入（客户端伪造会被 $remote_addr 冲掉），内网通路不会
+    产生此头。2026-09-27 两条通路实测已验证。
+    """
+    return 'wan' if (request.headers.get('X-Real-IP') or '').strip() else 'lan'
+
+
 @portal_bp.route('/api/portal/health')
 def portal_health():
     """归一化状态：ok / loading / down。
@@ -141,4 +165,4 @@ def portal_health():
         except Exception:
             active = None
 
-    return jsonify({'llama': llama, 'active': active})
+    return jsonify({'llama': llama, 'active': active, 'path': _request_path()})

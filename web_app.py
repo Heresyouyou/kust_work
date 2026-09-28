@@ -1,12 +1,32 @@
 ﻿"""
-GeoTranslate Web v4 — 原生 iframe PDF + llama.cpp 本地翻译
+GeoTranslate Web v4 — 原生 iframe PDF + 云端 DeepSeek / 本地 llama.cpp 双引擎翻译
 启动: py -3.12 web_app.py
 打开: http://127.0.0.1:5555
 """
+# ═══════════════════════════════════════════════════════════
+# 必须在 import cv2 / numpy / torch 之前! 禁 OpenCL 防硬崩
+# (OpenCV 5.0 + 大图 → CL_OUT_OF_RESOURCES → terminate() 杀进程)
+# ═══════════════════════════════════════════════════════════
+import os as _os_early
+_os_early.environ['OPENCV_OPENCL_RUNTIME'] = 'disabled'
+_os_early.environ['OPENCV_OPENCL_DEVICE'] = 'disabled'
+
 import os, sys, time, json, uuid, threading, logging, subprocess, shutil, glob, math, re
 from pathlib import Path
 from queue import Queue
 from flask import Flask, request, jsonify, send_from_directory, render_template_string, Response
+
+# ── 日志（★ 必须最先初始化）──
+# 下面的可选依赖（bilingual / nas_archive）在自己的 except 分支里就要用 logger,
+# 若把 logger 放到它们后面定义, 一旦真的导入失败就会 NameError 盖掉原始原因。
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
+logger = logging.getLogger('geo')
+
+# ── 翻译引擎（2026-09-17 变更: 默认云端 DeepSeek API, 本地 GPU 让给蒸馏）──
+# 用 setdefault: 尊重运维的显式设置（USE_DEEPSEEK=0 时仍可回本地），
+# 但保证「什么都没设」时默认就是云端。实际取值在启动日志里打印，便于发现残留。
+os.environ.setdefault('USE_DEEPSEEK', '1')
+TRANSLATE_ENGINE = 'deepseek' if os.environ.get('USE_DEEPSEEK', '1') == '1' else 'local'
 
 # ── 双语拼接版（翻译完成后自动生成：左原文 / 右译文）──
 try:
@@ -15,10 +35,6 @@ try:
 except Exception as _e:  # 绝不能因为双语模块挂掉翻译服务
     logger.warning('bilingual 模块不可用，双语版将跳过: %s', _e)
     find_translated = mono_to_dual_name = make_bilingual = ensure_dual = None
-
-# ── 日志 ──
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
-logger = logging.getLogger('geo')
 
 # ── NAS 文献仓库（译文三版本归档 / 本地索引检索 / 48h 回收）──
 # 与双语模块同款防护：NAS 可能没挂载，绝不能因此拖垮翻译主流程。
@@ -65,36 +81,75 @@ def _pid_alive(pid):
     except: pass
     return False
 
+def _kill_pid(pid):
+    """跨平台 kill 进程 (Windows 用 taskkill, Unix 用 os.kill + SIGTERM/SIGKILL)"""
+    import subprocess, time, platform
+    try:
+        if platform.system() == 'Windows':
+            subprocess.run(['taskkill', '/F', '/PID', str(pid)], capture_output=True, timeout=5)
+        else:
+            try: os.kill(pid, 15)  # SIGTERM
+            except: pass
+            time.sleep(0.5)
+            try: os.kill(pid, 9)   # SIGKILL
+            except: pass
+    except Exception:
+        pass
+    time.sleep(1)  # 等端口释放
+
+def _find_pids_on_port(port):
+    """返回所有占用指定端口的 PID 列表 (Windows netstat)"""
+    import subprocess, re
+    try:
+        out = subprocess.run(['netstat', '-ano'], capture_output=True, text=True, timeout=5).stdout
+        pids = set()
+        for line in out.splitlines():
+            m = re.search(rf':{port}\s+.*?LISTENING\s+(\d+)', line)
+            if m:
+                pids.add(int(m.group(1)))
+        return pids
+    except Exception:
+        return set()
+
 def _acquire_flask_lock():
-    """启动前检查 + 拿锁:
-    1. 读 PID file → 旧进程还活着? → 拒绝或 kill
-    2. 端口被占? → 说明已经有 Flask 在跑 → 拒绝
+    """启动前检查 + 拿锁 (三层, 冲突时自动清 —— 用户手动重启友好):
+    1. PID file 旧进程 → kill
+    2. 端口被占但 PID file 对不上 → 按端口反查 PID → kill
+    3. 端口被占且 netstat 找得到 → 直接 kill
     返回 True 表示本进程可以启动
     """
+    import subprocess, time
+
     # 1. PID file 记录了旧 Flask
     if PID_FILE.exists():
         try:
             old_pid = int(PID_FILE.read_text().strip())
             if _pid_alive(old_pid):
-                # 端口也在监听 → 已经有一个活着的 Flask 在跑
-                if _port_in_use(PORT):
-                    print(f'[锁] PID file 显示 {old_pid} 还活着 + 端口 {PORT} 已监听 → 拒绝重复启动')
-                    return False
-                else:
-                    # PID file 里的进程还活着但端口没绑 → 旧锁无效
-                    print(f'[锁] PID file {old_pid} 活着但端口空闲 → 清理旧锁')
-                    PID_FILE.unlink(missing_ok=True)
-            else:
-                # 进程已死 → 清理旧锁
-                print(f'[锁] PID file {old_pid} 已死 → 清理')
-                PID_FILE.unlink(missing_ok=True)
+                # 旧进程还活着 → 不管端口状态, 直接 kill (用户手动重启意图明确)
+                print(f'[锁] 发现旧 Flask PID={old_pid} → kill')
+                _kill_pid(old_pid)
+            PID_FILE.unlink(missing_ok=True)
         except Exception:
             PID_FILE.unlink(missing_ok=True)
 
-    # 2. 端口直接被占 (无 PID file 或 file 损坏)
+    # 2. 端口仍被占 (残留进程 / supervisor 拉的 / 其他实例)
     if _port_in_use(PORT):
-        print(f'[锁] 端口 {PORT} 已被占用 (无有效 PID file) → 拒绝启动')
-        return False
+        pids = _find_pids_on_port(PORT)
+        # 排除自己 (pid 1, 4 等系统进程)
+        pids.discard(os.getpid())
+        pids.discard(4)
+        if pids:
+            print(f'[锁] 端口 {PORT} 被 PID {pids} 占用 → kill')
+            for pid in pids:
+                _kill_pid(pid)
+        # 再等一下, 如果还被占说明不是 Python 进程或系统进程
+        for _ in range(10):
+            time.sleep(0.5)
+            if not _port_in_use(PORT):
+                break
+        if _port_in_use(PORT):
+            print(f'[锁] ❌ 端口 {PORT} 仍被占用 (可能是系统进程或非 Python) → 拒绝启动')
+            return False
 
     # 3. 拿锁
     PID_FILE.write_text(str(os.getpid()))
@@ -130,19 +185,38 @@ except Exception as _e:
     print(f'[预加载] DocLayout 失败: {_e}', flush=True)
     DOC_LAYOUT_MODEL = None
 
-# GeoBabelTranslator (llama-server HTTP, 常驻引擎)
-try:
-    from run_babeldoc import _get_translator
-    _translator_fn = None  # translate_pdf 内部会自己建
-except Exception:
-    pass
+# 注: 此处原本有一句「预导入」 `from run_babeldoc import _get_translator`,
+# 但 run_babeldoc 里并不存在该符号 → 导入必然失败, 而 except 是静默 pass,
+# 所以它从未起到预检作用, 只是白白吃掉一条异常。已删除。
+# 真正的引擎在 _run_translate() 里按需导入(懒加载, 不拖慢启动)。
+
+# ── 启动期把「实际生效的引擎」打进日志 ──
+# 这一段是运维唯一需要看的行: 引擎选错了(比如计划任务残留 USE_DEEPSEEK=0)
+# 会在翻译开始前就暴露, 而不是等到发现译文质量不对才回头查。
+if TRANSLATE_ENGINE == 'deepseek':
+    logger.info(
+        '🧠 翻译引擎 = 云端 DeepSeek API | model=%s | 零 GPU 占用 '
+        '(本地 llama-server 已停用, GPU 让给蒸馏)',
+        os.environ.get('DEEPSEEK_MODEL', 'deepseek-flash'),
+    )
+    if os.environ.get('DS_FALLBACK_LOCAL', '0') == '1':
+        logger.warning('   ⚠️ DS_FALLBACK_LOCAL=1: 云端不可用时会回退本地引擎, 将占用 GPU')
+else:
+    logger.warning(
+        '🧠 翻译引擎 = 本地 llama.cpp (USE_DEEPSEEK=0) | 需要 GPU —— '
+        '若正在跑蒸馏, 请改为云端: 删除 USE_DEEPSEEK 环境变量后重启'
+    )
 
 UPLOAD_DIR.mkdir(exist_ok=True)
 TRANSLATED_DIR.mkdir(exist_ok=True)
 
 # ── Flask ──
 app = Flask(__name__, static_folder=None)
-app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024  # 200MB
+# 显微拼图需要一次上传上百张原图（2752×2208 JPEG 约 5MB/张，91 张已达 485MB）。
+# 200MB 会让「100 张拼图」在传输层就被 413 拒绝，因此放宽到 2GB。
+# 注意：这是 Flask 层限制，wsgi/waitress 与任何反向代理（NAS 上的 nginx）
+# 若有独立上限需同步放宽，否则仍会在更外层被拦。
+app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024 * 1024  # 2GB
 
 # ── 加载 HTML 模板 ──
 INDEX_HTML_PATH = BASE / 'index.html'
@@ -169,12 +243,200 @@ TRANSLATE_HARD_TIMEOUT = 30 * 60
 TRANSLATE_STALL_TIMEOUT = 10 * 60
 WATCHDOG_INTERVAL = 30
 
-# ── 引擎单例 ──
+# ══════════════════════════════════════════════════════════════
+#  统一任务队列 · 任务种类（kind）
+#
+#  队列原本只服务「文献翻译」。图像拼合同样吃 GPU / 内存，而它自己那条
+#  串行通道与本队列**互不相识** —— 一个翻译 + 一个拼合同时开跑会互相抢
+#  显存与内存、双双变慢。这里把拼合并到**同一条串行通道**：任何时刻只有
+#  一个「重活」在跑，排队互斥、先来先服务。
+#
+#  跨模块调用沿用既有约定：模块**不反向 import web_app**（web_app → modules
+#  → web_app 会循环导入），改由 web_app 单向下发句柄（与 get_queue 注入同思路）。
+# ══════════════════════════════════════════════════════════════
+KIND_TRANSLATE = 'translate'
+KIND_STITCH = 'stitch'
+
+# 共享串行道。两条路径都要拿它：
+#   ① 队列消费线程（每个任务开跑前后 acquire/release）
+#   ② 拼合的**同步**入口 `/api/stitch/run`（它不进队列，直接跑）
+# 没有 ②，一个同步拼合就能和队列里正在跑的翻译并发 —— 正是要避免的情况。
+TASK_LANE = threading.Semaphore(1)
+
+# kind -> 执行函数 fn(job_id, ctx)。由模块在 init_xxx 时注册。
+_TASK_RUNNERS = {}
+
+# 各 kind 的超时与取消语义（秒；None = 不启用该项）
+#   hard  —— 超过就放弃等待、判失败、队列继续消费（防「一个卡死拖垮整条队列」）
+#   stall —— 这么久没收到进度回报就发取消信号。**仅对 cancelable=True 的
+#            kind 生效**：拼合不消费 cancel_event（OpenCV 循环里没有检查点），
+#            对它发信号只会把「健康的长任务」误判成失败，故为 None。
+_KIND_TIMEOUTS = {
+    KIND_TRANSLATE: {'hard': TRANSLATE_HARD_TIMEOUT,
+                     'stall': TRANSLATE_STALL_TIMEOUT, 'cancelable': True},
+    # 91 张 + 大画布实测 5~6 分钟；给 60 分钟硬上限足够，且不误杀大任务
+    KIND_STITCH:    {'hard': 60 * 60, 'stall': None, 'cancelable': False},
+}
+
+# kind -> 页面上的中文名（快照里带出去，前端不必硬编码）
+_KIND_LABEL = {KIND_TRANSLATE: '翻译', KIND_STITCH: '拼合'}
+
+
+class TaskCtx:
+    """交给外部 kind 的执行句柄。
+
+    只暴露必要的写操作，模块拿不到 jobs 内部结构，也就无法把队列改坏。
+    心跳（last_progress_at）由 report() 统一维护 —— 那是看门狗判断
+    「任务到底有没有在动」的唯一依据。
+
+    `lane_held = True`：调度线程在 join 本任务期间**已经持着共享串行道**
+    （TASK_LANE）。执行体据此知道自己不必（也绝不能）再 acquire 一次 ——
+    同一信号量重入会自锁。
+    """
+
+    lane_held = True
+
+    __slots__ = ('job_id', 'payload', '_cancel_event')
+
+    def __init__(self, job_id, payload=None, cancel_event=None):
+        self.job_id = job_id
+        self.payload = payload if payload is not None else {}
+        self._cancel_event = cancel_event
+
+    def report(self, percent=None, message=None, log=None):
+        """上报进度。percent 单调不减（避免阶段回退导致进度条倒退）。"""
+        with jobs_lock:
+            j = jobs.get(self.job_id)
+            if not j:
+                return
+            if percent is not None:
+                try:
+                    j['percent'] = max(float(j.get('percent') or 0), float(percent))
+                except (TypeError, ValueError):
+                    pass
+            if message is not None:
+                j['message'] = message
+            if log is not None:
+                j['progress_log'] = list(log)
+            j['last_progress_at'] = time.time()
+
+    def cancelled(self):
+        ce = self._cancel_event
+        return bool(ce is not None and ce.is_set())
+
+    def _stamp_end(self, j):
+        j['ended_at'] = time.time()
+        j['elapsed'] = j['ended_at'] - j.get('started_at', j['created_at'])
+
+    def finish(self, message='完成', percent=100, **extra):
+        """标记成功。已被超时/取消接管的任务不覆盖（与 _run_translate 同守卫）。"""
+        with jobs_lock:
+            j = jobs.get(self.job_id)
+            if j and j.get('status') == 'translating':
+                j['status'] = 'done'
+                j['percent'] = percent
+                j['message'] = message
+                j.update(extra)
+                self._stamp_end(j)
+
+    def fail(self, error):
+        with jobs_lock:
+            j = jobs.get(self.job_id)
+            if j and j.get('status') == 'translating':
+                j['status'] = 'failed'
+                j['error'] = str(error)
+                j['message'] = '失败'
+                self._stamp_end(j)
+
+
+def register_task_runner(kind, run_fn):
+    """登记某个 kind 的执行函数 fn(job_id, ctx)。"""
+    _TASK_RUNNERS[kind] = run_fn
+    return kind
+
+
+def submit_task(kind, name, *, payload=None, job_id=None, display=None):
+    """通用入队：任意 kind 都走这条串行队列。返回 job_id。
+
+    job_id 可由调用方传入 —— 拼合模块用它把「自己那张任务表的主键」与
+    「队列里的工单号」对齐，避免维护第二套 id 映射。
+    """
+    cfg = _KIND_TIMEOUTS.get(kind) or {}
+    job_id = job_id or uuid.uuid4().hex
+    now = time.time()
+
+    with jobs_lock:
+        to_del = [k for k, v in jobs.items()
+                  if v.get('status') in ('done', 'failed', 'cancelled')
+                  and now - v.get('ended_at', 0) > 3600]
+        for k in to_del:
+            del jobs[k]
+
+        jobs[job_id] = {
+            'job_id': job_id,
+            'kind': kind,
+            'display': display or _KIND_LABEL.get(kind) or kind,
+            'name': name,
+            'status': 'queued',
+            'progress': 0,
+            'percent': 0,
+            'progress_log': [],
+            'message': '等待中...',
+            'created_at': now,
+            'started_at': 0,
+            'ended_at': 0,
+            'elapsed': 0,
+            'error': None,
+            'last_progress_at': now,
+            'hard_timeout': cfg.get('hard') or TRANSLATE_HARD_TIMEOUT,
+            'stall_timeout': cfg.get('stall'),
+            'cancelable': bool(cfg.get('cancelable')),
+            'cancel_event': threading.Event(),
+            # 私有载荷（路径、选项…）。以下划线开头 => 快照/状态接口一律不外泄。
+            '_payload': payload or {},
+            'path': (payload or {}).get('path'),
+        }
+
+    QUEUE.put(job_id)
+    _ensure_worker()
+    return job_id
+
+
+def get_task(job_id, *, with_payload=False):
+    """给外部 kind 用的只读任务快照（字段少、可 JSON 序列化）。
+
+    刻意不带 `progress`（那是翻译的 0~100 阶段总进度）、也不带 `_payload`：
+    模块只需要知道自己这张工单的状态与位次。
+    """
+    with jobs_lock:
+        j = jobs.get(job_id)
+        if not j:
+            return None
+        d = {k: j.get(k) for k in
+             ('job_id', 'kind', 'display', 'name', 'status', 'message',
+              'percent', 'progress_log', 'error',
+              'created_at', 'started_at', 'ended_at', 'elapsed')}
+        d['queue_position'] = _queue_position(job_id) if d['status'] == 'queued' else 0
+        if with_payload:
+            d['payload'] = j.get('_payload')
+    return d
+
+# ── 引擎单例（本地引擎; 云端模式禁止构造）──
 _engine = None
 _engine_lock = threading.Lock()
 
 def get_translator():
+    """本地 llama.cpp 引擎单例。仅 USE_DEEPSEEK=0 时才有意义。
+
+    ⚠️ 云端模式下直接报错 —— 构造 LlamaBatchEngine 会去拉起 llama-server,
+    把正在跑蒸馏的显存抢走, 属于「静默破坏别人的任务」, 必须拦死。
+    """
     global _engine
+    if TRANSLATE_ENGINE == 'deepseek':
+        raise RuntimeError(
+            '当前为云端 DeepSeek 模式, 不应构造本地引擎 (会占用 GPU)。'
+            '翻译请统一走 run_babeldoc.translate_pdf()。'
+        )
     with _engine_lock:
         if _engine is None:
             from llama_http_engine import LlamaBatchEngine
@@ -185,6 +447,11 @@ def get_translator():
 @app.after_request
 def _set_cache(response):
     p = request.path
+    # 阅读器框架的资源自己声明缓存策略（vendor 下的 pdf.js 长缓存，
+    # kpdf/ui 源码走 no-cache + ETag 回验）。这里的规则是「按后缀一刀切」，
+    # 会把它覆盖成 1 小时强缓存 —— 改完框架代码刷不出来，故直接放行。
+    if p.startswith('/api/reader/assets/') or p.startswith('/api/triangle/assets/'):
+        return response
     # /theme.js 是「配置型」资源（浅色变量表 + 日出日落参数），调完配色要立刻生效，
     # 不能让它跟着 .js 走 1 小时强缓存 —— 否则改完主题还得等缓存过期才看得到。
     if p == '/theme.js':
@@ -279,7 +546,17 @@ def api_check():
             })
         return jsonify({'exists': False, 'cache_hit': False})
 
-    # GET: llama health check (兼容旧行为)
+    # GET: 健康检查 —— 返回当前实际使用的翻译引擎
+    # 2026-09-17: 默认引擎已换成云端 DeepSeek, 本机 llama-server 会被停掉释放 GPU,
+    # 所以「本地 8090 不通」不再等于「服务坏了」。这里以引擎类型为准报 ok。
+    _info = {'ok': True, 'engine': TRANSLATE_ENGINE,
+             'use_deepseek': os.environ.get('USE_DEEPSEEK', '1') == '1'}
+    if TRANSLATE_ENGINE == 'deepseek':
+        _info['model'] = os.environ.get('DEEPSEEK_MODEL', 'deepseek-flash')
+        _info['note'] = '云端 API, 零 GPU 占用'
+        return jsonify(_info)
+
+    # 本地引擎才去探 8090
     try:
         # trust_env=False: 本地回环不走 HTTP_PROXY
         # (否则代理把请求行改写为绝对 URI -> llama.cpp 路由匹配不上 -> 404)
@@ -287,9 +564,12 @@ def api_check():
         _sess = _req.Session()
         _sess.trust_env = False
         r = _sess.get('http://127.0.0.1:8090/health', timeout=2)
-        return jsonify({'ok': True, 'llama': r.json()})
+        _info['llama'] = r.json()
+        return jsonify(_info)
     except Exception as e:
-        return jsonify({'ok': False, 'error': str(e)}), 503
+        _info['ok'] = False
+        _info['error'] = str(e)
+        return jsonify(_info), 503
 
 # ── API: upload + 入队 ──
 def _validate_pdf(f):
@@ -413,24 +693,42 @@ def _queue_worker():
         try:
             with jobs_lock:
                 j = jobs.get(job_id)
-                if not j or j.get('status') not in ('queued', 'translating'):
-                    if j: j['status'] = 'cancelled'
+                if not j:
                     continue
-                j['status'] = 'translating'
-                j['started_at'] = time.time()
-                j['last_progress_at'] = time.time()   # 看门狗据此判定「无进度」
-                j['progress'] = 0
-                j['message'] = '初始化...'
+                if j.get('status') not in ('queued', 'translating'):
+                    j['status'] = 'cancelled'
+                    continue
+                _hard = j.get('hard_timeout') or TRANSLATE_HARD_TIMEOUT
 
-            t = threading.Thread(target=_run_job_safely, args=(job_id,),
-                                 daemon=True, name='job-' + job_id[:8])
-            t.start()
-            t.join(TRANSLATE_HARD_TIMEOUT)
+            # 拿共享串行道：同步拼合（/api/stitch/run）会短暂占用它。
+            # 排队期间保持 status='queued'，页面位次照常显示，不会被误报成「进行中」。
+            TASK_LANE.acquire()
+            try:
+                with jobs_lock:
+                    j = jobs.get(job_id)
+                    if not j or j.get('status') != 'queued':
+                        continue          # 排队期间被取消 → 直接跳过
+                    j['status'] = 'translating'
+                    j['started_at'] = time.time()
+                    j['last_progress_at'] = time.time()   # 看门狗据此判定「无进度」
+                    j['progress'] = 0
+                    j['percent'] = 0
+                    j['message'] = '初始化...'
 
-            if t.is_alive():
-                logger.error('Job %s 硬超时 %.0f 分钟未完成 → 放弃，队列继续消费',
-                             job_id, TRANSLATE_HARD_TIMEOUT / 60.0)
-                _mark_timeout(job_id, TRANSLATE_HARD_TIMEOUT)
+                t = threading.Thread(target=_run_job_safely, args=(job_id,),
+                                     daemon=True, name='job-' + job_id[:8])
+                t.start()
+                t.join(_hard)
+
+                if t.is_alive():
+                    logger.error('Job %s 硬超时 %.0f 分钟未完成 → 放弃，队列继续消费',
+                                 job_id, _hard / 60.0)
+                    _mark_timeout(job_id, _hard)
+            finally:
+                try:
+                    TASK_LANE.release()
+                except Exception:
+                    pass
         except Exception:
             # 调度线程绝不能死：它一死就再没人消费队列，且 _worker_started 已为 True，
             # 之后也不会重启 → 队列彻底停摆。这里吞掉异常保证线程存活。
@@ -439,11 +737,22 @@ def _queue_worker():
 
 
 def _run_job_safely(job_id):
-    """工作线程入口：异常兜底，且不会覆盖已被超时/取消接管的任务状态。"""
+    """工作线程入口：按 kind 分派，异常兜底，且不覆盖已被超时/取消接管的状态。"""
+    with jobs_lock:
+        j = jobs.get(job_id) or {}
+        kind = j.get('kind') or KIND_TRANSLATE
+        payload = j.get('_payload')
+        ce = j.get('cancel_event')
     try:
-        _run_translate(job_id)
+        if kind == KIND_TRANSLATE:
+            _run_translate(job_id)
+            return
+        fn = _TASK_RUNNERS.get(kind)
+        if fn is None:
+            raise RuntimeError(f'未注册的任务种类（kind={kind}）')
+        fn(job_id, TaskCtx(job_id, payload, ce))
     except Exception as e:
-        logger.exception('translate failed')
+        logger.exception('task failed (kind=%s)', kind)
         with jobs_lock:
             j = jobs.get(job_id)
             # 只有仍处于 translating 才写失败：已被超时/取消接管的不要覆盖
@@ -491,8 +800,14 @@ def _stall_watchdog():
                 running = [(k, v) for k, v in jobs.items()
                            if v.get('status') == 'translating']
             for jid, j in running:
+                # 只对「声明了软超时、且真的消费取消信号」的 kind 生效。
+                # 拼合没有 cancel_event 检查点，对它发信号毫无作用，只会把
+                # 一个健康的长任务标成「正在尝试中断」——宁可不管。
+                stall = j.get('stall_timeout')
+                if not stall or not j.get('cancelable'):
+                    continue
                 last = j.get('last_progress_at') or j.get('started_at') or now
-                if now - last >= TRANSLATE_STALL_TIMEOUT:
+                if now - last >= stall:
                     ce = j.get('cancel_event')
                     if ce and not ce.is_set():
                         gap = now - last
@@ -763,7 +1078,8 @@ def api_status(job_id):
         j = jobs.get(job_id)
         if not j: return jsonify({'error': 'not found'}), 404
 
-        data = {k: v for k, v in j.items() if k not in ('path', 'cancel_event')}
+        data = {k: v for k, v in j.items()
+                if k not in ('path', 'cancel_event', '_payload')}
 
         if j['status'] == 'queued':
             data['queue_position'] = _queue_position(job_id)
@@ -802,6 +1118,13 @@ def api_cancel(job_id):
             return jsonify({'ok': True, 'action': 'cancelled_queued'})
         
         # 3. translating → 已经在跑, cancel_event 会在下次 progress_callback 时触发
+        #    ★ 但那只对「真的消费 cancel_event」的 kind 有效（翻译）。拼合的执行
+        #      体在 OpenCV 循环里没有检查点，发信号不会让它停下来 —— 与其把
+        #      按钮变成安慰剂，不如明确拒绝，让用户知道只能等它跑完。
+        if not j.get('cancelable'):
+            return jsonify({'ok': False,
+                            'error': f"该任务类型（{j.get('display') or j.get('kind')}）"
+                                     f"不支持中途取消，请等待其自然结束"}), 409
         j['message'] = '正在取消...'
         logger.info('Job %s cancel_event set (translating)', job_id)
         return jsonify({'ok': True, 'action': 'cancel_signal_sent'})
@@ -864,9 +1187,9 @@ def _queue_snapshot():
     等活对象，直接 jsonify(jobs) 会抛 TypeError。
     在 jobs_lock 内取数，避免跨线程迭代竞态（jobs 由 worker 线程并发改写）。
     """
-    _FIELDS = ('job_id', 'name', 'status', 'progress', 'message',
-               'created_at', 'started_at', 'ended_at', 'elapsed',
-               'error', 'original_url', 'mono_url', 'dual_url')
+    _FIELDS = ('job_id', 'kind', 'display', 'name', 'status', 'progress',
+               'percent', 'message', 'created_at', 'started_at', 'ended_at',
+               'elapsed', 'error', 'original_url', 'mono_url', 'dual_url')
     try:
         with jobs_lock:
             items = [{k: j.get(k) for k in _FIELDS} for j in jobs.values()]
@@ -879,6 +1202,9 @@ def _queue_snapshot():
     for it in items:
         p = it.get('progress')
         it['progress'] = round(float(p), 1) if isinstance(p, (int, float)) else 0.0
+        pc = it.get('percent')
+        it['percent'] = round(float(pc), 1) if isinstance(pc, (int, float)) else 0.0
+        it['display'] = it.get('display') or _KIND_LABEL.get(it.get('kind')) or '任务'
         # 排队位次只对「还在队列里没开跑」的任务有意义
         pos = 0
         if it.get('status') == 'queued':
@@ -889,12 +1215,16 @@ def _queue_snapshot():
         it['queue_position'] = pos
 
     st = {'queued': 0, 'translating': 0, 'done': 0, 'failed': 0, 'cancelled': 0}
+    by_kind = {}
     for it in items:
         s = it.get('status')
         if s in st:
             st[s] += 1
+        k = it.get('kind') or 'translate'
+        by_kind[k] = by_kind.get(k, 0) + 1
     st['total'] = len(items)
     st['active'] = st['queued'] + st['translating']
+    st['by_kind'] = by_kind
 
     # 排序：翻译中 → 排队中（按入队先后）→ 已结束（按结束时间倒序）
     def _key(it):
@@ -926,7 +1256,14 @@ try:
     # 今日早报要读 daily_push_state.json / news.json / output/*.png，
     # 期刊列表要读 journals.json 等。模块自己不猜路径，一律由这里注入。
     modules.register_all(app, upload_dir=UPLOAD_DIR, translated_dir=TRANSLATED_DIR,
-                         data_dir=BASE.parent, get_queue=_queue_snapshot)
+                         data_dir=BASE.parent, get_queue=_queue_snapshot,
+                         # 统一任务队列句柄：拼合模块据此入队 / 查工单 / 共用串行道
+                         # ★ register_runner 必须有：只注入 submit_task 的话，
+                         #   工单能入队但队列不知道谁执行 → 任务被标成
+                         #   「未注册的任务种类（kind=stitch）」（2026-09-28 踩到）
+                         submit_task=submit_task, get_task=get_task,
+                         task_lane=TASK_LANE,
+                         register_runner=register_task_runner)
 except Exception:
     logger.exception('❌ 功能模块注册失败（门户本身仍可用）')
 
@@ -963,7 +1300,12 @@ if __name__ == '__main__':
     try:
         import waitress
         print('[启动] waitress (生产级 WSGI)')
-        waitress.serve(app, host='0.0.0.0', port=PORT, threads=8)
+        # waitress 默认 max_request_body_size=1GiB，会在 Flask 之前拦掉大上传，
+        # 与 MAX_CONTENT_LENGTH 对齐到 2GiB，否则「上传 100 张」仍失败。
+        # channel_timeout 放宽：大体积 multipart 上传耗时远超默认 120s。
+        waitress.serve(app, host='0.0.0.0', port=PORT, threads=8,
+                       max_request_body_size=2 * 1024 * 1024 * 1024,
+                       channel_timeout=600)
     except ImportError:
         print('[启动] Flask 内置 WSGI (建议 pip install waitress)')
         app.run(host='0.0.0.0', port=PORT, threaded=True, debug=False, use_reloader=False)

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>任务打卡 · kust.work</title>
+<link rel="stylesheet" href="/api/tasks/assets/tasks.css">
+<!-- 主题引擎：必须同步加载（勿加 defer/async），否则会先闪深色再变浅色。
+     由它在右上角挂出「自动 / 浅色 / 深色」三态切换按钮。 -->
+<script src="/theme.js"></script>
+<!-- 角色运行时：解析角色与数据 → 没有角色就弹「创建角色」→ 再注入看板脚本。
+     看板脚本由它动态注入，所以这里不写 <script src="app.js">。 -->
+<script src="/api/tasks/assets/roles.js"></script>
+</head>
+<body>
+
+<!-- 门户顶栏（与站内其它页面一致；用 header 标签，主题引擎会在这里挂切换按钮） -->
+<header class="np-top">
+  <a class="back" href="/">&larr; 工作台</a>
+  <span class="logo">ku</span>
+  <span class="brand">任务打卡</span>
+  <span class="spacer"></span>
+</header>
+
+<!-- 角色条：多角色切换入口（当前角色记在 cookie，数据在服务端，团队共享） -->
+<div class="rolebar" id="roleBar"></div>
+
+<header class="hero">
+  <div class="container">
+    <h1><span class="logo">🗺️</span>任务打卡<span class="lvl" id="heroLv">Lv.1 冒险者</span></h1>
+    <p class="sub">证书 · 赛事 · 课程 · 科研：报名・准考证・考试・查分，一个节点都不漏</p>
+  </div>
+  <div class="stat-strip">
+    <div class="container">
+      <div class="stat-card"><div class="ico i-purple">🎯</div><div><div class="num" id="statNodes">0</div><div class="lbl">任务节点</div></div></div>
+      <div class="stat-card"><div class="ico i-teal">✅</div><div><div class="num" id="statReg">0</div><div class="lbl">已接任务</div></div></div>
+      <div class="stat-card"><div class="ico i-gold">🔥</div><div><div class="num" id="statStreak">0 天</div><div class="lbl">最长连续打卡</div></div></div>
+      <div class="stat-card"><div class="ico i-rose">📝</div><div><div class="num" id="statCheckins">0</div><div class="lbl">累计打卡</div></div></div>
+    </div>
+  </div>
+</header>
+
+<div class="app">
+  <!-- ===== 侧边栏导航 ===== -->
+  <aside class="sidebar">
+    <div class="side-user">
+      <div class="su-head"><span class="lv" id="sideLv">Lv.1</span><span class="su-name">🎓 冒险者</span></div>
+      <div class="exp-bar"><i id="sideExpBar"></i></div>
+      <div class="exp-txt"><span id="sideExpText">0 / 40 EXP</span><span>升级得剧情</span></div>
+      <div class="side-streak">🔥 最长连续打卡 <b id="sideStreak">0 天</b></div>
+    </div>
+    <nav>
+      <button class="nav-item active" type="button" data-view="rpg">🧭 RPG 时间轴</button>
+      <button class="nav-item" type="button" data-view="stage">📚 阶段任务打卡</button>
+      <button class="nav-item" type="button" data-view="focus">🍅 沉浸式学习</button>
+      <button class="nav-item" type="button" data-view="pet">🎓 桌宠陪伴</button>
+    </nav>
+    <button class="btn btn-primary side-add" id="btnAdd">＋ 接新任务</button>
+    <div class="side-tip">完成任务 · 每日打卡 · 专注番茄都能获得经验，推进剧情章节。</div>
+  </aside>
+
+  <!-- ===== 主内容区 ===== -->
+  <main class="main">
+
+    <!-- 视图 1：RPG 时间轴 -->
+    <div class="view active" id="view-rpg">
+      <div class="view-head">
+        <span class="vh-title">🧭 RPG 时间轴</span>
+        <span class="vh-sub">学习进度 · 剧情推进 · 关键节点</span>
+        <div class="vh-actions">
+          <button class="btn btn-primary btn-sm" id="btnQuickAdd">＋ 接新任务</button>
+        </div>
+      </div>
+
+      <div class="story-box" id="storyBox"></div>
+
+      <div class="toolbar">
+        <div class="tabs">
+          <button class="active" type="button" data-type="通用证书">📜 通用证书</button>
+          <button type="button" data-type="专业赛事">🏆 专业赛事</button>
+          <button type="button" data-type="课程学习">📚 课程学习</button>
+          <button type="button" data-type="科研进度">🔬 科研进度</button>
+        </div>
+        <span style="font-size:12px; color:var(--np-ink-5)">节点显示简称 · 悬停看全名 · 点击查看完整信息</span>
+      </div>
+
+      <section class="card">
+        <div class="card-title"><span class="emoji">🧭</span>任务时间轴<span class="hint">按实际日期排布，临近节点自动高亮</span></div>
+        <div class="tl-wrap"><div class="tl-inner" id="timeline"></div></div>
+      </section>
+
+      <section class="card">
+        <div class="card-title"><span class="emoji">⏳</span>考试倒计时<span class="hint">已报名任务自动生成倒计时 · 今日事项置顶</span></div>
+        <div class="cd-grid" id="cdGrid"></div>
+      </section>
+
+      <section class="card">
+        <div class="card-title"><span class="emoji">🏅</span>里程碑徽章墙<span class="hint">连续 3/7/14/21/30 天 · 累计 10/30/50 次</span></div>
+        <div class="badges" id="badges"></div>
+      </section>
+    </div>
+
+    <!-- 视图 2：阶段任务打卡 -->
+    <div class="view" id="view-stage">
+      <div class="view-head">
+        <span class="vh-title">📚 阶段任务打卡</span>
+        <span class="vh-sub">分阶段设置任务 · 每日打卡记录完成情况</span>
+        <div class="vh-actions"><button class="btn btn-primary btn-sm" id="btnStageAdd">＋ 接新任务</button></div>
+      </div>
+      <div class="stage-add-tip">💡 标记「已报名」的任务会自动生成按月备考阶段（科目 + 核心重点）；点击「查看全部 N 个阶段」可在弹窗中查看进度、每日打卡/补卡，也可手动新增或删除阶段。</div>
+      <div id="prepWrap"></div>
+    </div>
+
+    <!-- 视图 3：沉浸式学习（番茄钟） -->
+    <div class="view" id="view-focus">
+      <div class="view-head">
+        <span class="vh-title">🍅 沉浸式学习</span>
+        <span class="vh-sub">番茄钟专注计时 · 管理你的学习时间</span>
+      </div>
+      <div class="focus-layout">
+        <div class="focus-main">
+          <div class="mode-tabs">
+            <button class="active" id="modeFocus" onclick="pomoSwitch('focus')">🍅 专注 25′</button>
+            <button id="modeShort" onclick="pomoSwitch('short')">☕ 短休 5′</button>
+            <button id="modeLong" onclick="pomoSwitch('long')">🌙 长休 15′</button>
+          </div>
+          <div class="focus-ring-wrap">
+            <svg height="270" viewBox="0 0 270 270" width="270">
+              <circle class="ring-bg" cx="135" cy="135" r="120"></circle>
+              <circle class="ring-fg focus" cx="135" cy="135" id="focusRing" r="120"></circle>
+            </svg>
+            <div class="focus-time">
+              <div class="ft-num" id="focusTime">25:00</div>
+              <div class="ft-lbl" id="focusLabel">🍅 专注时间 · 心无旁骛</div>
+            </div>
+          </div>
+          <div class="focus-actions">
+            <button class="btn btn-primary" id="btnPomoStart">▶ 开始</button>
+            <button class="btn btn-ghost" id="btnPomoPause">⏸ 暂停</button>
+            <button class="btn btn-ghost" id="btnPomoReset">↺ 重置</button>
+          </div>
+          <div class="focus-tag-row">
+            <span style="font-size:13px; color:var(--np-ink-3)">本次专注内容：</span>
+            <input id="focusTag" maxlength="20" placeholder="如：四级词汇 / 高数刷题（可空）">
+            <span style="font-size:12px; color:var(--np-ink-5)">快捷：</span>
+            <span class="focus-chips" id="focusChips"></span>
+          </div>
+        </div>
+        <div class="focus-side">
+          <div class="focus-stat">
+            <div class="fs-title">📊 今日统计</div>
+            <div class="fs-grid">
+              <div class="fs-item"><div class="v" id="fsCnt">0</div><div class="k">今日番茄</div></div>
+              <div class="fs-item"><div class="v" id="fsMin">0</div><div class="k">专注分钟</div></div>
+              <div class="fs-item"><div class="v" id="fsStreak">0</div><div class="k">连续专注天</div></div>
+              <div class="fs-item"><div class="v" id="fsTotal">0</div><div class="k">累计番茄</div></div>
+            </div>
+          </div>
+          <div class="focus-stat">
+            <div class="fs-title">🕐 最近专注记录</div>
+            <div class="focus-log" id="focusLog"></div>
+          </div>
+          <div class="focus-tip">🎯 番茄工作法：专注 25 分钟 → 短休 5 分钟，每 4 个番茄后可长休 15 分钟。完成一个专注番茄，冒险者经验 +15，桌宠会为你喝彩！</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 视图 4：桌宠陪伴 -->
+    <div class="view" id="view-pet">
+      <div class="view-head">
+        <span class="vh-title">🎓 桌宠陪伴</span>
+        <span class="vh-sub">会陪你学习的桌宠 · 互动提升陪伴感</span>
+      </div>
+      <div class="pet-layout">
+        <div class="pet-stage">
+          <div class="pet-big" id="petBig" title="点我互动">🎓</div>
+          <div class="pet-bubble" id="petBubble">你好呀，我是你的学习桌宠！摸摸我、喂喂我，我们一起升级～</div>
+          <div class="pet-hint">点击桌宠可互动 · 不同互动有不同反应哦</div>
+        </div>
+        <div class="pet-side">
+          <div class="pet-card">
+            <div class="pc-title">😊 状态</div>
+            <div class="meter"><div class="m-head"><span>心情</span><span id="petMoodTxt">0</span></div><div class="m-track"><div class="m-fill happy" id="petMood"></div></div></div>
+            <div class="meter"><div class="m-head"><span>饱腹</span><span id="petFullTxt">0</span></div><div class="m-track"><div class="m-fill full" id="petFull"></div></div></div>
+            <div class="pet-log-title" id="petFav">互动记录：摸摸头 0 次 · 喂食 0 次</div>
+          </div>
+          <div class="pet-card">
+            <div class="pc-title">🕹 互动</div>
+            <div class="pet-btns">
+              <button class="btn btn-primary" id="btnPetPat">🤗 摸摸头</button>
+              <button class="btn btn-gold" id="btnPetFeed">🍰 喂食</button>
+              <button class="btn btn-ghost" id="btnPetCheer">💬 换句鼓励</button>
+              <button class="btn btn-ghost" id="btnPetFocus">🍅 陪我学习（去番茄钟）</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>任务打卡 · 报名・准考证・考试・查分，一个不漏</footer>
+  </main>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="dialog" id="dialog"></div>
+</div>
+
+<div class="assistant" id="assistant">
+  <div class="bubble">
+    <span id="assistantText">报名成功，记得打卡！</span>
+    <div class="bubble-actions">
+      <button class="btn btn-gold btn-sm" id="btnGoCheck">去打卡 →</button>
+      <button class="btn btn-ghost btn-sm" id="btnGoPet">🎓 陪伴</button>
+    </div>
+  </div>
+  <div class="hat" id="assistantHat" title="点我换一句鼓励语">🎓</div>
+</div>
+
+<div class="banner-wrap" id="bannerWrap"><div class="banner" id="bannerText">打卡成功</div></div>
+<canvas id="fxCanvas"></canvas>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<div class="rmask" id="roleMask">
+  <div class="rbox">
+    <h3>角色管理</h3>
+    <p class="rsub">每个角色拥有一套完整的独立工作台（任务时间轴・阶段打卡・番茄钟・徽章・桌宠）。切换角色即切换整套数据。</p>
+    <div class="rwarn" id="roleWarn">角色数据存在 kust.work 上，团队内其它人也能切到你的角色查看。</div>
+    <div id="roleRows"></div>
+    <div class="rfoot" id="roleFoot">
+      <button class="btn btn-ghost" id="roleAddBtn" type="button">＋ 新建角色</button>
+      <button class="btn" id="roleCloseBtn" type="button">完成</button>
+    </div>
+  </div>
+</div>
+
+<div class="rmask" id="gateMask">
+  <div class="rbox gate">
+    <h3 id="gateTitle">先创建一个角色</h3>
+    <p class="rsub" id="gateSub">每个角色是一整套独立的工作台，数据存在 kust.work 上。</p>
+    <div class="gate-form">
+      <label for="gateName">角色名称</label>
+      <input id="gateName" type="text" maxlength="16" autocomplete="off"
+             placeholder="如：阿呆 / 2027 考研 / 我的备考台">
+      <div class="gate-avs" id="gateAvatars"></div>
+    </div>
+    <div class="gate-err" id="gateErr"></div>
+    <div class="rfoot">
+      <button class="btn btn-ghost" id="gateClose" type="button" hidden>取消</button>
+      <button class="btn btn-primary" id="gateCreate" type="button">创建并进入</button>
+    </div>
+    <div id="gateExistingWrap" hidden>
+      <div class="gate-sep">或进入已有角色</div>
+      <div id="gateExisting"></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

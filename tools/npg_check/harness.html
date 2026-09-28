@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<link rel="stylesheet" href="file:///D:/PostNews/Translate/modules/tasks/assets/tasks.css">
+<link rel="stylesheet" href="file:///D:/PostNews/Translate/modules/tasks/assets/goals.css">
+</head><body>
+<nav>
+  <button class="nav-item active" type="button" data-view="rpg">RPG</button>
+  <button class="nav-item" type="button" data-view="stage">备赛</button>
+  <button class="nav-item" type="button" data-view="focus">专注</button>
+  <button class="nav-item" type="button" data-view="pet">桌宠</button>
+</nav>
+<main class="main">
+  <!-- 复刻真实模板的 #view-rpg：学习目标首页面板要挂在「任务时间轴」那张卡的下方，
+       所以骨架页必须还原「#timeline 被包在 section.card 里」这个关键结构，
+       否则测不出挂载点到底对不对。 -->
+  <div class="view active" id="view-rpg">
+    <div class="view-head">
+      <span class="vh-title">🧭 RPG 时间轴</span>
+      <span class="vh-sub">学习进度 · 剧情推进 · 关键节点</span>
+    </div>
+    <div class="story-box" id="storyBox"></div>
+    <div class="toolbar">
+      <div class="tabs">
+        <button class="active" type="button" data-type="通用证书">📜 通用证书</button>
+        <button type="button" data-type="专业赛事">🏆 专业赛事</button>
+        <button type="button" data-type="课程学习">📚 课程学习</button>
+        <button type="button" data-type="科研进度">🔬 科研进度</button>
+      </div>
+      <span style="font-size:12px; color:var(--np-ink-5)">节点显示简称 · 悬停看全名 · 点击查看完整信息</span>
+    </div>
+    <section class="card" id="tlCard">
+      <div class="card-title"><span class="emoji">🧭</span>任务时间轴<span class="hint">按实际日期排布，临近节点自动高亮</span></div>
+      <div class="tl-wrap"><div class="tl-inner" id="timeline"></div></div>
+    </section>
+    <section class="card" id="cdCard">
+      <div class="card-title"><span class="emoji">⏳</span>考试倒计时</div>
+      <div class="cd-grid" id="cdGrid"></div>
+    </section>
+    <section class="card" id="badgeCard">
+      <div class="card-title"><span class="emoji">🏅</span>里程碑徽章墙</div>
+      <div class="badges" id="badges"></div>
+    </section>
+  </div>
+  <div class="view" id="view-stage"></div>
+  <div class="view" id="view-focus"></div>
+  <div class="view" id="view-pet"></div>
+</main>
+<script>
+/* ── 骨架页：尽量复刻真实注入时序 ──────────────────────────────────────
+   真实环境里 roles.js 先注入看板 app.js（它会同步执行到底：绑定已存在的
+   .nav-item 的 onclick、设好 window.__TASKS_BOARD__），再注入 goals.js。
+   所以这里用同样「初始化时一次性绑定」的方式做桩，才能验出「后注入的
+   导航按钮拿不到 onclick」这类集成问题。 */
+window.__TASKS_BOARD__ = {
+  reload: function () { window.__boardReloaded = (window.__boardReloaded || 0) + 1; }
+};
+window.__TASKS_ROLES__ = {
+  key: function (n) { return 'kust.tasks.v2.testrole.' + n; },
+  prefix: function () { return 'kust.tasks.v2.'; },
+  list: function () { return []; },
+  current: function () { return { id: 'testrole', name: '验收角色' }; },
+  avatarPool: function () { return []; },
+  online: function () { return true; },
+  rev: function () { return 3; }
+};
+
+/* 真实流程里 goals.js 是「首拉完成之后」才被 roles.js 注入的，那时 roles.js 已经写过
+   syncrev —— 这里补上，才是忠实的时序（否则「首次同步完成后才允许播种示例」的守卫
+   会把骨架页的种子一并拦掉，那是首页空白更糟）。 */
+try { localStorage.setItem('kust.tasks.v2.testrole.syncrev', '1'); } catch (e) { }
+
+/* app.js 的视图切换（同选择器、同白名单行为） */
+var VIEWS = ['rpg', 'stage', 'focus', 'pet'];
+function switchView(name) {
+  var views = document.querySelectorAll('.view');
+  for (var i = 0; i < views.length; i++) {
+    views[i].className = (views[i].id === 'view-' + name) ? 'view active' : 'view';
+  }
+  var navs = document.querySelectorAll('.nav-item');
+  for (var j = 0; j < navs.length; j++) {
+    navs[j].className = (navs[j].getAttribute('data-view') === name) ? 'nav-item active' : 'nav-item';
+  }
+  try { localStorage.setItem('kust.tasks.v2.testrole.view', name); } catch (e) { }
+}
+
+/* 初始化时一次性绑定 —— 这正是真实 app.js 的行为，后注入的按钮绑不上 */
+var _navs = document.querySelectorAll('.nav-item');
+for (var _i = 0; _i < _navs.length; _i++) {
+  (function (item) { item.onclick = function () { switchView(item.getAttribute('data-view')); }; })(_navs[_i]);
+}
+</script>
+<script src="file:///D:/PostNews/Translate/modules/tasks/assets/goals.js"></script>
+</body></html>

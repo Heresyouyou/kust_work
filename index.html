@@ -1,9 +1,14 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="zh-CN" data-page-node-id="uHyo68V7nkO6hzs6m4zXjD">
+<head data-page-node-id="5KR9Z4ls0ahZVh22LkLzkw">
+<meta charset="UTF-8" data-page-node-id="8hffgdiDe9ZDJdi9ZQBxpL">
+<meta name="viewport" content="width=device-width, initial-scale=1" data-page-node-id="D8sEtAkKmwq37pA3kl1tCy">
 <title>GeoTranslate · 地学论文双栏翻译 v4</title>
+
+<!-- 自研阅读器内核样式（.kp-* 类）——宿主里挂 kpdf 视图必须加载它，
+     否则 .kp-root/.kp-view 等全是无样式状态（表现为 PDF 按极小尺寸渲染）。
+     刻意放在本页 <style> 之前：两边的 :root 变量同源，让本页的优先。 -->
+<link rel="stylesheet" href="/api/reader/assets/reader.css" data-page-node-id="vvZU6g98TWJ8a2nTQ8TAQw">
 
 <style>
   /* 深色为默认值（/theme.js 缺失也完整可读）；浅色由 theme.js 注入的
@@ -39,7 +44,11 @@
     --card-shadow: none;
     --topbar-h: 48px;
     --radius: 6px;
+    /* 浮层（loading-wrap）背景：跟随主题翻转 */
+    --overlay-bg: rgba(20,20,28,0.95);
   }
+  /* 浅色主题下浮层背景翻转为浅色（与 theme.js 注入的浅色变量同源，不冲突） */
+  :root[data-theme="light"] { --overlay-bg: rgba(255,255,255,0.95); }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; overflow: hidden; }
   body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
@@ -54,6 +63,9 @@
   .brand { font-weight: 600; font-size: 14px; letter-spacing: -0.3px; }
   .brand small { color: var(--muted); font-weight: 400; margin-left: 6px; font-size: 11px; }
   .spacer { flex: 1; }
+  /* 与 archive / daily 等界面一致的「返回工作台」入口（位置：header 最左） */
+  .back { font-size: 12px; color: var(--muted); display: inline-flex; align-items: center; gap: 5px; text-decoration: none; }
+  .back:hover { color: var(--accent); }
   .file-chip { display: none; align-items: center; gap: 8px;
     padding: 4px 12px; border-radius: 4px;
     background: var(--surface-2); border: 1px solid var(--border);
@@ -78,12 +90,7 @@
   .app { position: absolute; inset: var(--topbar-h) 0 0 0; display: flex; }
   .pane { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
   .pane.en { border-right: 1px solid var(--border); }
-  .pane-head { height: 36px; display: flex; align-items: center; padding: 0 14px;
-    background: var(--surface-2); border-bottom: 1px solid var(--border);
-    font-size: 12px; color: var(--muted); letter-spacing: 0.5px; flex-shrink: 0; }
-  .pane-head .dot { width: 7px; height: 7px; border-radius: 50%;
-    background: var(--accent); margin-right: 8px; }
-  .pane-head .status { margin-left: auto; font-size: 11px; }
+  /* 顶部头部已移除：缩放 + 状态整合进底部 .bottom-bar，让 PDF 占满整栏 */
 
   /* ── 空态 ── */
   .empty { flex: 1; display: flex; flex-direction: column;
@@ -108,41 +115,42 @@
     background: #fff; border-radius: 2px;
     transition: box-shadow .2s; }
   
-  /* iframe 原生 PDF 渲染 (替代实时 pdf.js canvas) */
-  .pdf-frame {
+  /* 自研 kpdf 内核渲染宿主（替代 iframe + Chromium 原生 PDF）
+     kpdf 把自己的 root 挂进来，所以宿主必须给出确定高度：
+     flex:1 分剩余空间 + min-height:0 允许内部滚动容器收缩。 */
+  .kpdf-host {
     flex: 1;
     width: 100%;
-    border: none;
-    background: #fff;
+    min-height: 0;
+    position: relative;
     overflow: hidden;
-    display: block;
+    background: var(--bg, #2b2b2b);
   }
-  .pdf-frame.hidden { display: none !important; }
+  .kpdf-host.hidden { display: none !important; }
+  /* 宿主内 kpdf 的 root 撑满 */
+  .kpdf-host > * { position: absolute; inset: 0; }
   .scroll canvas:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.7), 0 0 0 1px rgba(74,158,106,0.15); }
-  .page-bar { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+  /* 底部多功能浮窗：页码 + 缩放 + 状态，集成自原顶部头部，给 PDF 让出顶部空间 */
+  .bottom-bar { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 12px;
     background: rgba(0,0,0,0.82); color: #ddd;
-    padding: 4px 8px; border-radius: 14px; font-size: 11px;
-    pointer-events: auto; display: flex; align-items: center; gap: 6px; }
-  .page-bar button {
-    background: none; border: 1px solid #555; color: #ddd;
-    width: 22px; height: 22px; border-radius: 50%;
-    cursor: pointer; font-size: 11px; line-height: 1;
+    padding: 5px 12px; border-radius: 14px; font-size: 11px;
+    pointer-events: auto; backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.08); }
+  .bottom-bar .grp { display: inline-flex; align-items: center; gap: 4px; }
+  .bottom-bar .sep { width: 1px; height: 16px; background: rgba(255,255,255,0.18); }
+  .bottom-bar button { background: none; border: 1px solid #555; color: #ddd;
+    width: 24px; height: 24px; border-radius: 50%;
+    cursor: pointer; font-size: 12px; line-height: 1;
     display: flex; align-items: center; justify-content: center;
-  }
-  .page-bar button:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .page-bar button:disabled { opacity: 0.3; cursor: default; }
-  .page-bar .pg-num { min-width: 40px; text-align: center; font-variant-numeric: tabular-nums; }
-    backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.06);
-    font-variant-numeric: tabular-nums; letter-spacing: 0.3px; }
-  .pane-head .zoom { display: inline-flex; align-items: center; gap: 2px;
-    margin-left: 10px; }
-  .pane-head .zoom button { background: transparent; border: 1px solid var(--border);
-    color: var(--muted); width: 22px; height: 22px; border-radius: 3px;
-    cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center;
-    padding: 0; line-height: 1; }
-  .pane-head .zoom button:hover { border-color: var(--accent); color: var(--accent); }
-  .pane-head .zoom .pct { font-size: 11px; color: var(--muted); width: 36px; text-align: center;
-    font-variant-numeric: tabular-nums; }
+    transition: background .15s, color .15s, border-color .15s; }
+  .bottom-bar button:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .bottom-bar button:active { transform: scale(.92); }
+  .bottom-bar button:disabled { opacity: 0.3; cursor: default; }
+  .bottom-bar .pg-num { min-width: 42px; text-align: center; font-variant-numeric: tabular-nums; }
+  .bottom-bar .zoom .pct { min-width: 46px; text-align: center; color: #bbb;
+    font-variant-numeric: tabular-nums; user-select: none; }
+  .bottom-bar .dot { width: 7px; height: 7px; border-radius: 50%; }
 
   /* 分割线 */
   .divider { width: 4px; background: var(--border); cursor: col-resize; flex-shrink: 0;
@@ -161,7 +169,7 @@
 
   /* ── 右侧翻译中 ── */
     .loading-wrap { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    background: rgba(20,20,28,0.95); backdrop-filter: blur(8px);
+    background: var(--overlay-bg); backdrop-filter: blur(8px);
     border-radius: 14px; padding: 18px 24px 20px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.5); z-index: 100;
     display: flex; flex-direction: column; align-items: stretch; gap: 10px; min-width: 280px; max-width: 360px; }
@@ -225,98 +233,112 @@
      注意：PDF 白纸底、悬浮进度卡、断线提示保持原色，不随主题变化。 -->
 <script src="/theme.js"></script>
 </head>
-<body>
+<body data-page-node-id="0T8esXIWM8R8yOG3ymT1DC">
 
 
-<header>
-  <span class="brand">GeoTranslate<small>v4 · 按需渲染 + 鲁棒轮询</small></span>
-  <span class="spacer"></span>
-  <span class="file-chip" id="fileChip">📄 <span id="chipName"></span><span class="close" id="chipClose">✕</span></span>
-  <span id="downloadOpts" class="download-opts hidden">
-    <label class="dl-radio"><input type="radio" name="dlFmt" value="mono"> 中文版</label>
-<label class="dl-radio"><input type="radio" name="dlFmt" value="dual" checked> 双语对照</label>
-<label class="dl-radio"><input type="radio" name="dlFmt" value="both"> 两者都要</label>
-    <button class="action-btn" id="downloadBtn">⬇ 下载</button>
+<header data-page-node-id="kGHbrrm4RbOheFGOsuzNYZ">
+  <a class="back" href="/" data-page-node-id="QkriEpAwurRDa6aSGoWSFT">&larr; 工作台</a>
+  <span class="brand" data-page-node-id="5A66ImHxIio8y4uTHrskdv">GeoTranslate<small data-page-node-id="FCxZPBC9ETgZ8ABloZnipS">v4 · 按需渲染 + 鲁棒轮询</small></span>
+  <span class="spacer" data-page-node-id="YHwFPmmayl2c9WsBfxMl3j"></span>
+  <span class="file-chip" id="fileChip" data-page-node-id="yrxfabGhvOGZyqynEAyzCo">📄 <span id="chipName" data-page-node-id="Nue4H5QnfP6cXSuezjeC9n"></span><span class="close" id="chipClose" data-page-node-id="5SSFC9GFkEffJEAhBwXyRP">✕</span></span>
+  <span id="downloadOpts" class="download-opts hidden" data-page-node-id="ENge0mGFTeegeGfJTFsdxA">
+    <label class="dl-radio" data-page-node-id="gQpKLKty3lX5FFdedrJA2O"><input type="radio" name="dlFmt" value="mono" data-page-node-id="7vI7ZurFfkUdSiPcFulDyt"> 中文版</label>
+<label class="dl-radio" data-page-node-id="UVx4m4hF1BIisHi10pWK94"><input type="radio" name="dlFmt" value="dual" checked data-page-node-id="U2AKoL8uN8smap7v2pC5Ar"> 双语对照</label>
+<label class="dl-radio" data-page-node-id="G5UjsgDifb8vP9UNGpfFCC"><input type="radio" name="dlFmt" value="both" data-page-node-id="ZJgq8LWrrS3TQZrOabXLof"> 两者都要</label>
+    <button class="action-btn" id="downloadBtn" data-page-node-id="TFvrTaVLPVaOdXvhwhfRi6">⬇ 下载</button>
   </span>
-  <label class="upload-btn">📄 选择 PDF<input type="file" id="fileInput" accept=".pdf"></label>
+  <label class="upload-btn" data-page-node-id="LNowwPL66RjhaNTxCsYlpc">📄 选择 PDF<input type="file" id="fileInput" accept=".pdf" data-page-node-id="QGLiWLZxptrzEDF4zgp2Q7"></label>
 </header>
 
-<div class="net-alert" id="netAlert">网络离线 · 等待重连...</div>
+<div class="net-alert" id="netAlert" data-page-node-id="WibxBsRUHyzl6vgoHweHso">网络离线 · 等待重连...</div>
 
-<div class="app">
+<div class="app" data-page-node-id="nMEXV5ODZwCLztkkDkjpPh">
   <!-- 左: 英文原文 -->
-  <div class="pane en" id="leftPane">
-    <div class="pane-head">
-      <span class="dot"></span>原文 · EN
-      <span class="zoom">
-        <button id="zoomLeftOut" title="缩小 (-)">−</button>
-        <span class="pct" id="leftZoom">140%</span>
-        <button id="zoomLeftIn" title="放大 (+)">+</button>
-        <button id="zoomLeftReset" title="重置 (0)">↺</button>
-      </span>
-      <span class="status" id="leftStatus"></span>
+  <div class="pane en" id="leftPane" data-page-node-id="wh9lRKUCBjbeNSvUIaP6R8">
+    <div class="empty" id="leftEmpty" data-page-node-id="qSj1sCTX0UDMz5hI59DfBs">
+      <div class="big-icon" data-page-node-id="1zZtzYcoWFz6PRQIKzUTaU">📄</div>
+      <div class="title" data-page-node-id="o6l96L5UmURBkc6aq1l5JN">拖入 PDF 或点击这里选择</div>
+      <div class="hint" data-page-node-id="u2QkOGQrYKgN56ISjORY7C">自动检测缓存 · 本地翻译 · 支持批量</div>
     </div>
-    <div class="empty" id="leftEmpty">
-      <div class="big-icon">📄</div>
-      <div class="title">拖入 PDF 或点击这里选择</div>
-      <div class="hint">自动检测缓存 · 本地翻译 · 支持批量</div>
+    <!-- 自研 kpdf 内核渲染（原 iframe + Chromium 原生 PDF 已替换） -->
+    <div id="leftView" class="kpdf-host hidden" title="原文 PDF" data-page-node-id="DX2jpH7tkzLiWs93wc6aTw"></div>
+    <!-- 底部浮窗：页码 + 缩放 + 状态，集成自原顶部头部 -->
+    <div class="bottom-bar" id="leftBottomBar" data-page-node-id="T3EhnnJzVlF5CLD9Hxzuru">
+      <div class="grp nav" data-page-node-id="LIJfhalYoRG4DupVBEIvz1">
+        <button id="leftPrev" title="上一页" data-page-node-id="DyyOraXPxm0gWpp5EpB4F0">‹</button>
+        <span class="pg-num" id="leftPage" data-page-node-id="NH5hAwUEFw3bMzLvO1Mf8s">— / —</span>
+        <button id="leftNext" title="下一页" data-page-node-id="C3Bdl2JZs1KcN4c5dE8iw7">›</button>
+      </div>
+      <div class="sep" data-page-node-id="fkxFyhAuHTR1PoB9LdxEAh"></div>
+      <div class="grp zoom" data-page-node-id="Vm3p0DxsBOrpjFQFz4Bzvm">
+        <button id="zoomLeftOut" title="缩小 (-)" data-page-node-id="97zuDaeHAvwiQMl3dccLH7">−</button>
+        <span class="pct" id="leftZoom" data-page-node-id="lzV3JnoTENrUp7HpNC1nqq">140%</span>
+        <button id="zoomLeftIn" title="放大 (+)" data-page-node-id="iynF7VF2tXozCnLfMTy4OK">+</button>
+        <button id="zoomLeftReset" title="重置 (0)" data-page-node-id="qB7hQoL5oCOPFywjxFFDJo">↺</button>
+      </div>
+      <div class="sep" data-page-node-id="Xn9wTeIleQ5heiWlf6G2R7"></div>
+      <span class="status" id="leftStatus" data-page-node-id="EvnfZqwD5GTf2BjGWzSHjA"></span>
     </div>
-    <!-- iframe 原生 PDF 渲染: 稳定 + 浏览器缓存 + 自带缩放/搜索 -->
-    <iframe id="leftFrame" class="pdf-frame hidden" title="原文 PDF"></iframe><!-- 保留兼容, 不再用于渲染 -->
-    <div class="page-bar" id="leftPageBar"><button id="leftPrev" title="上一页">‹</button><span class="pg-num" id="leftPage">— / —</span><button id="leftNext" title="下一页">›</button></div>
   </div>
 
   <!-- 分割线 (可拖拽调左右宽度) -->
-  <div class="divider" id="divider"></div>
+  <div class="divider" id="divider" data-page-node-id="O7iQHK0qZg0rD97FPYlVoV"></div>
 
   <!-- 右: 中文译文 -->
-  <div class="pane zh" id="rightPane">
-    <div class="pane-head">
-      <span class="dot" id="rightDot" style="background: var(--muted)"></span>译文 · ZH
-      <span class="zoom">
-        <button id="zoomRightOut" title="缩小 (-)">−</button>
-        <span class="pct" id="rightZoom">140%</span>
-        <button id="zoomRightIn" title="放大 (+)">+</button>
-        <button id="zoomRightReset" title="重置 (0)">↺</button>
-      </span>
-      <span class="status" id="rightStatus"></span>
+  <div class="pane zh" id="rightPane" data-page-node-id="Yx2ChmUZ54vVzZDrdROqgu">
+    <div class="empty" id="rightEmpty" style="cursor:default" data-page-node-id="Qq4kfq4tSE9RPVJ1r7BPuw">
+      <div class="big-icon" data-page-node-id="0dxtbYwTJNocFM2aKvPFQl">🀄</div>
+      <div class="title" style="color:var(--muted)" data-page-node-id="vR7plaC2KdGrt7bUcBQ4bn">等待左侧上传</div>
+      <div class="hint" data-page-node-id="XGukpDhii95LdqcSB39RZB">翻译完成后自动显示在这里</div>
     </div>
-    <div class="empty" id="rightEmpty" style="cursor:default">
-      <div class="big-icon">🀄</div>
-      <div class="title" style="color:var(--muted)">等待左侧上传</div>
-      <div class="hint">翻译完成后自动显示在这里</div>
-    </div>
-    <div class="loading-wrap hidden" id="loadingWrap">
-      <div style="display:flex; align-items:center; gap:16px; width:100%;">
-        <svg class="progress-ring" viewBox="0 0 72 72">
-          <circle class="bg" cx="36" cy="36" r="32" stroke-width="5" fill="none"/>
-          <circle class="fg" cx="36" cy="36" r="32" stroke-width="5" fill="none"/>
+    <div class="loading-wrap hidden" id="loadingWrap" data-page-node-id="A5WlUO95yRpg1GQnTTRaMq">
+      <div style="display:flex; align-items:center; gap:16px; width:100%;" data-page-node-id="lpMGMASTYbTDFfmZlLrwzG">
+        <svg class="progress-ring" viewBox="0 0 72 72" data-page-node-id="q3ecRBuVQBiKMdEa2YnINf">
+          <circle class="bg" cx="36" cy="36" r="32" stroke-width="5" fill="none" data-page-node-id="4yG7RCamobV10Hq2O816QC"/>
+          <circle class="fg" cx="36" cy="36" r="32" stroke-width="5" fill="none" data-page-node-id="VpBal1TdYlX2hWBj0Wbidj"/>
         </svg>
-        <div style="flex:1; min-width:0;">
-          <div class="pct-num" id="pctNum" style="font-size:22px;">0%</div>
-          <div class="load-msg" id="loadMsg" style="font-size:11px;">加载翻译模型...</div>
+        <div style="flex:1; min-width:0;" data-page-node-id="vTP74OB3CPjTPZ11ULokxe">
+          <div class="pct-num" id="pctNum" style="font-size:22px;" data-page-node-id="MCnrjbqVNy9BvHMxA4HTTw">0%</div>
+          <div class="load-msg" id="loadMsg" style="font-size:11px;" data-page-node-id="X4AUfTjFqoP2POCBhDM5Zp">加载翻译模型...</div>
         </div>
-        <button id="cancelBtn" class="cancel-btn" style="display:none" title="取消翻译">✕ 取消</button>
+        <button id="cancelBtn" class="cancel-btn" style="display:none" title="取消翻译" data-page-node-id="6RP1Fu5zz0V5ZUCyDbux1G">✕ 取消</button>
       </div>
-      <div class="stage-bars" id="stageBars">
-        <div class="stage-bar-row" data-stage="parse">
-          <span class="s-name">解析</span><div class="s-bar"><div class="s-fill"></div></div><span class="s-pct">0%</span>
+      <div class="stage-bars" id="stageBars" data-page-node-id="Aq4MJtCRdDjU78F7VWMGEL">
+        <div class="stage-bar-row" data-stage="parse" data-page-node-id="5Sl7USSZGongMEafFE8GkT">
+          <span class="s-name" data-page-node-id="jorkxhyYitFsEJ2SI70nes">解析</span><div class="s-bar" data-page-node-id="AkZzAfVplyllMBvaxzUKod"><div class="s-fill" data-page-node-id="HP4UZajsJzpj3xAR2uX0yk"></div></div><span class="s-pct" data-page-node-id="jD2ApVZHgXGbY0o9S571ve">0%</span>
         </div>
-        <div class="stage-bar-row" data-stage="translate">
-          <span class="s-name">翻译</span><div class="s-bar"><div class="s-fill"></div></div><span class="s-pct">0%</span>
+        <div class="stage-bar-row" data-stage="translate" data-page-node-id="paz04O4AUujLl3xoUXlncY">
+          <span class="s-name" data-page-node-id="SvAI2Mk4FXoyE6mx7NgFSl">翻译</span><div class="s-bar" data-page-node-id="rgnt7i4JKTSlNN14dsDkei"><div class="s-fill" data-page-node-id="RvkeCkIe5iZf0n5mo8FfNW"></div></div><span class="s-pct" data-page-node-id="SGegW5dhcikI9UwjR0jInR">0%</span>
         </div>
-        <div class="stage-bar-row" data-stage="typeset">
-          <span class="s-name">排版</span><div class="s-bar"><div class="s-fill"></div></div><span class="s-pct">0%</span>
+        <div class="stage-bar-row" data-stage="typeset" data-page-node-id="ZA1MOm3UGjDsyV0aCKcWtn">
+          <span class="s-name" data-page-node-id="7QWaHvSpHktIWHrVIxNmyH">排版</span><div class="s-bar" data-page-node-id="nTNDFJAlfXHQ1SNBWXeQrP"><div class="s-fill" data-page-node-id="tIA9emXm2mH1jR9k9oGzx6"></div></div><span class="s-pct" data-page-node-id="w3FMUpSr4Tqcg8oEMSIXS8">0%</span>
         </div>
-        <div class="stage-bar-row" data-stage="output">
-          <span class="s-name">输出</span><div class="s-bar"><div class="s-fill"></div></div><span class="s-pct">0%</span>
+        <div class="stage-bar-row" data-stage="output" data-page-node-id="DabgDbZZVd88ySFSqDQ8x4">
+          <span class="s-name" data-page-node-id="QJPhlSUbJ9IMklxIKiTEuy">输出</span><div class="s-bar" data-page-node-id="WoC5zbdQRGTle3tiKY0uMj"><div class="s-fill" data-page-node-id="8Brsd01RJGVPKBNscFC4pa"></div></div><span class="s-pct" data-page-node-id="GBT6nmuATiH4SVOJhZMxM1">0%</span>
         </div>
       </div>
-      <div class="upload-bar hidden" id="uploadBar"><div id="uploadFill" style="width:0%"></div></div>
+      <div class="upload-bar hidden" id="uploadBar" data-page-node-id="T0FhWcifXMO2rHAVgEiSDb"><div id="uploadFill" style="width:0%" data-page-node-id="74JXFzVGu3NZZ4HN6aKu8B"></div></div>
     </div>
-    <!-- iframe 原生 PDF 渲染 -->
-    <iframe id="rightFrame" class="pdf-frame hidden" title="译文 PDF"></iframe><!-- 保留兼容 -->
-    <div class="page-bar" id="rightPageBar"><button id="rightPrev" title="上一页">‹</button><span class="pg-num" id="rightPage">— / —</span><button id="rightNext" title="下一页">›</button></div>
+    <!-- 自研 kpdf 内核渲染（原 iframe + Chromium 原生 PDF 已替换） -->
+    <div id="rightView" class="kpdf-host hidden" title="译文 PDF" data-page-node-id="gaKfbwCY8OVULI74VhCxh5"></div>
+    <!-- 底部浮窗：页码 + 缩放 + 状态，集成自原顶部头部 -->
+    <div class="bottom-bar" id="rightBottomBar" data-page-node-id="40H2c7RennPCByEYUtOhwJ">
+      <div class="grp nav" data-page-node-id="Tvnkq1zPVLNyrpaEZiojmd">
+        <button id="rightPrev" title="上一页" data-page-node-id="WRs6ORExN3cSI0pSbbyKPX">‹</button>
+        <span class="pg-num" id="rightPage" data-page-node-id="S3fxhaNxFGh62Fxz3TIriP">— / —</span>
+        <button id="rightNext" title="下一页" data-page-node-id="T1e5nTe4rDp7gKzsVKFkCE">›</button>
+      </div>
+      <div class="sep" data-page-node-id="ovpNebQVSdhtVoPEczNLAv"></div>
+      <div class="grp zoom" data-page-node-id="nMWjJSQIXQBGF0m8DCpQ1b">
+        <button id="zoomRightOut" title="缩小 (-)" data-page-node-id="MigjMtnuR5UUULQmMLz92f">−</button>
+        <span class="pct" id="rightZoom" data-page-node-id="5I1XBuIyR3mt2LkVqB0DIQ">140%</span>
+        <button id="zoomRightIn" title="放大 (+)" data-page-node-id="vtSdRButSFH8gXSlRg4Vgk">+</button>
+        <button id="zoomRightReset" title="重置 (0)" data-page-node-id="Zdcy6qhk7mVhyYe8Nq3jOn">↺</button>
+      </div>
+      <div class="sep" data-page-node-id="YRPEN24cdNmAwThERjJWqc"></div>
+      <span class="dot" id="rightDot" style="background: var(--muted)" data-page-node-id="5JSpDkkhiLJDzpLJcEGCWs"></span>
+      <span class="status" id="rightStatus" data-page-node-id="nFHnH0WjjHEMr5mREkm36r"></span>
+    </div>
   </div>
 </div>
 
@@ -324,7 +346,7 @@
 
 <script>
 // ═══════════════════════════════════════════════
-//  GeoTranslate — 原生 iframe PDF + postMessage 同步
+//  GeoTranslate — 自研 kpdf 内核渲染 + SyncGroup 双栏同步
 // ═══════════════════════════════════════════════
 
 const $ = id => document.getElementById(id);
@@ -344,13 +366,13 @@ const chipClose = $('chipClose');
 const downloadOpts = $('downloadOpts');
 const downloadBtn = $('downloadBtn');
 const leftEmpty = $('leftEmpty');
-const leftFrame = $('leftFrame');
+const leftView = $('leftView');      // 自研 kpdf 渲染宿主（原 iframe）
 const leftStatus = $('leftStatus');
 const leftPage = $('leftPage');
 const rightEmpty = $('rightEmpty');
 const rightDot = $('rightDot');
 const loadingWrap = $('loadingWrap');
-const rightFrame = $('rightFrame');
+const rightView = $('rightView');    // 自研 kpdf 渲染宿主（原 iframe）
 const rightStatus = $('rightStatus');
 const rightPage = $('rightPage');
 const pctNum = $('pctNum');
@@ -362,292 +384,166 @@ const rightZoom = $('rightZoom');
 const cancelBtn = $('cancelBtn');
 
 // ═══════════════════════════════════════════════════════════════
-//  GeoTranslate — Chromium PDF iframe 双向实时同步
-//  方案: postMessage (Chromium PDF viewer 原生协议) 优先 + hash 兜底
-//  Chromium PDF viewer postMessage 协议 (公开):
-//    父→iframe: {type:'setZoom', zoom:number} | {type:'goToPage', page:number} | {type:'zoomIn'} | {type:'zoomOut'}
-//    iframe→父: {type:'update', zoom, page, numPages, scrollX, scrollY, ...}
+//  GeoTranslate — 自研 kpdf 内核（替代 iframe + Chromium 原生 PDF）
+//
+//  旧实现：两个 <iframe> 套 Chromium 内置 viewer，靠它的私有 postMessage
+//          协议 + hash 兜底 + 500ms 轮询做同步；缩放还被 Chromium 的
+//          0.5/0.75/1/1.25… 枚举值卡住，只能取近似值。
+//  新实现：左右各挂一个单栏 kpdf viewer，跨实例用 SyncGroup 做归一化锚点
+//          同步；缩放是连续值，滚动/缩放双向同步由内核负责，不再轮询。
 // ═══════════════════════════════════════════════════════════════
 
-// ── 状态 (追踪两边的 scroll/page/zoom, 用于同步决策) ──
-const V = {
-    left:  { page: 1, scrollX: 0, scrollY: 0, zoom: 1, numPages: 0, ready: false },
-    right: { page: 1, scrollX: 0, scrollY: 0, zoom: 1, numPages: 0, ready: false },
-    master: 'left',   // 哪边是主 (用户正在操作的那边)
-    lockUntil: 0,     // 同步锁, 防止递归
-    usingPostMessage: true,  // 检测 Chromium 后会确认
+const KP = {
+  mod: null,       // 懒加载的 kpdf 模块（零构建 ESM，首次用到才拉模块图）
+  left: null,      // 左 reader 实例
+  right: null,     // 右 reader 实例
+  group: null,     // 跨实例 SyncGroup
+  master: 'left',  // 用户最后操作的一侧
 };
 
-// ── Chromium PDF viewer 消息发送 (带失败检测, 3 次失败后回退 hash) ──
-let _pmFailures = 0;
-function _sendPdfCmd(frame, cmd) {
-    if (!frame?.src || frame.src === 'about:blank') return;
-    if (!V.usingPostMessage) return _hashFallback(cmd);
-    try {
-        frame.contentWindow.postMessage(cmd, '*');
-    } catch(e) {
-        _pmFailures++;
-        if (_pmFailures > 3) { V.usingPostMessage = false; console.warn('[PDF] postMessage disabled, using hash fallback'); }
-    }
+/** 懒加载 kpdf 模块图。 */
+async function kpdfMod() {
+  if (!KP.mod) {
+    const [idx, sync] = await Promise.all([
+      import('/api/reader/assets/kpdf/index.js'),
+      import('/api/reader/assets/kpdf/sync.js'),
+    ]);
+    KP.mod = {
+      createReader: idx.createReader,
+      SyncGroup: sync.SyncGroup,
+      SYNC_MODE: sync.SYNC_MODE,
+      SCALE_MODE: sync.SCALE_MODE,
+    };
+  }
+  return KP.mod;
 }
 
-function _hashFallback(cmd) {
-    // hash 方式兜底, 只支持 page/zoom, 不支持 scroll
-    const frame = V.master === 'left' ? leftFrame : rightFrame;
-    if (!frame.src) return;
-    const base = frame.src.split('#')[0];
-    let page = 1, zoom = 'FitW';
-    const m = frame.src.match(/#page=(\d+)&zoom=([^&]*)/);
-    if (m) { page = m[1]; zoom = m[2]; }
-    if (cmd.type === 'goToPage') page = cmd.page;
-    if (cmd.type === 'setZoom') {
-        const z = cmd.zoom;
-        zoom = (z >= 2 ? '2' : z >= 1.5 ? '1.5' : z >= 1 ? '1' : z >= 0.75 ? '0.75' : '0.5');
-    }
-    frame.src = `${base}#page=${page}&zoom=${zoom}&pagemode=none`;
+const paneView = (which) => KP[which]?.views?.[0] || null;
+const paneHost = (which) => (which === 'left' ? leftView : rightView);
+
+/** 挂载（或换掉）一侧的 PDF。 */
+async function mountPane(which, url) {
+  if (!url) return null;
+  const host = paneHost(which);
+  // 自己负责收起空态占位：否则 .empty 会以 flex 项身份把渲染宿主挤成一条
+  // （setPdfFrame 也会收，但 mountPane 可能被直接调用，不能依赖调用方）
+  (which === 'left' ? leftEmpty : rightEmpty)?.classList.add('hidden');
+  // ⚠️ 必须在建视图之前让宿主可见并完成布局：宿主若还是 display:none，
+  //    宽度为 0，viewport 的 fit:'width' 会按 0 宽算 scale，页面会缩成几十像素。
+  host.classList.remove('hidden');
+  void host.offsetWidth;   // 强制一次 reflow，确保尺寸已生效
+  const { createReader } = await kpdfMod();
+
+  // 换文档前先销毁旧实例：否则 PDF.js worker 与事件监听会泄漏
+  if (KP[which]) { try { KP[which].destroy(); } catch (e) { /* ignore */ } KP[which] = null; }
+
+  const reader = await createReader(host, {
+    panes: [{ src: url, label: which === 'left' ? '原文' : '译文' }],
+    mode: 'continuous',
+    fit: 'width',
+    // 翻译页自己有缩放/翻页控件，宿主里不留阅读器的工具栏与侧栏
+    toolbar: false, statusbar: false, findbar: false, sidebar: null,
+    sync: { enabled: false },   // 单栏；两侧同步交给下面的 SyncGroup
+  });
+  KP[which] = reader;
+
+  const view = paneView(which);
+  if (view) {
+    const pageEl = which === 'left' ? leftPage : rightPage;
+    const showPage = () => {
+      const total = view.doc?.numPages ?? KP[which]?.docs?.[0]?.numPages ?? '—';
+      pageEl.textContent = `${(view.page ?? 0) + 1} / ${total}`;
+    };
+    view.on('scroll', showPage);
+    view.on('scale', showPage);
+    showPage();
+
+    // 谁在滚，谁是 master
+    view.on('scroll', (e) => { if (!e?.programmatic) KP.master = which; });
+    // 内核自己处理 Ctrl+Wheel 缩放，这里只把结果回写到百分比显示
+    view.on('scale', (e) => {
+      if (e?.programmatic) return;
+      S.iframeZoom = Math.round((e.scale ?? 1) * 100);
+      leftZoom.textContent = S.iframeZoom + '%';
+      rightZoom.textContent = S.iframeZoom + '%';
+    });
+  }
+
+  host.classList.remove('hidden');
+  ensureSync();
+  return reader;
 }
 
-// ── 发命令到 iframe ──
-function pdfGoToPage(frame, page) {
-    _sendPdfCmd(frame, { type: 'goToPage', page });
-}
-function pdfSetZoom(frame, zoom) {
-    _sendPdfCmd(frame, { type: 'setZoom', zoom });
-}
-function pdfZoomIn(frame)  { _sendPdfCmd(frame, { type: 'zoomIn' }); }
-function pdfZoomOut(frame) { _sendPdfCmd(frame, { type: 'zoomOut' }); }
-
-// ── 父页面监听 iframe 发的 update 消息 ──
-window.addEventListener('message', (e) => {
-    const data = e.data;
-    if (!data || typeof data !== 'object' || !data.type) return;
-
-    // Chromium PDF viewer 的 update 消息
-    if (data.type === 'update') {
-        // 找到发消息的 iframe (parent/window 关系)
-        let which = null;
-        if (e.source === leftFrame?.contentWindow) which = 'left';
-        else if (e.source === rightFrame?.contentWindow) which = 'right';
-        if (!which) return;
-
-        V.usingPostMessage = true;  // 收到消息, 确认可用
-        _pmFailures = 0;
-
-        // 更新状态
-        const st = V[which];
-        st.page = data.page ?? st.page;
-        st.scrollX = data.scrollX ?? st.scrollX;
-        st.scrollY = data.scrollY ?? st.scrollY;
-        st.zoom = data.zoom ?? st.zoom;
-        st.numPages = data.numPages ?? st.numPages;
-        st.ready = true;
-
-        // 更新页码显示
-        const other = which === 'left' ? 'right' : 'left';
-        const myFrame = which === 'left' ? leftFrame : rightFrame;
-        const otherFrame = which === 'left' ? rightFrame : leftFrame;
-        const pageEl = which === 'left' ? leftPage : rightPage;
-        const total = st.numPages > 0 ? st.numPages : '—';
-        pageEl.textContent = `${st.page} / ${total}`;
-
-        // 更新 zoom 显示 (Chromium 发的是小数: 1=100%, 1.5=150%)
-        const pct = Math.round((st.zoom || 1) * 100);
-        leftZoom.textContent = pct + '%';
-        rightZoom.textContent = pct + '%';
-
-        // ═══ 核心: 双向同步 ═══
-        // 如果是用户操作 (master=which), 同步到另一边
-        if (V.master === which && st.ready && Date.now() > V.lockUntil) {
-            const otherSt = V[other];
-            const otherReady = otherSt.ready;
-            if (!otherReady) return;  // 对方还没准备好
-
-            // 1. 翻页同步
-            if (Math.abs(st.page - otherSt.page) >= 1) {
-                otherSt.page = st.page;
-                pdfGoToPage(otherFrame, st.page);
-            }
-
-            // 2. 缩放同步 (Chromium zoom 是枚举: 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4)
-            if (Math.abs(st.zoom - otherSt.zoom) > 0.01) {
-                otherSt.zoom = st.zoom;
-                pdfSetZoom(otherFrame, st.zoom);
-            }
-
-            // 3. 滚动位置同步 (用户滚一边 → 另一边同步滚)
-            // Chromium PDF viewer 的滚动在 #viewer-scroll 容器里 (不是 contentWindow)
-            // 但 postMessage 没直接提供 scroll 设置, 我们通过 DOM 操作
-            if (Math.abs(st.scrollY - otherSt.scrollY) > 20) {
-                try {
-                    const doc = otherFrame.contentDocument;
-                    if (doc) {
-                        // 路径 A: Chromium 原生 viewer 的滚动容器 #viewer-scroll
-                        const viewerScroll = doc.querySelector('#viewer-scroll, [id*="viewer-scroll"], .pdf-viewer, .scroll-container');
-                        if (viewerScroll) {
-                            viewerScroll.scrollTop = st.scrollY;
-                        } else {
-                            // 路径 B: 直接 contentWindow.scrollTo
-                            otherFrame.contentWindow?.scrollTo({ top: st.scrollY, behavior: 'auto' });
-                        }
-                    }
-                } catch(e) {
-                    // cross-origin 或 DOM 不匹配, 忽略
-                }
-            }
-
-            // 加锁 50ms 防止递归
-            V.lockUntil = Date.now() + 50;
-        }
-    }
-});
-
-// ── iframe onload: 请求初始状态 ──
-function _onPdfFrameLoad(frame, which) {
-    // 请求 viewer 发初始状态
-    _sendPdfCmd(frame, { type: 'getViewerPreferences' });
-    _sendPdfCmd(frame, { type: 'requestViewport' });
-    // 有些 viewer 不响应, 等 ready 超时后标记
-    setTimeout(() => {
-        if (!V[which].ready) {
-            V[which].ready = true;  // 标记 ready (哪怕没收到 update)
-            // 读 contentWindow.hash 作为 fallback
-            try {
-                const h = frame.contentWindow?.location.hash || frame.src.split('#')[1] || '';
-                const m = h.match(/page=(\d+)/);
-                if (m) V[which].page = parseInt(m[1]);
-            } catch(e) {}
-        }
-    }, 2000);
+/** 两侧都就绪后建立跨实例同步（归一化锚点 + 等比缩放）。 */
+function ensureSync() {
+  const l = paneView('left'), r = paneView('right');
+  if (!l || !r || !KP.mod) return;
+  if (KP.group) {
+    try { KP.group.remove(l); KP.group.remove(r); } catch (e) { /* ignore */ }
+    KP.group = null;
+  }
+  const { SyncGroup, SYNC_MODE, SCALE_MODE } = KP.mod;
+  KP.group = new SyncGroup({
+    mode: SYNC_MODE.ANCHOR,
+    scaleMode: SCALE_MODE.FIT,
+    enabled: true,
+  });
+  KP.group.add(l, { master: true });
+  KP.group.add(r);
 }
 
-// ── 设置 iframe (保持 hash fallback + 自动请求 postMessage 状态) ──
-function setPdfFrame(url, frame) {
-    if (!url) return;
-    const which = frame === leftFrame ? 'left' : 'right';
-    V[which].ready = false;
-    V[which].page = 1;
-    leftEmpty.classList.add('hidden');
-    rightEmpty?.classList.add('hidden');
-    frame.onload = () => _onPdfFrameLoad(frame, which);
-    frame.src = url.split('#')[0] + '#page=1&zoom=FitW&pagemode=none';
-    frame.classList.remove('hidden');
+// ── 对外接口（与原 iframe 实现同名，调用点无需改动） ──
+function setPdfFrame(url, el) {
+  if (!url) return;
+  const which = (el === leftView) ? 'left' : 'right';
+  leftEmpty?.classList.add('hidden');
+  rightEmpty?.classList.add('hidden');
+  mountPane(which, url).catch((e) => {
+    console.error('[kpdf] 挂载失败', e);
+    const st = which === 'left' ? leftStatus : rightStatus;
+    if (st) st.textContent = '渲染失败';
+  });
 }
 
-function clearPdfFrame(frame) {
-    if (frame) { frame.src = 'about:blank'; frame.classList.add('hidden'); }
+function clearPdfFrame(el) {
+  const which = (el === leftView) ? 'left' : 'right';
+  if (KP[which]) { try { KP[which].destroy(); } catch (e) { /* ignore */ } KP[which] = null; }
+  if (KP.group) { try { KP.group.destroy?.(); } catch (e) { /* ignore */ } KP.group = null; }
+  const host = paneHost(which);
+  host.classList.add('hidden');
+  host.replaceChildren();
 }
 
-// ── 用户操作 → 谁是 master ──
-[leftFrame, rightFrame].forEach(f => {
-    f.addEventListener('mousedown', () => { V.master = f === leftFrame ? 'left' : 'right'; });
-    f.addEventListener('wheel', () => { V.master = f === leftFrame ? 'left' : 'right'; }, {passive: true});
-    f.addEventListener('keydown', () => { V.master = f === leftFrame ? 'left' : 'right'; });
-});
-
-// ── 翻页按钮 (改为主控当前 master 的 iframe) ──
+// ── 翻页（kpdf 内部页码 0-based，UI 传 1-based） ──
 function goToPage(page) {
-    if (!page || page < 1) return;
-    pdfGoToPage(leftFrame, page);
-    pdfGoToPage(rightFrame, page);
+  const n = Math.max(0, (page | 0) - 1);
+  for (const w of ['left', 'right']) paneView(w)?.gotoPage?.(n);
 }
-function nextPage() {
-    const p = V.left.page || V.right.page || 1;
-    goToPage(p + 1);
-}
-function prevPage() {
-    const p = V.left.page || V.right.page || 1;
-    if (p > 1) goToPage(p - 1);
-}
+// view.page 是 0-based：下一页 = page+1（0-based）= 1-based 的 page+2
+function nextPage() { goToPage((paneView('left')?.page ?? 0) + 2); }
+// 上一页 = page-1（0-based）= 1-based 的 page；page=0 时 goToPage(0) 会夹到第 1 页
+function prevPage() { goToPage(paneView('left')?.page ?? 0); }
 
-function _updatePageDisplay() {
-    // 有 postMessage update 时会自动更新, 这里做 hash fallback
-}
+function _updatePageDisplay() { /* 页码由 kpdf 的 scroll/scale 事件驱动 */ }
 
-// ── 绑定翻页按钮 ──
-$('leftPrev').onclick = () => { V.master = 'left'; prevPage(); };
-$('leftNext').onclick = () => { V.master = 'left'; nextPage(); };
-$('rightPrev').onclick = () => { V.master = 'right'; prevPage(); };
-$('rightNext').onclick = () => { V.master = 'right'; nextPage(); };
-
-// ── src 变化检测 (hash fallback, 兼容非 Chromium) ──
-setInterval(() => {
-    // 如果 postMessage 已经在工作, 就不做 hash 轮询
-    if (V.usingPostMessage && (V.left.ready || V.right.ready)) {
-        // 但要补充读 scrollY (Chromium update 可能不带)
-        for (const which of ['left', 'right']) {
-            const f = which === 'left' ? leftFrame : rightFrame;
-            try {
-                let y = f.contentWindow?.scrollY ?? 0;
-                if (!y) {
-                    const doc = f.contentDocument;
-                    if (doc) {
-                        const el = doc.querySelector('#viewer-scroll, [id*="viewer-scroll"], .pdf-viewer');
-                        if (el) y = el.scrollTop;
-                    }
-                }
-                if (Math.abs(y - V[which].scrollY) > 20) {
-                    V[which].scrollY = y;
-                    // 如果 master 在这边, 同步到另一边
-                    if (V.master === which && Date.now() > V.lockUntil) {
-                        const other = which === 'left' ? 'right' : 'left';
-                        const otherF = which === 'left' ? rightFrame : leftFrame;
-                        try {
-                            const otherDoc = otherF.contentDocument;
-                            if (otherDoc) {
-                                const vs = otherDoc.querySelector('#viewer-scroll, [id*="viewer-scroll"], .pdf-viewer');
-                                if (vs) { vs.scrollTop = y; }
-                                else { otherF.contentWindow?.scrollTo({ top: y }); }
-                                V[other].scrollY = y;
-                                V.lockUntil = Date.now() + 50;
-                            }
-                        } catch(e) {}
-                    }
-                }
-            } catch(e) {}
-        }
-        return;
-    }
-    // 纯 hash fallback
-    try {
-        function pageOf(frame) {
-            const h = frame.contentWindow?.location.hash || frame.src.split('#')[1] || '';
-            const m = h.match(/page=(\d+)/);
-            return m ? parseInt(m[1]) : 0;
-        }
-        const lp = pageOf(leftFrame), rp = pageOf(rightFrame);
-        if (lp !== rp && lp > 0 && rp > 0) {
-            const base = (lp > rp ? rightFrame : leftFrame).src.split('#')[0];
-            const target = lp > rp ? lp : rp;
-            const other = lp > rp ? rightFrame : leftFrame;
-            other.src = `${base}#page=${target}&zoom=FitW&pagemode=none`;
-        }
-        if (lp > 0) leftPage.textContent = lp + ' / —';
-        if (rp > 0) rightPage.textContent = rp + ' / —';
-    } catch(e) {}
-}, 500);
-
-// ── 键盘翻页 ──
-document.addEventListener('keydown', e => {
-    if (['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)) return;
-    if (e.key === 'PageDown') { e.preventDefault(); nextPage(); }
-    else if (e.key === 'PageUp') { e.preventDefault(); prevPage(); }
-    else if (e.key === 'Home') { e.preventDefault(); goToPage(1); }
-});
-
-// ── 缩放按钮 (通过 postMessage) ──
-const ZMIN = 60, ZMAX = 300, ZSTEP = 10;
+// ── 缩放：连续值，不再被 Chromium 的 0.5/0.75/1/1.25… 枚举近似卡住 ──
+const ZMIN = 25, ZMAX = 800, ZSTEP = 10;
 function _applyZoom(pct) {
-    S.iframeZoom = pct;
-    leftZoom.textContent = pct + '%';
-    rightZoom.textContent = pct + '%';
-    const z = Math.round(pct / 100 * 100) / 100;
-    // Chromium zoom 是枚举值, 找最近的: 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4
-    const enums = [0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4];
-    let closest = enums[0];
-    for (const e of enums) { if (Math.abs(e - z) < Math.abs(closest - z)) closest = e; }
-    pdfSetZoom(leftFrame, closest);
-    pdfSetZoom(rightFrame, closest);
+  S.iframeZoom = Math.max(ZMIN, Math.min(ZMAX, pct));
+  leftZoom.textContent = S.iframeZoom + '%';
+  rightZoom.textContent = S.iframeZoom + '%';
+  const z = S.iframeZoom / 100;
+  for (const w of ['left', 'right']) paneView(w)?.setScale?.(z, { by: 'toolbar' });
 }
+// 快捷键里历史上叫过这个名字（原本是个未定义的 bug），保留别名
+const setIframeZoom = _applyZoom;
+
+// ── 翻页 / 缩放按钮 ──
+$('leftPrev').onclick = () => { KP.master = 'left'; prevPage(); };
+$('leftNext').onclick = () => { KP.master = 'left'; nextPage(); };
+$('rightPrev').onclick = () => { KP.master = 'right'; prevPage(); };
+$('rightNext').onclick = () => { KP.master = 'right'; nextPage(); };
+
 $('zoomLeftIn').onclick = () => _applyZoom(Math.min(ZMAX, S.iframeZoom + ZSTEP));
 $('zoomLeftOut').onclick = () => _applyZoom(Math.max(ZMIN, S.iframeZoom - ZSTEP));
 $('zoomLeftReset').onclick = () => _applyZoom(140);
@@ -655,17 +551,16 @@ $('zoomRightIn').onclick = () => _applyZoom(Math.min(ZMAX, S.iframeZoom + ZSTEP)
 $('zoomRightOut').onclick = () => _applyZoom(Math.max(ZMIN, S.iframeZoom - ZSTEP));
 $('zoomRightReset').onclick = () => _applyZoom(140);
 
-// Ctrl+Wheel 缩放 (劫持 iframe wheel → 统一 postMessage)
-[leftFrame, rightFrame].forEach(f => {
-    f.addEventListener('wheel', e => {
-        if (e.ctrlKey || e.metaKey) {
-            e.preventDefault();
-            V.master = f === leftFrame ? 'left' : 'right';
-            const d = e.deltaY < 0 ? ZSTEP : -ZSTEP;
-            _applyZoom(Math.max(ZMIN, Math.min(ZMAX, S.iframeZoom + d)));
-        }
-    }, {passive: false});
+// ── 键盘翻页 ──
+document.addEventListener('keydown', e => {
+  if (['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)) return;
+  if (e.key === 'PageDown') { e.preventDefault(); nextPage(); }
+  else if (e.key === 'PageUp') { e.preventDefault(); prevPage(); }
+  else if (e.key === 'Home') { e.preventDefault(); goToPage(1); }
 });
+
+// Ctrl+Wheel 缩放由 kpdf 内核自己处理（viewport 内部 wheel → setScale），
+// 结果经 SyncGroup 同步到另一侧，这里不再外层劫持，避免双重缩放。
 
 // ── 文件选择 + 拖拽 ──
 document.addEventListener('drop', e => {
@@ -845,13 +740,13 @@ async function handleFile(file) {
         const data = await r.json();
         if (r.ok) {
             S.onReadyLeft = data.original_url;
-            setPdfFrame(data.original_url, leftFrame);
+            setPdfFrame(data.original_url, leftView);
             leftStatus.textContent = '已加载';
             // 缓存命中 → upload 直接返回 done
             if (data.cache_hit || data.status === 'done') {
                 S.currentMonoUrl = data.mono_url;
                 S.currentDualUrl = data.dual_url;
-                if (data.mono_url) setPdfFrame(data.mono_url, rightFrame);
+                if (data.mono_url) setPdfFrame(data.mono_url, rightView);
                 rightStatus.textContent = '已翻译 (缓存)';
                 loadingWrap.classList.add('hidden');
                 if (data.mono_url) downloadOpts.classList.remove('hidden');
@@ -915,7 +810,7 @@ function startPoll(jobId) {
                 cancelBtn.style.display = 'none';
                 S.currentMonoUrl = d.mono_url;
                 S.currentDualUrl = d.dual_url;
-                if (d.mono_url) setPdfFrame(d.mono_url, rightFrame);
+                if (d.mono_url) setPdfFrame(d.mono_url, rightView);
                 downloadOpts.classList.remove('hidden');
                 return; // 停止轮询
             }
@@ -961,8 +856,8 @@ chipClose.addEventListener('click', () => {
     downloadOpts.classList.add('hidden');
     leftEmpty.classList.remove('hidden');
     rightEmpty.classList.remove('hidden');
-    clearPdfFrame(leftFrame);
-    clearPdfFrame(rightFrame);
+    clearPdfFrame(leftView);
+    clearPdfFrame(rightView);
     loadingWrap.classList.add('hidden');
 });
 

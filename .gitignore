@@ -15,6 +15,36 @@ output/
 *.pdf
 *.pdf.bak
 
+# 私钥 / 凭据（本仓库是公开的，绝不能提交）
+*.pem
+*.key
+*_token.txt
+*_basicauth.txt
+
+# 内网 NAS 明文用户名/口令所在模块，永不入仓
+modules/share/
+
+# 模块运行时数据 / 开发产物 / 第三方 vendor
+# （sync_from_workspace.py 的 SKIP_* 规则已会跳过，这里是纵深防御：
+#   万一有人手工拷贝，也不会被误提交）
+#
+# 上传原件（过程性临时件）
+modules/*/uploads/
+# 拼接结果等重型产物
+modules/*/results/
+# 运行时用户数据（如 tasks/data/store.json）
+modules/*/data/
+# 开发产物（memory / 验证脚本 / 中间产物）
+modules/*/.workbuddy/
+# 模块内的生成物（story 的汇报页图 / 提词稿）
+modules/*/docs/
+# 第三方库（pdf.js），需另行获取
+modules/reader/assets/vendor/
+
+# 历史备份文件
+*.bak
+*.bak_*
+
 # 编辑器 / 系统
 .vscode/
 .idea/

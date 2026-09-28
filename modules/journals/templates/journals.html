@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="zh-CN" data-page-node-id="aPA3l56ZTREt99szte3AlY">
+<head data-page-node-id="afq3fldTEVpOgZvRUVSys9">
+<meta charset="UTF-8" data-page-node-id="iSjtuZjyYwEpDXojDH7wqK">
+<meta name="viewport" content="width=device-width, initial-scale=1" data-page-node-id="lGaJGaLwLOv3e935bpk4g0">
 <title>期刊列表 · kust.work</title>
 <style>
   /* 深色为默认值（/theme.js 缺失也完整可读）；浅色由 theme.js 注入的
@@ -93,19 +93,36 @@
 
   /* ── 今日更新（页顶板块）──
      刻意不叫 .card：DOM 测试里用 `class="card` 统计卡片数，蹭类名会误计数。
-     内部条目完全复用 .art / .tzh / .ob / .vi，所以视觉与下方卡片天然一致，
-     唯一多出来的是来源刊名 .tj。 */
+     内部条目完全复用 .art / .tzh / .vi，所以与下方卡片天然同一套样式。 */
   .today { background: var(--surface); border: 1px solid var(--accent-line);
     border-radius: var(--radius); padding: 16px; margin-bottom: 18px; }
   .today[hidden] { display: none; }
-  .today-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 9px; }
-  .today-title { font-size: 14.5px; font-weight: 600; letter-spacing: -0.2px; line-height: 1.4; }
+  .today-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 4px; }
+  .today-title { font-size: 14.5px; font-weight: 600; letter-spacing: -0.2px; line-height: 1.4;
+    display: flex; align-items: baseline; gap: 8px; }
+  /* 日期做成小胶囊，跟标题同一行但视觉降级 —— 当天板块里它只是标注，不是主角 */
+  .today-date { font-size: 10.5px; font-weight: 400; padding: 1px 7px; border-radius: 3px;
+    background: var(--accent-soft); color: var(--accent);
+    font-family: ui-monospace, Consolas, monospace; }
   .today-tip { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+
+  /* 分组：一个刊一节。首节不画分隔线，避免和 today-head 之间出现双线 */
+  .tgroup { padding-top: 11px; margin-top: 11px; border-top: 1px solid var(--surface-3); }
+  .tgroup:first-of-type { padding-top: 6px; margin-top: 6px; border-top: none; }
+  .tg-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 2px; }
+  .tg-name { font-size: 12.5px; font-weight: 600; color: var(--text); letter-spacing: -0.2px; }
+  a.tg-name:hover { color: var(--accent); }
+  .tg-region { font-size: 9.5px; padding: 1px 6px; border-radius: 3px; line-height: 1.5;
+    background: var(--surface-2); border: 1px solid var(--border); color: var(--muted); }
+  .tg-n { margin-left: auto; font-size: 10px; color: var(--dim);
+    font-family: ui-monospace, Consolas, monospace; }
   /* 当天条目可能较多，按两列铺开；每列宽度与下方 .grid 一致 */
   .today .arts { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
     gap: 0 20px; }
-  .art .tj { color: var(--muted); font-size: 10.5px; flex-shrink: 0; padding-top: 2px;
-    max-width: 38%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* 今日板块的时刻：当天全是"今天"，MM-DD 无信息量，改显示 HH:MM */
+  .art .hm { color: var(--accent); font-size: 10.5px; flex-shrink: 0; padding-top: 2px;
+    opacity: .85; font-family: ui-monospace, Consolas, monospace; }
 
   .c-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 9px; }
   .c-name { font-size: 14.5px; font-weight: 600; line-height: 1.4; letter-spacing: -0.2px; }
@@ -118,6 +135,9 @@
   .chips { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 11px; }
   .chip { font-size: 10px; padding: 2px 7px; border-radius: 3px;
     background: var(--surface-2); border: 1px solid var(--border); color: var(--muted); }
+  /* 「今日 +N」标记：解释为什么这张卡被排到了最前面 */
+  .chip-today { background: var(--accent-soft); border-color: var(--accent-dim);
+    color: var(--accent); font-weight: 600; }
 
   .arts { flex: 1; border-top: 1px solid var(--surface-3); padding-top: 9px; margin-top: 2px; }
   .art { display: flex; gap: 8px; padding: 5px 0; font-size: 12px; line-height: 1.55; }
@@ -198,47 +218,47 @@
      由它在右上角挂出「自动 / 浅色 / 深色」三态切换按钮。 -->
 <script src="/theme.js"></script>
 </head>
-<body>
+<body data-page-node-id="2pMaEMTdaD0hcUkgLfMZ0i">
 
-<header>
-  <a class="back" href="/">&larr; 工作台</a>
-  <span class="logo">ku</span>
-  <span class="brand">期刊列表</span>
-  <span class="spacer"></span>
-  <span class="stat" id="st">加载中…</span>
+<header data-page-node-id="ZddT87RJPmLE6aehUL9Wnh">
+  <a class="back" href="/" data-page-node-id="cMzq1lMUuwrQWVl8CRImJp">&larr; 工作台</a>
+  <span class="logo" data-page-node-id="NE6jzMUZRxgrm0RwWlOG3Z">ku</span>
+  <span class="brand" data-page-node-id="3SP5Nwvjv3msk5Bj1TC9a0">期刊列表</span>
+  <span class="spacer" data-page-node-id="EyUIWgE271u3jFOzyPMowJ"></span>
+  <span class="stat" id="st" data-page-node-id="6M7PwcnHKCaviMh68E3QF3">加载中…</span>
 </header>
 
-<main>
-  <div class="head">
-    <h1>目标期刊列表</h1>
-    <p>点击期刊名直达官网首页 · 「近 60 天」为本机近 60 天<b>获取到</b>的文章链接（本地日期时间为准，非当天发布）· 「主题归档」为近 2 个月与 filter 主题相关的命中文献</p>
+<main data-page-node-id="PTaTMRQNQlOTtTgKoUVNs1">
+  <div class="head" data-page-node-id="8mbPo1sxQiyNOzTocwoVVw">
+    <h1 data-page-node-id="AoOwHCH9dgYBCjIVFnkl32">目标期刊列表</h1>
+    <p data-page-node-id="X0xcTWGoqBu5fDUcdY04AH">点击期刊名直达官网首页 · 「近 60 天」为本机近 60 天<b data-page-node-id="vABnw8HNqP1GLvznukRATv">获取到</b>的文章链接（本地日期时间为准，非当天发布）· 「主题归档」为近 2 个月与 filter 主题相关的命中文献</p>
   </div>
 
-  <div class="vbar">
-    <button class="vtab on" data-view="latest">近 60 天</button>
-    <button class="vtab" data-view="topic">主题归档</button>
-    <button class="vbtn" id="allbtn" hidden>全部展开 ↓</button>
-    <span class="vnote" id="vnote"></span>
+  <div class="vbar" data-page-node-id="KfcCmJLee7tlAQ9VJ9QJjs">
+    <button class="vtab on" data-view="latest" data-page-node-id="rTFBbsp18bphbcA60dw0Bx">近 60 天</button>
+    <button class="vtab" data-view="topic" data-page-node-id="Zws6ufgbmCb1vfKD8qhITL">主题归档</button>
+    <button class="vbtn" id="allbtn" hidden data-page-node-id="b0gGCwRs3HFxpCH6BvvY39">全部展开 ↓</button>
+    <span class="vnote" id="vnote" data-page-node-id="N1o8CZO0bv5HCsFPTxCE93"></span>
   </div>
 
-  <div class="bar" id="bar">
-    <button class="tab on" data-region="all">全部</button>
-    <button class="tab" data-region="国际">国际期刊</button>
-    <button class="tab" data-region="国内">国内期刊</button>
-    <input class="search" id="search" type="search" placeholder="搜索标题 / 中文翻译…" autocomplete="off">
-    <button class="clr" id="clr" hidden>清除</button>
-    <span class="sum" id="sum">—</span>
+  <div class="bar" id="bar" data-page-node-id="MVlz4pDkHGYmbGsamYJ7SF">
+    <button class="tab on" data-region="all" data-page-node-id="Xm7HR4kOS84bkSiBS1rDfy">全部</button>
+    <button class="tab" data-region="国际" data-page-node-id="cROl5n6O2jgDiDGHx2JF8N">国际期刊</button>
+    <button class="tab" data-region="国内" data-page-node-id="IYCzHDXUrx3PYwS4HaiYXu">国内期刊</button>
+    <input class="search" id="search" type="search" placeholder="搜索标题 / 中文翻译…" autocomplete="off" data-page-node-id="fUzALnRZxNqsXdPosvIFg9">
+    <button class="clr" id="clr" hidden data-page-node-id="4SC6TojZloqhMEZKobI0Z7">清除</button>
+    <span class="sum" id="sum" data-page-node-id="CvfJcPIiJbb6IQOeYIBnJA">—</span>
   </div>
 
-  <div id="today" hidden></div>
-  <div id="legend"></div>
-  <div id="body"><div class="loading">正在读取期刊数据…</div></div>
+  <div id="today" hidden data-page-node-id="C1bk5XMdpxSF2KZzIMiJ6m"></div>
+  <div id="legend" data-page-node-id="Wt4pZDXESq1qqApR2wLx0W"></div>
+  <div id="body" data-page-node-id="zzbUuM5qqj5BZqxonCi6ak"><div class="loading" data-page-node-id="iQwKAEXt3ren3ED3kQLyT6">正在读取期刊数据…</div></div>
 </main>
 
-<footer>
-  数据源 <code>journals.json</code> · <code>journal_ledger.json</code> ·
-  <code>journal_updates.json</code> · <code>journal_batch_pending.json</code> ·
-  <code>journal_doc_urls.json</code> · <code>journal_topic_archive.json</code>（只读）
+<footer data-page-node-id="FDNnz4RYH1HBCr8jV1gNBa">
+  数据源 <code data-page-node-id="vT6C8cVnI2WBPPmuB7bbEG">journals.json</code> · <code data-page-node-id="QrPDQ1HHXESqnyzf9oJ3zu">journal_ledger.json</code> ·
+  <code data-page-node-id="hG8ltYmXyOmvmWKc3Z5e1i">journal_updates.json</code> · <code data-page-node-id="wUaAa3CwE8TANl6jwBUIxo">journal_batch_pending.json</code> ·
+  <code data-page-node-id="S9XG2CdQHWPC5u8PBtGd55">journal_doc_urls.json</code> · <code data-page-node-id="OUlpzlF8dO8OxxKnDKiIRo">journal_topic_archive.json</code>（只读）
 </footer>
 
 <script>
@@ -276,6 +296,7 @@
       website: j.website, site_host: j.site_host, publisher: j.publisher,
       doc_url: j.doc_url, category: j.category, level: j.level, frequency: j.frequency,
       sub: j.sub, article_total: j.article_total, topic_total: j.topic_total, topic_tiers: j.topic_tiers,
+      has_today: j.has_today, today_count: j.today_count, article_newest_ts: j.article_newest_ts,
       _force: true
     };
     if (VIEW === 'latest') {
@@ -301,9 +322,9 @@
   }
 
   // 近 60 天条目：标题 + 本地获取日期（MM-DD）+ 卷期
-  // jname 可空：传了就在日期前挂一个来源刊名（只「今日更新」板块用它，
-  // 下方卡片本来就是按刊分组的，不需要重复显示）。除此之外与下方完全一致。
-  function artRow(a, jname) {
+  // ★ 形参只能有一个：下面是 `shown.map(artRow)`，map 会把「下标」当第二个实参传进来。
+  //   曾因签名写成 artRow(a, jname) 而把下标当刊名渲染，卡片里凭空冒出 1/2/3/4/5 灰字。
+  function artRow(a) {
     var u = safeUrl(a.url);
     var t = u
       ? '<a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(a.title) + '</a>'
@@ -315,9 +336,26 @@
       : '';
     // 英文条目下方挂中文小字（离线预翻译，没有就不显示，绝不占位）
     var zh = a.title_zh ? '<div class="tzh">' + esc(a.title_zh) + '</div>' : '';
-    var tj = jname ? '<span class="tj" title="' + esc(jname) + '">' + esc(jname) + '</span>' : '';
     return '<div class="art"><span class="mk">▸</span><div class="t">' + t + zh + '</div>'
-      + tj + ob + vi + '</div>';
+      + ob + vi + '</div>';
+  }
+
+  // 今日条目：同为一条 .art（样式与下方卡片完全一致），两处与 artRow 不同 ——
+  //   ① 日期换成**时刻**（当天全是今天，MM-DD 无信息量，HH:MM 才看得出先后）
+  //   ② 不再挂来源刊名（刊名已上提到分组头，逐条重复是噪音）
+  function todayRow(a) {
+    var u = safeUrl(a.url);
+    var t = u
+      ? '<a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(a.title) + '</a>'
+      : esc(a.title);
+    var vi = a.volume ? '<span class="vi">v' + esc(a.volume) + (a.issue ? 'n' + esc(a.issue) : '') + '</span>' : '';
+    var hm = a.obtained_hm
+      ? '<span class="hm" title="本地获取时间 ' + esc(a.obtained_at || '') + '">'
+        + esc(a.obtained_hm) + '</span>'
+      : '';
+    var zh = a.title_zh ? '<div class="tzh">' + esc(a.title_zh) + '</div>' : '';
+    return '<div class="art">' + hm + '<span class="mk">▸</span><div class="t">' + t + zh + '</div>'
+      + vi + '</div>';
   }
 
   // 主题归档条目：分数 + 分档徽章 + 日期 + 卷期页码 + 命中关键词
@@ -354,6 +392,11 @@
     if (j.name_en && j.name_en !== j.name) sub.push(j.name_en);
     if (j.short_name) sub.push(j.short_name);
     var chips = [];
+    // 「今日 +N」放最前：它就是这张卡被排到区域最前面的原因，要一眼看见。
+    // 只在「近 60 天」视图挂 —— 归档视图走发表日期口径，跟「今日获取」不是一回事。
+    if (VIEW === 'latest' && j.has_today) {
+      chips.push('<span class="chip chip-today">今日 +' + (j.today_count || 1) + '</span>');
+    }
     if (j.category) chips.push('<span class="chip">' + esc(j.category) + '</span>');
     (j.level || []).slice(0, 3).forEach(function (l) {
       chips.push('<span class="chip">' + esc(l) + '</span>');
@@ -456,6 +499,13 @@
   // 判据与下方完全同源 —— 都是「本地获取时间」，由服务端按当天日期切好，
   // 前端只负责按区域/搜索过滤后渲染，不自己算日期（避免时区与口径分歧）。
   // 只在「近 60 天」视图出现：主题归档是另一套数据（发表日期口径），混进来会误导。
+  //
+  // 排版：**按刊分组**，一组一个刊 ——
+  //   组头   = 刊名（可点进官网）+ 区域标 + 「N 篇」
+  //   组内   = 逐条时间线，按获取时刻倒序
+  //   组的先后 = 该刊当天最新一条的获取时刻（越新越靠前）
+  // 为什么不全平铺：当天条目可能是几十条跨十几个刊，平铺就是一面墙，
+  // 看不出「今天哪些刊有动静」；分组后一眼扫完刊名即可决定要不要展开细看。
   function renderToday() {
     if (!todayEl) return;
     var t = DATA && DATA.today;
@@ -470,23 +520,48 @@
     });
     if (!items.length) { todayEl.hidden = true; todayEl.innerHTML = ''; return; }
 
-    var seen = {}, jn = 0;
+    // 聚合：顺序即「该刊首次出现的先后」，随后统一按 newest 重排（见下）。
+    var groups = [], idx = {};
     items.forEach(function (a) {
-      if (a.journal && !seen[a.journal]) { seen[a.journal] = 1; jn++; }
+      var k = a.journal || '（未标注来源）';
+      var g = idx[k];
+      if (!g) {
+        g = idx[k] = { name: k, url: '', region: '', items: [], newest: 0 };
+        groups.push(g);
+      }
+      if (!g.url && a.journal_url) g.url = a.journal_url;
+      if (!g.region && a.region) g.region = a.region;
+      g.items.push(a);
+      if ((a.obtained_ts || 0) > g.newest) g.newest = a.obtained_ts || 0;
     });
+    groups.forEach(function (g) {
+      g.items.sort(function (x, y) { return (y.obtained_ts || 0) - (x.obtained_ts || 0); });
+    });
+    groups.sort(function (x, y) { return y.newest - x.newest; });
 
     var head = '<div class="today-head"><div>'
-      + '<div class="today-title">今日更新</div>'
-      + '<div class="today-tip">' + esc(t.date) + ' 本机获取到的文章链接 · 按获取时间倒序'
+      + '<div class="today-title">今日更新'
+      + '<span class="today-date">' + esc(t.date) + '</span></div>'
+      + '<div class="today-tip">本机当日获取到的文章链接 · 按刊分组、组内按获取时间倒序'
       + ' · 与下方「近 60 天」同源同口径</div>'
-      + '</div><span class="c-badge">' + items.length + ' 篇 · ' + jn + ' 种期刊</span></div>';
+      + '</div><span class="c-badge">' + items.length + ' 篇 · ' + groups.length + ' 种期刊</span></div>';
 
-    var rows = items.map(function (a) { return artRow(a, a.journal); }).join('');
+    var body = groups.map(function (g) {
+      var u = safeUrl(g.url);
+      var name = u
+        ? '<a class="tg-name" href="' + esc(u) + '" target="_blank" rel="noopener"'
+          + ' title="打开期刊首页">' + esc(g.name) + '</a>'
+        : '<span class="tg-name">' + esc(g.name) + '</span>';
+      var region = g.region ? '<span class="tg-region">' + esc(g.region) + '</span>' : '';
+      return '<div class="tgroup"><div class="tg-head">' + name + region
+        + '<span class="tg-n">' + g.items.length + ' 篇</span></div>'
+        + '<div class="arts">' + g.items.map(todayRow).join('') + '</div></div>';
+    }).join('');
+
     if (t.hidden) {
-      rows += '<div class="none-tip">另有 ' + t.hidden + ' 篇超出单日展示上限</div>';
+      body += '<div class="none-tip">另有 ' + t.hidden + ' 篇超出单日展示上限</div>';
     }
-    todayEl.innerHTML = '<div class="today">' + head
-      + '<div class="arts">' + rows + '</div></div>';
+    todayEl.innerHTML = '<div class="today">' + head + body + '</div>';
     todayEl.hidden = false;
   }
 

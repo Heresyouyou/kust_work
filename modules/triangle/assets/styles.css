@@ -1,0 +1,300 @@
+/* ============================================================================
+ * 三角计算 · 样式
+ * 深色为默认值（/theme.js 缺失也完整可读）；浅色由 theme.js 注入的
+ * :root[data-theme="light"] 覆盖。一律走变量，不写死色值。
+ * 变量集与门户其它页面（科研配色 / 今日早报等）保持一致。
+ * ========================================================================== */
+:root {
+  /* 面 */
+  --bg: #2b2b2b; --surface: #1f1f1f; --surface-2: #262626; --surface-3: #2f2f2f;
+  /* 线 */
+  --border: #3a3a3a; --border-hover: #4a4a4a;
+  /* 字 */
+  --text: #e8e4df; --muted: #8a867f; --dim: #6f6b64; --link: #cfd8d2;
+  /* 主色 */
+  --accent: #4a9e6a; --accent-dim: #2d6e46; --accent-line: #2d6e46;
+  --accent-soft: #232823; --accent-soft-hover: #242a24;
+  --on-accent: #101710; --logo-bg: #2d6e46; --logo-fg: #e2f3e8;
+  --placeholder: #6a665f;
+  /* 语义 */
+  --err: #c0524a;
+  --radius: 6px;
+
+  /* 三角形绘制语义色（深色） */
+  --tri-stroke: #5b8def;
+  --tri-fill: rgba(91, 139, 239, 0.10);
+  --tri-vertex: #ffd166;
+  --tri-arc: #7ee787;
+  --lab-angle: #7ee787;   /* 角标签字母 */
+  --lab-side: #ffd166;    /* 边标签字母 */
+}
+
+/* 浅色主题下，三角形语义色加深以保证对比度 */
+:root[data-theme="light"] {
+  --tri-stroke: #2f6fed;
+  --tri-fill: rgba(47, 111, 237, 0.12);
+  --tri-vertex: #b07d12;
+  --tri-arc: #1d8a4d;
+  --lab-angle: #1d8a4d;
+  --lab-side: #8a6300;
+}
+
+/* ===== 基础 ===== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { width: 100%; }
+body {
+  font-family: -apple-system, "Segoe UI", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-text-size-adjust: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+a { color: inherit; text-decoration: none; }
+
+/* ===== 顶栏（与门户其它页面一致） ===== */
+header {
+  height: 48px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 20px; gap: 12px;
+  flex-shrink: 0;
+  position: sticky; top: 0; z-index: 20;
+}
+.back { font-size: 12px; color: var(--muted); }
+.back:hover { color: var(--accent); }
+.logo {
+  width: 24px; height: 24px; border-radius: 5px;
+  background: var(--logo-bg);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; color: var(--logo-fg); letter-spacing: -0.3px;
+}
+.brand { font-weight: 600; font-size: 14px; letter-spacing: -0.3px; }
+.spacer { flex: 1; }
+
+main { flex: 1; width: 100%; padding: 28px 20px 40px; }
+
+footer {
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  padding: 11px 20px;
+  font-size: 11px; color: var(--muted); line-height: 1.8; flex-shrink: 0;
+}
+
+/* ===== 计算器容器 ===== */
+.calculator {
+  width: 100%;
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+/* ===== 顶部 ===== */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.topbar h1 { font-size: 18px; margin: 0; font-weight: 600; }
+.unit-toggle {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 13px; color: var(--muted);
+}
+.unit-toggle button {
+  background: var(--surface-2); color: var(--text);
+  border: 1px solid var(--border);
+  padding: 5px 10px; border-radius: 7px;
+  cursor: pointer; font-size: 12px;
+}
+.unit-toggle button.active {
+  background: var(--accent); border-color: var(--accent-dim); color: var(--on-accent);
+}
+
+/* ===== 画布（响应式） ===== */
+.stage { display: flex; justify-content: center; margin-top: 14px; }
+
+.canvas {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  aspect-ratio: 640 / 520;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+#tri {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  display: block;
+}
+
+.tri-shape {
+  fill: var(--tri-fill);
+  stroke: var(--tri-stroke);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+.tri-side { stroke: var(--tri-stroke); stroke-width: 2.5; }
+.tri-vertex { fill: var(--tri-vertex); stroke: var(--surface); stroke-width: 1.5; }
+.tri-angle-arc { fill: none; stroke: var(--tri-arc); stroke-width: 1.5; opacity: 0.7; }
+
+/* ===== 图上标签（JS 注入） ===== */
+.lab {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  pointer-events: auto;
+}
+.lab-letter {
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--lab-side);
+}
+.lab.angle .lab-letter { color: var(--lab-angle); }
+
+.lab input {
+  width: 60px;
+  padding: 3px 5px;
+  font-size: 12px;
+  text-align: center;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+.lab input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(74, 158, 106, 0.30);
+}
+.lab.side input { border-color: var(--border-hover); }
+
+/* 计算求得（未知量）配色 */
+.lab input.computed { color: var(--accent); border-color: var(--accent-dim); background: var(--accent-soft); }
+.panel input.computed { color: var(--accent); border-color: var(--accent-dim); background: var(--accent-soft); }
+
+/* ===== 下方输入面板 ===== */
+.panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 16px;
+}
+.panel-col h3 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 600;
+  text-align: center;
+}
+.panel .row {
+  display: grid;
+  grid-template-columns: 22px 80px 1fr;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.panel .row.angle { grid-template-columns: 22px 80px 1fr; }
+.panel .row.side { grid-template-columns: 22px 80px; }
+.panel .row label {
+  width: 22px;
+  font-weight: 700;
+  text-align: center;
+  font-size: 14px;
+}
+.panel .row.angle label { color: var(--lab-angle); }
+.panel .row.side label { color: var(--lab-side); }
+.panel input {
+  width: 100%;
+  padding: 5px 7px;
+  font-size: 13px;
+  text-align: center;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+.panel input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(74, 158, 106, 0.30);
+}
+/* 三角函数小值（只读） */
+.trig {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--muted);
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+}
+.trig span b { color: var(--accent); font-weight: 600; }
+.trig span.computed { color: var(--accent); }
+.trig span.computed b { color: var(--accent); }
+
+/* ===== 状态 / 按钮 / 图例 / 提示 ===== */
+.status {
+  margin-top: 12px;
+  min-height: 18px;
+  font-size: 13px;
+  color: var(--err);
+  text-align: center;
+}
+.status.ok { color: var(--accent); }
+.actions {
+  display: flex; gap: 10px; justify-content: center; margin-top: 8px;
+}
+.actions button {
+  background: var(--surface-2); color: var(--text);
+  border: 1px solid var(--border);
+  padding: 7px 16px; border-radius: 8px;
+  cursor: pointer; font-size: 13px;
+}
+.actions button:hover { background: var(--surface-3); border-color: var(--border-hover); }
+#btnCalc { background: var(--accent); border-color: var(--accent-dim); color: var(--on-accent); }
+#btnCalc:hover { background: var(--accent-dim); }
+
+.legend {
+  display: flex; align-items: center; gap: 6px;
+  margin-top: 12px; font-size: 12px; color: var(--muted);
+  flex-wrap: wrap; justify-content: center;
+}
+.legend .dot {
+  width: 10px; height: 10px; border-radius: 50%; display: inline-block;
+}
+.legend .dot.known { background: var(--text); border: 1px solid var(--accent); }
+.legend .dot.computed { background: var(--accent); }
+.legend .sep { width: 14px; }
+
+.hint {
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.hint b { color: var(--text); font-weight: 600; }
+
+/* ===== 移动端 ===== */
+@media (max-width: 560px) {
+  main { padding: 22px 14px 32px; }
+  .topbar h1 { font-size: 16px; }
+  .panel { grid-template-columns: 1fr; gap: 10px; }
+  .panel .row, .panel .row.angle, .panel .row.side {
+    grid-template-columns: 20px 70px 1fr;
+  }
+  .panel .row.side { grid-template-columns: 20px 70px; }
+  .hint { font-size: 11.5px; }
+}

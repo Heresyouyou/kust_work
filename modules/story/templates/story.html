@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><!--PAGE_TITLE--></title>
+<link rel="stylesheet" href="/api/story/assets/story.css">
+<!-- 主题引擎：必须同步加载（勿加 defer/async），否则会先闪深色再变浅色。 -->
+<script src="/theme.js"></script>
+</head>
+<body>
+
+<div class="prog" id="prog"></div>
+
+<header>
+  <a class="back" href="/">&larr; 工作台</a>
+  <span class="logo">ku</span>
+  <span class="brand"><!--BRAND--></span>
+  <span class="spacer"></span>
+  <span class="hdr-meta"><!--HDR_META--></span>
+  <a class="adm" href="/story/admin" title="发布新汇报 / 编辑 / 重建页图">管理</a>
+</header>
+
+<!-- 顶部标签式：一个标签 = 一份汇报（story.md + 对应 PPT 入口）。
+     href 指向 /story/<sid>，由 stories.py 注册表决定有几枚、叫什么。 -->
+<nav class="tabs" aria-label="汇报切换">
+  <span class="lead">汇报</span>
+  <!--STORY_TABS-->
+</nav>
+
+<main>
+
+  <!--STORY_HERO-->
+
+  <!--STORY_BODY-->
+
+</main>
+
+<footer>
+  <span>kust.work · 汇报说明书</span>
+  <span class="sep">|</span>
+  <span>昆明理工大学 红土色体系 · 明德任责　致知力行</span>
+  <span class="spacer"></span>
+  <!--FOOT_LINK-->
+</footer>
+
+<script>
+/* 通用轻量交互：顶部进度线 + 目录高亮。
+   与具体汇报无关，因此放在外壳里 —— 每份汇报都自动拥有，
+   自定义版式的汇报另有自己的 story.js 做数据渲染，两者互不干扰。 */
+(function () {
+  'use strict';
+  var prog = document.getElementById('prog');
+  var links = Array.prototype.slice.call(document.querySelectorAll('.toc a[href^="#"]'));
+  // 目录锚点的目标可能是 section[id]，也可能是 md 渲染出来的 h2[id]
+  var secs = Array.prototype.slice.call(document.querySelectorAll('section[id], h2[id], h3[id]'));
+
+  function onScroll() {
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    var y = window.scrollY || window.pageYOffset;
+    if (prog) prog.style.width = (h > 0 ? Math.min(100, (y / h) * 100) : 0) + '%';
+
+    var cur = '';
+    secs.forEach(function (s) {
+      if (s.getBoundingClientRect().top <= 140) cur = s.id;
+    });
+    links.forEach(function (a) {
+      a.classList.toggle('on', a.getAttribute('href') === '#' + cur);
+    });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  onScroll();
+})();
+</script>
+<!--STORY_JS-->
+</body>
+</html>

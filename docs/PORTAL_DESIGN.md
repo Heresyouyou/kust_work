@@ -75,7 +75,7 @@ Windows Flask :5555（单进程，就是现在这一个）
 ```
 
 **为什么前端 4 处 `fetch('/api/...')` 不需要改？**
-因为 `/translate` 是页面 URL，而 `/api/*` 留在根路径。浏览器从 `/translate` 页面发起的 `/api/check` 会解析为 `https://<nas-host>/<share>/check` → Apache `ProxyPass /` 全量转发 → Flask 命中 `@app.route('/api/check')` ✅。
+因为 `/translate` 是页面 URL，而 `/api/*` 留在根路径。浏览器从 `/translate` 页面发起的 `/api/check` 会解析为 `https://<nas-host>/<share> → Apache `ProxyPass /` 全量转发 → Flask 命中 `@app.route('/api/check')` ✅。
 后端产出的 `/translated/xxx.pdf` 同理 ✅。
 
 ### 2.2 改动清单（web_app.py 仅 2 处）
@@ -240,7 +240,7 @@ ProxyPassReverse "/"            "http://<lan-ip>:5560/"
 
 | 风险 | 说明 | 对策 |
 |------|------|------|
-| **`/webdav/` 会被兜底规则吃掉** | 现状已有 `http://<nas-host>/<share>/Public/`（PROPFIND 返回 207）。新增 `ProxyPass /` 兜底后，若 `/webdav/` 规则写在它后面就失效 | **改造前先 dump 现有 Apache 配置**，把 `/webdav/` 规则放在最前 |
+| **`/webdav/` 会被兜底规则吃掉** | 现状已有 `http://<nas-host>/<share> 返回 207）。新增 `ProxyPass /` 兜底后，若 `/webdav/` 规则写在它后面就失效 | **改造前先 dump 现有 Apache 配置**，把 `/webdav/` 规则放在最前 |
 | ProxyPass 顺序 | `/` 是通配，必须在最后 | 长短前缀顺序：最具体 → 最宽泛 |
 | `<Directory /> Require all denied` | 主 `apache.conf` L26 会先 403 拦截 | 反代配置里 `<Directory /> Require all granted` 覆盖 |
 | LoadModule 顺序 | `proxy_http.so` 先于 `proxy.so` → `undefined symbol` | proxy → proxy_http → proxy_connect |

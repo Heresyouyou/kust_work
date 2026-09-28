@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><!--ADM_TITLE--></title>
+<link rel="stylesheet" href="/api/story/assets/story.css">
+<style>
+  /* 管理页专属：表单 + 清单表。外壳（顶栏/变量/红土色族）全部来自
+     /api/story/assets/story.css —— 与 story 页共用一份，避免两处漂移。 */
+  .crumb { font-size: 12px; color: var(--dim); margin-bottom: 6px; }
+  .crumb a { color: var(--ku); }
+
+  .pub { background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px 20px; margin-bottom: 14px; }
+  .pub .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .row { margin-bottom: 12px; }
+  .row label { display: block; font-size: 12px; font-weight: 600; color: var(--text);
+    margin-bottom: 5px; }
+  .row label b { color: var(--ku-strong); }
+  .row label span { display: block; font-weight: 400; font-size: 11px; color: var(--dim);
+    margin-top: 2px; line-height: 1.5; }
+  .row input[type=text], .row input:not([type]), .row textarea {
+    width: 100%; background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 8px 11px; font: inherit; font-size: 12.5px;
+    color: var(--text); outline: none; transition: border-color .16s; }
+  .row input:focus, .row textarea:focus { border-color: var(--ku-line); }
+  .row input::placeholder, .row textarea::placeholder { color: var(--dim); }
+  .row textarea { resize: vertical; line-height: 1.6; }
+  .row input[type=file] { width: 100%; font-size: 12px; color: var(--muted); padding: 6px 0; }
+  .row input[type=file]::file-selector-button {
+    font: inherit; font-size: 12px; margin-right: 10px; padding: 5px 12px; cursor: pointer;
+    background: var(--surface-3); color: var(--text); border: 1px solid var(--border);
+    border-radius: var(--radius); }
+  .drop { border-top: 1px dashed var(--border); padding-top: 14px; margin-top: 4px; }
+  .ck { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted);
+    margin-top: 7px; cursor: pointer; }
+  .ck input { margin: 0; }
+  .acts { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
+  .pub button, .pub a.ghost { font: inherit; }
+  .primary { background: #D3A48E; color: #241612; border: 0; border-radius: var(--radius);
+    padding: 11px 22px; font-size: 13.5px; font-weight: 600; cursor: pointer;
+    transition: transform .16s, box-shadow .16s, background .16s; }
+  .primary:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(111,62,52,.28); }
+  :root[data-theme="light"] .primary { background: #6F3E34; color: #fff; }
+  .primary:disabled { opacity: .55; cursor: progress; transform: none; box-shadow: none; }
+  .ghost { font-size: 12.5px; color: var(--muted); padding: 11px 14px;
+    border: 1px solid var(--border); border-radius: var(--radius); }
+  .ghost:hover { color: var(--ku); border-color: var(--ku-line); }
+  .status { font-size: 12.5px; color: var(--muted); }
+  .status.bad { color: var(--err); }
+  .status.good { color: var(--accent); }
+  .hint { font-size: 11.5px; color: var(--dim); margin-bottom: 14px; line-height: 1.6; }
+  .admon { background: var(--ku-soft); border: 1px solid var(--ku-line); border-radius: var(--radius);
+    padding: 14px 16px; font-size: 12.5px; color: var(--text); line-height: 1.7; margin-bottom: 16px; }
+
+  /* 进度框：转换是后台线程跑的，这里只负责把日志滚出来 */
+  .prog-box { background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--ku); border-radius: var(--radius);
+    padding: 14px 16px; margin-bottom: 22px; }
+  .pb-h { display: flex; align-items: baseline; gap: 12px; margin-bottom: 9px; }
+  .pb-h b { font-size: 13px; }
+  .pb-h span { font-size: 11.5px; color: var(--muted); margin-left: auto; }
+  .pb-h span.run { color: var(--warn); }
+  .pb-h span.done { color: var(--accent); }
+  .pb-h span.err { color: var(--err); }
+  .prog-box pre { font-family: ui-monospace, Consolas, "Courier New", monospace;
+    font-size: 11.5px; line-height: 1.7; color: var(--muted); background: var(--surface-2);
+    border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px;
+    max-height: 190px; overflow: auto; white-space: pre-wrap; word-break: break-word; }
+  .pb-f { margin-top: 10px; font-size: 12.5px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .pb-f a { color: var(--ku); text-decoration: underline;
+    text-decoration-color: var(--ku-line); text-underline-offset: 3px; }
+
+  /* 清单表 */
+  .list { border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--surface); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th { text-align: left; font-size: 11px; font-weight: 600; color: var(--muted);
+    letter-spacing: .6px; padding: 11px 13px; border-bottom: 1px solid var(--border);
+    background: var(--surface-2); white-space: nowrap; }
+  td { padding: 11px 13px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  tbody tr:hover td { background: var(--surface-2); }
+  td.no { color: var(--dim); font-variant-numeric: tabular-nums; }
+  td.id code { font-family: ui-monospace, Consolas, monospace; font-size: 11.5px;
+    color: var(--muted); }
+  .tab-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .sub { font-size: 11.5px; color: var(--dim); line-height: 1.55; margin-top: 3px; }
+  .dim { color: var(--dim); }
+  .badges { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 5px; }
+  .b { font-size: 10.5px; padding: 1.5px 7px; border-radius: 10px;
+    border: 1px solid var(--border); color: var(--muted); white-space: nowrap; }
+  .b-in { color: var(--dim); }
+  .b-own { color: var(--ku); border-color: var(--ku-line); background: var(--ku-soft); }
+  .b-on { color: var(--accent); border-color: var(--accent-dim); }
+  .b-off { color: var(--dim); }
+  .b-run { color: var(--warn); border-color: var(--warn-border); }
+  .b-err { color: var(--err); border-color: var(--err); }
+  td.ops { white-space: nowrap; }
+  td.ops a, td.ops .lk { font-size: 11.5px; color: var(--muted); margin-right: 10px;
+    background: none; border: 0; padding: 0; font-family: inherit; cursor: pointer;
+    text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 3px; }
+  td.ops a:hover, td.ops .lk:hover { color: var(--ku); text-decoration-color: var(--ku-line); }
+  td.ops .lk.danger:hover { color: var(--err); }
+  td.empty { color: var(--dim); text-align: center; padding: 26px; }
+  .sech { display: flex; align-items: baseline; gap: 12px; margin: 30px 0 14px; }
+  .sech h2 { font-size: 15px; font-weight: 600; }
+  .sech .cnt { font-size: 11.5px; color: var(--dim); }
+  .sech .sp { margin-left: auto; }
+  .sech .sp a, .sech .sp button { font-size: 11.5px; color: var(--muted); background: none;
+    border: 0; font-family: inherit; cursor: pointer; text-decoration: underline;
+    text-decoration-color: var(--border); text-underline-offset: 3px; }
+  .sech .sp a:hover, .sech .sp button:hover { color: var(--ku); }
+  .tblwrap { overflow-x: auto; }
+
+  @media (max-width: 760px) {
+    .pub .grid { grid-template-columns: 1fr; }
+    th:nth-child(3), td:nth-child(3) { display: none; }
+  }
+</style>
+<!-- 主题引擎：必须同步加载（勿加 defer/async），否则会先闪深色再变浅色。 -->
+<script src="/theme.js"></script>
+</head>
+<body>
+
+<div class="prog" id="prog"></div>
+
+<header>
+  <a class="back" href="/story">&larr; 汇报说明书</a>
+  <span class="logo">ku</span>
+  <span class="brand">汇报管理</span>
+  <span class="spacer"></span>
+  <span class="hdr-meta"><!--ADM_CRUMB--></span>
+</header>
+
+<main>
+
+  <div class="crumb">
+    <a href="/">&larr; 工作台</a> ／ <a href="/story">汇报说明书</a> ／ <!--ADM_CRUMB-->
+  </div>
+
+  <h1 style="font-size:22px;font-weight:600;letter-spacing:-.4px;margin:2px 0 8px">
+    发布一份汇报
+  </h1>
+  <p class="hint">
+    一份汇报 = 一个目录 <code class="mono">docs/&lt;id&gt;/</code>。给 <b>PPT</b> 就自动转成网页放映版
+    （出页图、出放映入口）；再给 <b>STORY.md</b> 就多一页正文。<b>只给 PPT 也能发布</b> ——
+    那样只有放映入口，正文留空。
+  </p>
+  <!--ADM_ERRORS-->
+
+  <!--ADM_FORM-->
+
+  <div class="sech">
+    <h2>已入库的汇报</h2>
+    <span class="cnt" id="rowCnt"></span>
+    <span class="sp">
+      <button type="button" id="reloadBtn">刷新列表</button>
+    </span>
+  </div>
+  <div class="tblwrap">
+    <div class="list">
+      <table>
+        <thead>
+          <tr><th>#</th><th>标签 / 标题</th><th>id</th><th>内容</th><th>操作</th></tr>
+        </thead>
+        <tbody id="rows"><!--ADM_ROWS--></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <span>kust.work · 汇报管理</span>
+  <span class="sep">|</span>
+  <span>昆明理工大学 红土色体系 · 明德任责　致知力行</span>
+  <span class="spacer"></span>
+  <a href="/story">返回说明书 →</a>
+</footer>
+
+<script>
+/* 管理页交互。只做三件事：发布（含转换进度轮询）、重建页图、移除。
+   全部走 fetch + JSON，不依赖任何前端框架 —— 与本项目其余页面一致。
+
+   一条纪律：**清单行的渲染留在服务端**（无 JS 也能看，也能被离线测试断言），
+   前端只在动作结束后整页刷新一次。所以这里没有「客户端拼表格」那套东西。 */
+(function () {
+  'use strict';
+
+  var $ = function (id) { return document.getElementById(id); };
+  var form = $('pub');
+  var box = $('progBox');
+
+  function reload() { location.replace(location.pathname + location.search); }
+
+  /* ── 进度框 ── */
+  function showProg(name) {
+    if (!box) { return; }
+    box.hidden = false;
+    $('pbName').textContent = name || '生成页图';
+    $('pbState').textContent = '进行中…';
+    $('pbState').className = 'run';
+    $('pbLog').textContent = '';
+    $('pbFoot').innerHTML = '';
+    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function drawJob(j, sid) {
+    $('pbLog').textContent = (j.log || []).join('\n');
+    $('pbLog').scrollTop = $('pbLog').scrollHeight;
+    if (j.state === 'running') {
+      $('pbState').textContent = '进行中…';
+      $('pbState').className = 'run';
+      return false;
+    }
+    if (j.state === 'done') {
+      $('pbState').textContent = '完成 · ' + j.result + ' 页';
+      $('pbState').className = 'done';
+      $('pbFoot').innerHTML =
+        '<a href="/story/' + encodeURIComponent(sid) + '/deck" target="_blank">看放映版 →</a>' +
+        '<a href="/story/' + encodeURIComponent(sid) + '" target="_blank">看说明书 →</a>';
+      return true;
+    }
+    $('pbState').textContent = '失败';
+    $('pbState').className = 'err';
+    $('pbFoot').innerHTML = '<span class="dim">条目已登记，但页图没生成。' +
+      '修好后点清单里的「重建页图」，或换一份 PPT 重新上传。</span>';
+    return true;
+  }
+
+  /* 轮询任务；结束后 onEnd(ok) —— 成功才刷新页面（失败时要把日志留在屏幕上）*/
+  function poll(jid, sid, onEnd) {
+    var tick = function () {
+      fetch('/api/story/admin/job/' + jid).then(function (r) { return r.json(); })
+        .then(function (res) {
+          if (!res.data) { if (onEnd) onEnd(false); return; }
+          if (drawJob(res.data, sid)) { if (onEnd) onEnd(res.data.state === 'done'); }
+          else { setTimeout(tick, 800); }
+        })
+        .catch(function () { setTimeout(tick, 1500); });
+    };
+    tick();
+  }
+
+  function say(msg, cls) {
+    var el = $('pubStatus');
+    if (!el) { return; }
+    el.textContent = msg || '';
+    el.className = 'status' + (cls ? ' ' + cls : '');
+  }
+
+  /* ── 发布 / 保存 ── */
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var btn = $('pubBtn');
+      var url = form.dataset.mode === 'edit'
+        ? '/api/story/admin/update/' + encodeURIComponent(form.dataset.sid)
+        : '/api/story/admin/create';
+
+      if (btn) { btn.disabled = true; }
+      say('提交中…');
+
+      fetch(url, { method: 'POST', body: new FormData(form) })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          if (btn) { btn.disabled = false; }
+          if (!j || j.code !== 0) { say((j && j.message) || '提交失败', 'bad'); return; }
+          say(j.message, 'good');
+          var d = j.data || {};
+          if (d.job) {
+            showProg('生成页图 · ' + d.sid);
+            poll(d.job, d.sid, function (ok) { if (ok) { setTimeout(reload, 2600); } });
+          } else {
+            setTimeout(reload, 900);   // 没有 pptx（只发了正文）→ 直接回列表
+          }
+        })
+        .catch(function (err) { if (btn) { btn.disabled = false; } say('请求失败：' + err, 'bad'); });
+    });
+  }
+
+  /* ── 清单操作：重建 / 移除（事件委托 —— 行是服务端渲的，可能整表被替换）── */
+  document.addEventListener('click', function (e) {
+    var el = e.target;
+    if (!el || !el.dataset || !el.dataset.act) { return; }
+    var sid = el.dataset.sid;
+
+    if (el.dataset.act === 'rebuild') {
+      el.disabled = true;
+      fetch('/api/story/admin/rebuild/' + encodeURIComponent(sid), { method: 'POST' })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          el.disabled = false;
+          if (j.code !== 0) { alert(j.message); return; }
+          showProg('重建页图 · ' + sid);
+          poll(j.data.job, sid, function (ok) { if (ok) { setTimeout(reload, 2600); } });
+        })
+        .catch(function () { el.disabled = false; });
+      return;
+    }
+
+    if (el.dataset.act === 'delete') {
+      var tab = el.dataset.tab || sid;
+      if (!confirm('移除「' + tab + '」？\n\n注册表条目会删掉，目录会移进 docs/_trash/'
+                   + '（可回捞，不是真删）。')) { return; }
+      el.disabled = true;
+      fetch('/api/story/admin/delete/' + encodeURIComponent(sid), { method: 'POST' })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          el.disabled = false;
+          if (j.code !== 0) { alert(j.message); return; }
+          alert(j.message + (j.data && j.data.trash ? '\n目录已移到 ' + j.data.trash : ''));
+          reload();
+        })
+        .catch(function () { el.disabled = false; });
+    }
+  });
+
+  var rb = $('reloadBtn');
+  if (rb) { rb.addEventListener('click', reload); }
+
+  /* 进页面时若已有在跑的任务（比如发布后按了刷新），自动接上进度 */
+  fetch('/api/story/admin/list').then(function (r) { return r.json(); })
+    .then(function (res) {
+      var st = res.data.stories || [];
+      var cnt = $('rowCnt');
+      if (cnt) { cnt.textContent = '共 ' + res.data.total + ' 份'; }
+      var run = st.filter(function (s) { return s.job && s.job.state === 'running'; });
+      if (run.length) {
+        showProg('生成页图 · ' + run[0].id);
+        poll(run[0].job.jid, run[0].id, function (ok) { if (ok) { setTimeout(reload, 2600); } });
+      }
+    }).catch(function () {});
+})();
+</script>
+</body>
+</html>

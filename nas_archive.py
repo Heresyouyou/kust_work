@@ -60,7 +60,7 @@ LOCK_PATH = DATA_DIR / 'nas_index.lock'
 _ENV_ROOT = os.environ.get('NAS_PDF_ROOT', '').strip()
 ROOT_CANDIDATES = ([Path(_ENV_ROOT)] if _ENV_ROOT else []) + [
     Path('S:/Translator_PDFs'),
-    Path('//<nas-host>/<share>/Translator_PDFs'),
+    Path('//<nas-host>/<share>'),
 ]
 
 # 三个版本 → NAS 子目录名（与手工建好的目录一致，不要改）

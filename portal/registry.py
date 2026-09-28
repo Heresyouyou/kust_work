@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """kust.work 门户 · 功能模块注册表
 
 加一个新功能入口 = 往 MODULES 追加一条 dict。
@@ -53,6 +53,17 @@ MODULES = [
 
     # ═══════════ 科研工具 ═══════════
     {
+        'id': 'journals',
+        'group': '科研工具',
+        'name': '期刊更新',
+        'desc': '目标期刊首页直达，含本地抓取的最新文章链接',
+        'url': '/journals',
+        'tag': '可用',
+        'status': 'online',
+        'live': True,
+        'accent': True,
+    },
+    {
         'id': 'translate',
         'group': '科研工具',
         'name': '文献翻译',
@@ -63,14 +74,13 @@ MODULES = [
         'accent': True,
     },
     {
-        'id': 'journals',
+        'id': 'reader',
         'group': '科研工具',
-        'name': '期刊列表',
-        'desc': '目标期刊首页直达，含本地抓取的最新文章链接',
-        'url': '/journals',
-        'tag': '可用',
+        'name': 'PDF 阅读器',
+        'desc': '自研内核：原文与译文左右同步滚动、同步缩放',
+        'url': '/reader',
+        'tag': '新增',
         'status': 'online',
-        'live': True,
     },
     {
         'id': 'palette',
@@ -84,10 +94,10 @@ MODULES = [
     {
         'id': 'transqueue',
         'group': '科研工具',
-        'name': '翻译队列',
-        'desc': '文献翻译（当前文件队列）与英文标题翻译的进度、覆盖率与失败样例',
-        'url': '/translate/queue',
-        'tag': '新增',
+        'name': '任务队列',
+        'desc': '统一串行队列：文献翻译与图像拼合在此排队，进度、位次与失败原因',
+        'url': '/queue',
+        'tag': '合并',
         'status': 'online',
     },
     {
@@ -108,8 +118,57 @@ MODULES = [
         'tag': '规划中',
         'status': 'coming',
     },
+    {
+        'id': 'triangle',
+        'group': '科研工具',
+        'name': '三角计算',
+        'desc': '输入任意 3 项，求解并绘制三角形（SSS/SAS/ASA）',
+        'url': '/triangle',
+        'tag': '新增',
+        'status': 'online',
+    },
+    {
+        'id': 'story',
+        'group': '科研工具',
+        'name': '汇报说明书',
+        'desc': '汇报设计档案与 PPT 入口，顶部标签切换多份',
+        'url': '/story',
+        'tag': '新增',
+        'status': 'online',
+    },
+    {
+        'id': 'stitch',
+        'group': '科研工具',
+        'name': '图像拼合',
+        'desc': '上传任意数量显微照片，自动特征匹配 + 全局优化 + 羽化融合',
+        'url': '/stitch',
+        'tag': '新增',
+        'status': 'online',
+    },
+
+    # ═══════════ 个人效率 ═══════════
+    {
+        'id': 'tasks',
+        'group': '个人效率',
+        'name': '任务打卡',
+        'desc': '证书考试 × 专业赛事：任务时间轴 + 阶段打卡 + 番茄钟，多角色切换 · 团队共享',
+        'url': '/tasks',
+        'tag': '新增',
+        'status': 'online',
+        'accent': True,
+    },
 
     # ═══════════ 系统 ═══════════
+    {
+        'id': 'hardrefresh',
+        'group': '系统',
+        'name': '强制清缓存',
+        'desc': '一键等效 Ctrl+Shift+R：跳过浏览器缓存、重新拉取全部资源',
+        'url': None,
+        'tag': '工具',
+        'status': 'online',
+        'action': 'hardreload',
+    },
     {
         'id': 'share',
         'group': '系统',

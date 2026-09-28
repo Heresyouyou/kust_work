@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="0FpZhwOGVKinuSPzqMX6ju">
+<head data-page-node-id="6D56dVncSRAKaHdMyGkaeg">
+<meta charset="UTF-8" data-page-node-id="pnUqmiJ8xvdQRDnf4oco5x">
+<meta name="viewport" content="width=device-width, initial-scale=1" data-page-node-id="6wI2tzhvVT07mNMFbdQ5r8">
+<title>三角计算 · kust.work</title>
+<link rel="stylesheet" href="/api/triangle/assets/styles.css" data-page-node-id="VOTP3HG00YhpmED3Hyi8Et">
+<!-- 主题引擎：必须同步加载（勿加 defer/async），否则会先闪深色再变浅色。
+     由它在右上角挂出「自动 / 浅色 / 深色」三态切换按钮。 -->
+<script src="/theme.js"></script>
+</head>
+<body data-page-node-id="FbCqiD6wsoUSMyZbDHxK0q">
+
+<header data-page-node-id="0q8PAktSKqNK1gypx0riKC">
+  <a class="back" href="/" data-page-node-id="uniWlg5o9ORjtTixwpxXMK">&larr; 工作台</a>
+  <span class="logo" data-page-node-id="COKcUFGNy5Yw8T8n15Rr3z">ku</span>
+  <span class="brand" data-page-node-id="FJTgvpgtn7hC1pA6QgGRdF">三角计算</span>
+  <span class="spacer" data-page-node-id="OhgOsAguzlRxFr0HhBNz0M"></span>
+</header>
+
+<main data-page-node-id="jAjjpiMUf7636ZIa46AQ1d">
+  <div class="calculator" data-page-node-id="xAYIpYbDjaWAXAEq3T2Lyr">
+    <div class="topbar" data-page-node-id="9WyVOuF6VMFZTf0UYtutCX">
+      <h1 data-page-node-id="HkK1rBQE3cw2zDDOuHsOO2">三角函数计算器</h1>
+      <div class="unit-toggle" data-page-node-id="k9p7UwFHoMtgoLWnOKurJs">
+        <span data-page-node-id="JMVqOmwsUGI7XJNPsByafL">角度单位：</span>
+        <button id="unitDeg" class="active" data-page-node-id="EY6zvD94fIAHVhBWj6cQDi">度 (°)</button>
+        <button id="unitRad" data-page-node-id="gR5LrBZvSqlxiYrSQGcbnZ">弧度</button>
+      </div>
+    </div>
+
+    <div class="stage" data-page-node-id="R6cALIxM7wUYvsSqe39ShZ">
+      <div id="canvas" class="canvas" data-page-node-id="ltNjSpMpeCgJwF5zWM7Sy1">
+        <svg id="tri" viewBox="0 0 640 520" preserveAspectRatio="xMidYMid meet" data-page-node-id="G1I1fq2tlmu8FFqczyZqkW"></svg>
+        <!-- 角/边标签 + 输入框 由 JS 注入到 .canvas -->
+      </div>
+    </div>
+
+    <div id="panel" class="panel" data-page-node-id="1NcKND3sIWgls3TXtTXTBn"></div>
+
+    <div id="status" class="status" data-page-node-id="CHSYBVD2lcFDpI1QdYhmA8"></div>
+
+    <div class="actions" data-page-node-id="MPxgXmBPncqSjY2ZLCupGE">
+      <button id="btnCalc" data-page-node-id="T9A8mCGfzxkPC6IiJotSgF">计算</button>
+      <button id="btnClear" data-page-node-id="LvkPnRbYhCGfV6wCbr2rTv">清空</button>
+    </div>
+
+    <div class="legend" data-page-node-id="DMGHQhowZgpUIZE9tKaD9A">
+      <span class="dot known" data-page-node-id="gKyJ84F58xf2WrDS8pKLsK"></span> 你输入的值（已知量）
+      <span class="sep" data-page-node-id="0YGOmIVIxL5e7DFyWgrOBl"></span>
+      <span class="dot computed" data-page-node-id="AGHGuJh0z0ed9Y27dekHMi"></span> 计算求得的值（未知量）
+    </div>
+
+    <div class="hint" data-page-node-id="3hpAXaI5w825p33uyntlUq">
+      使用说明：在图上或下方的方框中，给任意 <b data-page-node-id="Q0QymgUnfPvHxZvJrvu3Lw">角 A/B/C</b> 或 <b data-page-node-id="7tDClvp2F4rnFjvDNMoQu5">边 a/b/c</b> 输入数值，
+      填完 <b data-page-node-id="iEyskZXkeUAAW4fYJEg4P6">3 个已知量</b> 后会自动判断并求解其余 3 项（也可点「计算」手动触发）。<br data-page-node-id="93W5AnY4z1LHo3UC1kbcJF"/>
+      清空某个框即表示它是待求量；求解后角度对应的 <b data-page-node-id="CCuC2ZTK4RQF65eeJxq0zT">sin / cos / tan</b> 会同步显示。<br data-page-node-id="2DE5ZBnUYSHAuntvYLRoUV"/>
+      支持组合：三边 <b data-page-node-id="AyddYNYI51jBxzrDsQ4z64">SSS</b>、两边夹角 <b data-page-node-id="GaLResXIat9TTyHLAWwUdk">SAS</b>、两角一边 <b data-page-node-id="PAsMHnRv2yrUcC85YDHB83">ASA/AAS</b>，以及直角情形 <b data-page-node-id="FiOheYrCpDI6OZWZaHI6C1">HL</b>。
+      仅三个角（<b data-page-node-id="BTfnPik9FID3r6iWA1oBpy">AAA</b>）或不满足三角形不等式的数据无法唯一确定三角形，会给出提示。
+    </div>
+  </div>
+</main>
+
+<footer data-page-node-id="BhDOZAA7WKwx2Y86EaKS95">
+  纯前端三角函数计算器 · 输入任意 3 项即可求解并绘制三角形（SSS / SAS / ASA / AAS / HL），计算均在本机完成
+</footer>
+
+<script src="/api/triangle/assets/app.js"></script>
+</body>
+</html>

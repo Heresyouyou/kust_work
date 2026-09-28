@@ -1,0 +1,505 @@
+/* ==========================================================================
+   学习目标 · 视图样式
+   —— 只使用 tasks.css 里的 --np-* 主题变量，深浅两套自动跟随，规则区零硬编码色值。
+   由 tools/tasks_build/build_module.py 随 goals.js 一起复制到 assets/。
+   ========================================================================== */
+
+.nav-item svg { width: 16px; height: 16px; vertical-align: -3px; margin-right: 6px; flex: none; }
+
+/* ── 图标尺寸兜底 ★ ───────────────────────────────────────────────────────
+   内联 SVG 图标没写 width/height，在 inline-flex 按钮里会按「固有尺寸 300×150」撑开
+   —— 移动端整个按钮变成一大块绿，文字被挤成竖排（PC 截图看不出来，375px 才暴露）。
+   凡是「图标」容器都必须显式约束；进度环（.npg-ring）与柱状图（#npgChart）是
+   「图形」而不是图标，它们自带 width/height 属性，不在此列。 */
+.npg-btn svg { width: 15px; height: 15px; flex: none; }
+.npg-note-ok svg { width: 14px; height: 14px; flex: none; vertical-align: -2px; }
+.npg-meta .flame svg { width: 13px; height: 13px; flex: none; }
+
+/* ── 视图骨架 ──────────────────────────────────────────────────────────── */
+.npg-subtabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0 16px; }
+.npg-subtab {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 14px;
+  border: 1px solid var(--np-brand-line1); border-radius: 999px; background: var(--np-card);
+  color: var(--np-ink-3); font-size: 14px; font-weight: 600; cursor: pointer;
+}
+.npg-subtab:hover { color: var(--np-ink); }
+.npg-subtab.on { background: var(--np-grad-brand); border-color: transparent; color: var(--np-on-brand); }
+.npg-panel { display: none; }
+.npg-panel.on { display: block; }
+
+.npg-card {
+  background: var(--np-card); border: 1px solid var(--np-brand-line1); border-radius: 14px;
+  padding: 16px; margin-bottom: 14px; box-shadow: 0 6px 20px -12px var(--np-sh-2);
+}
+.npg-card-title {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+  font-size: 15px; font-weight: 700; color: var(--np-ink);
+}
+.npg-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--np-brand); flex: none; }
+.npg-dot.red { background: var(--np-rose); }
+.npg-dot.amber { background: var(--np-gold); }
+.npg-muted { color: var(--np-ink-4); font-size: 13px; }
+.npg-num { font-variant-numeric: tabular-nums; font-weight: 700; }
+
+.npg-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 44px; padding: 0 16px; border-radius: 11px; border: 1px solid var(--np-brand-line1);
+  background: var(--np-card-alt); color: var(--np-ink); font-size: 14px; font-weight: 600; cursor: pointer;
+}
+.npg-btn:hover { border-color: var(--np-brand); color: var(--np-ink); }
+.npg-btn.primary { background: var(--np-grad-brand); border-color: transparent; color: var(--np-on-brand); }
+.npg-btn.ok { background: var(--np-ok-bg); border-color: var(--np-ok-line); color: var(--np-ok-2); }
+.npg-btn.danger { background: var(--np-rose-bg); border-color: var(--np-rose-line); color: var(--np-rose-2); }
+.npg-btn.ghost { background: transparent; }
+.npg-btn.wide { width: 100%; }
+.npg-btn.confirming { background: var(--np-rose) !important; border-color: transparent !important; color: #fff !important; }
+
+.npg-badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+.npg-badge.sample { background: var(--np-brand-soft2); border: 1px solid var(--np-brand-line2); color: var(--np-brand-2); }
+.npg-badge.overdue { background: var(--np-rose-bg); border: 1px solid var(--np-rose-line); color: var(--np-rose-2); }
+.npg-badge.done { background: var(--np-ok-bg); border: 1px solid var(--np-ok-line); color: var(--np-ok-2); }
+.npg-badge.today { background: var(--np-gold-bg); border: 1px solid var(--np-gold-line); color: var(--np-gold-5); }
+.npg-badge.makeup { background: var(--np-teal-bg); border: 1px solid var(--np-brand-line2); color: var(--np-ink-2); }
+
+/* ── 首屏条 ────────────────────────────────────────────────────────────── */
+.npg-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+.npg-stat {
+  background: var(--np-card); border: 1px solid var(--np-brand-line1); border-radius: 13px;
+  padding: 12px; display: flex; align-items: center; gap: 10px;
+}
+.npg-stat .ico { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex: none; }
+.npg-stat .ico svg { width: 17px; height: 17px; }
+.npg-stat b { display: block; font-size: 18px; font-variant-numeric: tabular-nums; }
+.npg-stat span { display: block; font-size: 12px; color: var(--np-ink-4); }
+.npg-ico-brand { background: var(--np-brand-soft2); color: var(--np-brand-2); }
+.npg-ico-gold { background: var(--np-gold-bg); color: var(--np-gold-3); }
+.npg-ico-ok { background: var(--np-ok-bg); color: var(--np-ok); }
+.npg-ico-teal { background: var(--np-teal-bg); color: var(--np-ink-2); }
+
+/* ── 今天要处理 ────────────────────────────────────────────────────────── */
+.npg-alert { display: flex; gap: 10px; align-items: flex-start; padding: 12px; border-radius: 12px; margin-bottom: 10px; }
+.npg-alert .ico { flex: none; }
+.npg-alert .ico svg { width: 20px; height: 20px; }
+.npg-alert .body { flex: 1; min-width: 0; }
+.npg-alert .body b { display: block; font-size: 14px; margin-bottom: 2px; }
+.npg-alert .why { font-size: 12.5px; opacity: .9; }
+.npg-alert .acts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.npg-alert.red { background: var(--np-rose-bg2); border: 1px solid var(--np-rose-line); color: var(--np-rose-2); }
+.npg-alert.amber { background: var(--np-gold-bg2); border: 1px solid var(--np-gold-line2); color: var(--np-gold-4); }
+.npg-alert.amber .why { color: var(--np-gold-3); }
+.npg-plan {
+  margin-top: 6px; padding: 6px 9px; border-radius: 9px; font-size: 12.5px;
+  background: var(--np-brand-soft1); border: 1px solid var(--np-brand-line2); color: var(--np-ink-2);
+}
+.npg-plan b { color: var(--np-brand-2); margin-right: 4px; }
+
+/* ── 目标卡 ────────────────────────────────────────────────────────────── */
+.npg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px; }
+.npg-goal { background: var(--np-card); border: 1px solid var(--np-brand-line1); border-radius: 14px; padding: 16px; }
+.npg-goal.done { opacity: .78; }
+.npg-goal.overdue { border-color: var(--np-rose-line); }
+.npg-goal-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.npg-goal-head .nm { font-size: 15px; font-weight: 700; }
+.npg-goal-head .sp { margin-left: auto; display: flex; gap: 6px; }
+.npg-icon-btn {
+  width: 32px; height: 32px; border-radius: 9px; border: 1px solid var(--np-brand-line1);
+  background: transparent; color: var(--np-ink-4); display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.npg-icon-btn:hover { color: var(--np-ink); }
+.npg-icon-btn.danger:hover { color: var(--np-rose-2); border-color: var(--np-rose-line); }
+.npg-icon-btn svg { width: 15px; height: 15px; }
+.npg-color { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.npg-bar { position: relative; height: 8px; border-radius: 999px; background: var(--np-brand-soft1); overflow: hidden; margin-bottom: 10px; }
+.npg-bar i { display: block; height: 100%; border-radius: 999px; }
+.npg-meta { font-size: 13px; color: var(--np-ink-3); line-height: 1.8; }
+.npg-meta .flame { color: var(--np-gold-2); display: inline-flex; align-items: center; gap: 3px; }
+.npg-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 12px; }
+.npg-field label { display: block; font-size: 12px; color: var(--np-ink-4); margin-bottom: 4px; }
+.npg-field input, .npg-field select, .npg-input, .npg-textarea {
+  width: 100%; min-height: 44px; padding: 8px 11px; border-radius: 10px; font-size: 16px;
+  background: var(--np-card-alt); border: 1px solid var(--np-brand-line1); color: var(--np-ink);
+}
+.npg-textarea { min-height: 74px; font-size: 15px; resize: vertical; line-height: 1.6; }
+.npg-note-ok { margin-top: 10px; font-size: 13px; color: var(--np-ok-2); }
+
+/* ── 进度环 ────────────────────────────────────────────────────────────── */
+.npg-ring-wrap { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.npg-ring { position: relative; width: 96px; height: 96px; flex: none; }
+.npg-ring .pct { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.npg-ring .pct b { font-size: 19px; font-variant-numeric: tabular-nums; }
+.npg-ring .pct span { font-size: 11px; color: var(--np-ink-4); }
+.npg-ring-stats { flex: 1; min-width: 160px; display: grid; gap: 6px; font-size: 13.5px; }
+.npg-ring-stats .row { display: flex; align-items: center; gap: 6px; color: var(--np-ink-2); }
+.npg-ring-stats .row svg { width: 15px; height: 15px; flex: none; }
+.npg-ahead { color: var(--np-ok-2); font-weight: 700; }
+.npg-behind { color: var(--np-rose-2); font-weight: 700; }
+.npg-toggle {
+  margin-top: 10px; width: 100%; min-height: 38px; border-radius: 10px; cursor: pointer;
+  background: var(--np-card-alt); border: 1px dashed var(--np-brand-line2); color: var(--np-ink-3); font-size: 13px;
+}
+.npg-logs { margin-top: 10px; border-top: 1px dashed var(--np-brand-line2); padding-top: 8px; display: grid; gap: 6px; }
+.npg-log { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--np-ink-3); }
+.npg-log .del {
+  margin-left: auto; width: 26px; height: 26px; border-radius: 8px; cursor: pointer;
+  background: transparent; border: 1px solid var(--np-rose-line); color: var(--np-rose-2); line-height: 1;
+}
+
+/* ── 近 14 天图 ────────────────────────────────────────────────────────── */
+/* 容器宽度相关的那几条在下方「看板：两张卡并排」一节里（并排断点也在那儿） */
+.npg-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; font-size: 12.5px; color: var(--np-ink-3); }
+.npg-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+
+/* ── 周报 ──────────────────────────────────────────────────────────────── */
+.npg-weeknav { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+.npg-weeknav .lbl { font-weight: 700; font-size: 14px; }
+.npg-wrow {
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  padding: 9px 0; border-top: 1px solid var(--np-brand-line1); font-size: 13.5px;
+}
+.npg-wrow:first-of-type { border-top: none; }
+.npg-wrow .nm { font-weight: 600; }
+.npg-wrow .vals { color: var(--np-ink-3); }
+.npg-wrow .cmp { color: var(--np-ink-4); font-size: 12.5px; }
+.npg-report {
+  white-space: pre-wrap; font-size: 13px; line-height: 1.7; color: var(--np-ink-2);
+  background: var(--np-card-alt); border: 1px solid var(--np-brand-line1); border-radius: 12px;
+  padding: 12px; margin-top: 10px;
+}
+.npg-empty { padding: 20px; text-align: center; color: var(--np-ink-4); font-size: 13.5px; }
+.npg-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* ── 弹窗 ──────────────────────────────────────────────────────────────── */
+.npg-mask {
+  position: fixed; inset: 0; background: var(--np-scrim); display: none;
+  align-items: center; justify-content: center; padding: 18px; z-index: 60;
+}
+.npg-mask.on { display: flex; }
+.npg-modal {
+  width: min(560px, 100%); max-height: 88vh; overflow: auto; background: var(--np-card);
+  border: 1px solid var(--np-brand-line1); border-radius: 16px; padding: 20px;
+}
+.npg-modal h3 { font-size: 16px; margin-bottom: 14px; }
+.npg-modal .npg-field { margin-bottom: 12px; }
+.npg-colors { display: flex; gap: 8px; flex-wrap: wrap; }
+.npg-colors button { width: 30px; height: 30px; border-radius: 9px; border: 2px solid transparent; cursor: pointer; }
+.npg-colors button.sel { border-color: var(--np-ink); }
+.npg-actions { display: flex; gap: 10px; margin-top: 16px; }
+.npg-actions .npg-btn { flex: 1; }
+
+/* ── 彩带 ──────────────────────────────────────────────────────────────── */
+@keyframes npgFall { from { transform: translateY(-12vh) rotate(0); opacity: 1; } to { transform: translateY(102vh) rotate(720deg); opacity: 0; } }
+.npg-confetti { position: fixed; top: -14vh; width: 9px; height: 5px; border-radius: 2px; z-index: 90; animation: npgFall linear forwards; pointer-events: none; }
+
+.npg-toast {
+  position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(16px);
+  background: var(--np-grad-ink); color: var(--np-ink); border: 1px solid var(--np-brand-line1);
+  padding: 10px 16px; border-radius: 12px; font-size: 13.5px; opacity: 0;
+  transition: opacity .2s, transform .2s; pointer-events: none; z-index: 95;
+}
+.npg-toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── RPG 时间轴首页里的「学习目标」面板 ──────────────────────────────────
+   宿主是 tasks.css 的 .card（卡片底色/圆角/留白都由它给），这里只补内部元素。
+   同样只用 --np-* 变量，深浅两套自动跟随；按钮沿用 .npg-btn（本身就 ≥44px）。 */
+.npg-home .card-title { margin-bottom: 10px; }
+.npg-hsum { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.npg-hpill {
+  display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 999px;
+  background: var(--np-brand-soft1); border: 1px solid var(--np-brand-line1);
+  color: var(--np-ink-3); font-size: 12.5px; font-weight: 600;
+}
+.npg-hpill b { font-size: 14px; color: var(--np-ink); }
+.npg-hpill.ok { background: var(--np-ok-bg); border-color: var(--np-ok-line); color: var(--np-ok-2); }
+.npg-hpill.ok b { color: var(--np-ok-2); }
+.npg-hpill.bad { background: var(--np-rose-bg); border-color: var(--np-rose-line); color: var(--np-rose-2); }
+.npg-hpill.bad b { color: var(--np-rose-2); }
+
+.npg-hrow {
+  display: flex; align-items: center; gap: 12px; padding: 12px 14px; margin-bottom: 10px;
+  border: 1px solid var(--np-brand-line1); border-radius: 12px; background: var(--np-card-alt);
+}
+.npg-hrow.overdue { border-color: var(--np-rose-line); }
+.npg-hrow.done { opacity: .74; }
+.npg-hdot { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.npg-hmain { flex: 1; min-width: 0; }
+.npg-htop { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 7px; }
+.npg-htop .nm {
+  font-size: 14.5px; font-weight: 700; color: var(--np-ink);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%;
+}
+.npg-hbar { position: relative; height: 7px; border-radius: 999px; background: var(--np-brand-soft1); overflow: hidden; margin-bottom: 7px; }
+.npg-hbar i { display: block; height: 100%; border-radius: 999px; }
+.npg-hmeta { font-size: 12.5px; color: var(--np-ink-3); line-height: 1.7; }
+.npg-hacts { display: flex; align-items: center; gap: 8px; flex: none; }
+.npg-hacts .npg-btn { padding: 0 13px; font-size: 13.5px; }
+.npg-hdone { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 700; color: var(--np-ok-2); }
+.npg-hdone svg { width: 15px; height: 15px; flex: none; }
+.npg-hfoot { margin-top: 12px; }
+
+/* ── 打卡方块（GitHub 贡献图风格） ─────────────────────────────────────── */
+.npg-hint-inline { margin-left: auto; font-size: 11.5px; font-weight: 500; color: var(--np-ink-4); }
+.npg-hfilts { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.npg-hfilt {
+  display: inline-flex; align-items: center; gap: 5px; min-height: 32px; padding: 5px 11px;
+  font-size: 12px; font-weight: 600; color: var(--np-ink-3); cursor: pointer;
+  background: var(--np-card-alt); border: 1px solid var(--np-br-12); border-radius: 999px;
+}
+.npg-hfilt i { width: 8px; height: 8px; border-radius: 2px; flex: none; }
+.npg-hfilt:hover { color: var(--np-ink); border-color: var(--np-brand-line1); }
+.npg-hfilt.on { background: var(--np-grad-brand); border-color: transparent; color: var(--np-on-brand); }
+.npg-heat-scroll { overflow-x: auto; overflow-y: hidden; padding-bottom: 4px; }
+.npg-heat-scroll svg { display: block; margin: 0 auto; }   /* 有余量就居中；放不下时 auto 归零，正常滚动，不会把左端裁掉 */
+.npg-heat-scroll text { pointer-events: none; }             /* 月视图的日号不许挡住格子的点击与悬浮 */
+.npg-heat-skel { height: 110px; border-radius: 10px; background: var(--np-card-alt); }
+.npg-heat-scroll rect[data-npg-heat] { cursor: pointer; }
+.npg-heat-scroll rect[data-npg-heat]:hover { stroke: var(--np-ink-3); stroke-width: 1.5; }
+.npg-heat-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; }
+.npg-heat-stats { display: flex; flex-wrap: wrap; gap: 3px 14px; font-size: 12px; color: var(--np-ink-3); font-variant-numeric: tabular-nums; }
+.npg-heat-stats b { color: var(--np-ink); font-weight: 700; }
+.npg-heat-legend { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--np-ink-4); }
+.npg-heat-legend i { width: 10px; height: 10px; border-radius: 2px; background: var(--np-brand); }
+
+/* 首页面板里的紧凑版（不画坐标轴，只留节奏感） */
+.npg-hheat { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--np-br-08); }
+.npg-hheat-hd { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-bottom: 8px; font-size: 12.5px; font-weight: 700; color: var(--np-ink-3); }
+.npg-hheat-sub { font-weight: 500; color: var(--np-ink-4); font-variant-numeric: tabular-nums; }
+.npg-hheat-sub b { color: var(--np-ink); }
+
+/* ── 看板：打卡方块 + 近 14 天柱状图（宽屏并排，窄屏堆叠） ──────────────────
+   为什么按「容器宽度」而不是「视口宽度」并排：同一个 1440 视口，门户里外可用的
+   宽度能差一倍（侧栏 / 外边距）。容器查询量的是这一列真有多少地方，
+   且老浏览器不认识 @container 时自动退回单列 —— 降级方向正好是安全的那一侧。 */
+#npgPanel-board { container-type: inline-size; }
+.npg-duo { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+.npg-duo > .npg-card { margin-bottom: 0; }
+@container (min-width: 1100px) {
+  /* 1.8 : 1 —— 左列要横放 53 周（年视图），实测要 ~687px 才不用横向滚，所以比例偏左；
+     柱状图 14 根柱子在 390 上下照样清楚。断点 1100 也是这么来的：
+     低于它左列放不下年视图，宁可退回上下堆叠（年视图还能更大）。
+     各留各的高度（align-items: start）：月视图下左边会明显变高，
+     硬拉等高于右边只会把右边的卡片拉出一个空荡荡的下半截。 */
+  .npg-duo { grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr); align-items: start; }
+  /* 并排后每张卡只有原来一半宽：标题里的长说明让它整行落下，
+     两张卡的标题行高度也就一致了（不然一边一行一边两行，卡片内容参差）。 */
+  .npg-duo .npg-card-title { flex-wrap: wrap; }
+  .npg-duo .npg-card-title .npg-hint-inline { flex-basis: 100%; margin-left: 0; }
+}
+.npg-chart-scroll { overflow-x: auto; }
+.npg-chart-scroll svg { display: block; margin: 0 auto; }   /* 封顶后居中；放不下时 auto 归零，正常滚动 */
+.npg-chart-skel { height: 210px; border-radius: 10px; background: var(--np-card-alt); }
+
+/* ── 首页：工作仪表盘（卡片顺序 / 宽度 / 显隐都由用户自己摆） ─────────────
+   双列靠容器查询而不是视口宽度：同一个视口，门户里外可用的宽度能差一倍
+   （实测门户 /tasks 的内容区封顶 1118px）。老浏览器不认 @container 时规则
+   不生效 → 退回单列，降级方向正好是安全的那一侧。 */
+#npgPanel-home { container-type: inline-size; }
+.npg-dash-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.npg-dash-lead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; min-width: 0; }
+.npg-dash-lead b { font-size: 15px; }
+.npg-dash-lead .npg-muted { font-size: 12px; }
+.npg-dash-tip {
+  margin-bottom: 12px; padding: 9px 12px; border-radius: 10px;
+  font-size: 12.5px; line-height: 1.6;
+  background: var(--np-gold-bg2); border: 1px solid var(--np-gold-line2); color: var(--np-gold-4);
+}
+.npg-dash-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: start; }
+
+/* 卡片外框由外壳给，组件只管往里填内容（组件之间因此长得一样齐） */
+.npg-w {
+  min-width: 0; padding: 15px 16px; background: var(--np-card);
+  border: 1px solid var(--np-brand-line1); border-radius: 14px;
+  transition: box-shadow .18s ease, border-color .18s ease;
+}
+.npg-w:hover { box-shadow: 0 10px 26px -14px var(--np-sh-2); border-color: var(--np-brand-line2); }
+.npg-w-body { min-width: 0; }
+/* 编辑态：只遮卡内交互与观感，不隐藏内容 —— 用户要看着卡片决定怎么摆 */
+.npg-dash.editing .npg-w { border-style: dashed; border-color: var(--np-brand-line2); }
+.npg-dash.editing .npg-w-body { pointer-events: none; opacity: .5; }
+
+.npg-w-bar {
+  display: flex; align-items: center; gap: 8px; margin: -3px -4px 10px; padding: 5px 6px 5px 10px;
+  border: 1px solid var(--np-brand-line2); border-radius: 10px; background: var(--np-card-alt);
+}
+.npg-w-bar .nm { flex: 1; min-width: 0; font-size: 13px; font-weight: 700; color: var(--np-ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.npg-w-bar .acts { display: flex; gap: 6px; flex: none; }
+.npg-w-btn {
+  width: 34px; height: 34px; padding: 0; display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--np-brand-line1); border-radius: 9px; background: var(--np-card);
+  color: var(--np-ink-3); cursor: pointer;
+}
+.npg-w-btn svg { width: 15px; height: 15px; }
+.npg-w-btn:hover { border-color: var(--np-brand); color: var(--np-ink); }
+.npg-w-btn.on { background: var(--np-brand-soft2); border-color: var(--np-brand-line2); color: var(--np-brand-2); }
+.npg-w-btn.danger:hover { border-color: var(--np-rose-line); color: var(--np-rose-2); }
+.npg-w-btn[disabled] { opacity: .32; cursor: default; }
+.npg-w-btn[disabled]:hover { border-color: var(--np-brand-line1); color: var(--np-ink-3); }
+.npg-w-btn:focus-visible, .npg-shelf-btn:focus-visible { outline: 2px solid var(--np-brand); outline-offset: 2px; }
+
+/* 组件内部：标题行 + 行式内容（各组件共用，视觉才齐） */
+.npg-whd {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px;
+  margin-bottom: 10px; font-size: 13.5px; font-weight: 700; color: var(--np-ink);
+}
+.npg-whd .npg-hint-inline { flex: 1 1 100%; margin-left: 0; }   /* 卡片最窄只有半栏，说明整行落下 */
+.npg-wstats { display: grid; grid-template-columns: repeat(auto-fit, minmax(148px, 1fr)); gap: 10px; }
+.npg-wrow2 { display: flex; align-items: flex-start; gap: 9px; padding: 10px 0; border-top: 1px solid var(--np-br-08); }
+.npg-wrow2:first-of-type { border-top: 0; padding-top: 2px; }
+.npg-wmain { flex: 1; min-width: 0; }
+.npg-wname { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; }
+.npg-wname .nm { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.npg-wmeta { margin-top: 3px; font-size: 12.5px; line-height: 1.7; color: var(--np-ink-3); font-variant-numeric: tabular-nums; }
+.npg-wmeta b { color: var(--np-ink); }
+.npg-wacts { display: flex; flex-wrap: wrap; gap: 6px; }   /* ★ 不写 flex:none —— 不收缩的话窄屏会把整行撑破 */
+.npg-wacts .npg-btn { min-height: 38px; padding: 0 12px; font-size: 13px; }
+.npg-wok {
+  display: flex; align-items: center; gap: 7px; padding: 12px; border-radius: 10px; font-size: 13.5px;
+  background: var(--np-ok-bg); border: 1px solid var(--np-ok-line); color: var(--np-ok-2);
+}
+.npg-wok svg { width: 16px; height: 16px; flex: none; }
+.npg-wgoal { padding: 11px 0; border-top: 1px solid var(--np-br-08); }
+.npg-wgoal:first-of-type { border-top: 0; padding-top: 2px; }
+.npg-wgoal.done { opacity: .72; }
+.npg-wgoal-hd { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.npg-wgoal-hd .nm { flex: 1; min-width: 0; font-size: 14px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.npg-wgoal-hd .pct { flex: none; font-size: 13px; color: var(--np-ink-3); }
+.npg-wlog { display: flex; align-items: center; gap: 8px; padding: 9px 0; border-top: 1px solid var(--np-br-08); font-size: 13px; }
+.npg-wlog:first-of-type { border-top: 0; padding-top: 2px; }
+.npg-wlog .dt { flex: none; font-size: 12px; color: var(--np-ink-4); }
+.npg-wlog .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.npg-wlog .vals { flex: none; color: var(--np-ink-3); font-variant-numeric: tabular-nums; }
+.npg-wtotal { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--np-br-08); font-size: 13px; color: var(--np-ink-3); }
+.npg-wtotal b { color: var(--np-ink); }
+.npg-wfoot { margin-top: 12px; }
+.npg-wguide { margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.85; color: var(--np-ink-3); }
+.npg-wguide li { margin-bottom: 4px; }
+.npg-wguide b { color: var(--np-ink-2); }
+
+/* 编辑态下方那颗「收起的卡片」货架 */
+.npg-shelf { margin-top: 14px; padding: 12px; border: 1px dashed var(--np-brand-line2); border-radius: 12px; background: var(--np-card-alt); }
+.npg-shelf-hd { margin-bottom: 8px; font-size: 12.5px; font-weight: 700; color: var(--np-ink-2); }
+.npg-shelf-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.npg-shelf-btn {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 13px;
+  border: 1px solid var(--np-brand-line1); border-radius: 10px; background: var(--np-card);
+  color: var(--np-ink-2); font-size: 13px; cursor: pointer;
+}
+.npg-shelf-btn svg { width: 14px; height: 14px; flex: none; }
+.npg-shelf-btn:hover { border-color: var(--np-brand); color: var(--np-ink); }
+.npg-shelf-note { margin: 10px 0; font-size: 11.5px; line-height: 1.6; color: var(--np-ink-4); }
+
+/* 容器够宽才双列；不够就单列 —— 半栏最窄约 400px，再窄「周报行 / 目标进度」就憋屈了 */
+@container (min-width: 820px) {
+  .npg-dash-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .npg-w.wide { grid-column: 1 / -1; }
+}
+
+/* ── 打卡方块：年 / 月视图切换 + 月份导航 ────────────────────────────────
+   一行放两组控件：左边切视图，右边翻月份（只有月视图才有）。窄屏自动换行，不挤成一团。 */
+.npg-hctl { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+.npg-hctl.mid { justify-content: center; gap: 10px; }   /* 月视图：网格居中，控件也居中，成为一组 */
+.npg-hseg {
+  display: inline-flex; gap: 2px; padding: 3px;
+  background: var(--np-card-alt); border: 1px solid var(--np-br-12); border-radius: 999px;
+}
+.npg-hseg-btn {
+  min-height: 34px; padding: 0 15px; font: inherit; font-size: 12.5px; font-weight: 600; line-height: 1;
+  color: var(--np-ink-3); background: transparent; border: 0; border-radius: 999px; cursor: pointer;
+  transition: color .15s ease, background .15s ease;
+}
+.npg-hseg-btn:hover { color: var(--np-ink); }
+.npg-hseg-btn.on { color: var(--np-on-brand); background: var(--np-grad-brand); }
+.npg-hnav { display: inline-flex; align-items: center; gap: 6px; }
+.npg-hnav-btn {
+  display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; padding: 0;
+  color: var(--np-ink-3); background: var(--np-card-alt); border: 1px solid var(--np-br-12); border-radius: 10px; cursor: pointer;
+}
+.npg-hnav-btn svg { width: 16px; height: 16px; }
+.npg-hnav-btn:hover:not([disabled]) { color: var(--np-brand-2); border-color: var(--np-brand-line2); }
+.npg-hnav-btn[disabled] { opacity: .38; cursor: default; }
+.npg-hnav-lbl { min-width: 84px; text-align: center; font-size: 13px; font-weight: 700; color: var(--np-ink); font-variant-numeric: tabular-nums; }
+.npg-hnav-now {
+  min-height: 36px; padding: 0 12px; font-size: 12px; font-weight: 600; color: var(--np-ink-3);
+  background: transparent; border: 1px solid var(--np-br-12); border-radius: 10px; cursor: pointer;
+}
+.npg-hnav-now:hover { color: var(--np-ink); border-color: var(--np-brand-line2); }
+
+/* 进度条上的 25/50/75 里程碑刻度（纯装饰，不吃点击；刻意做得淡，别把进度条切成一段段） */
+.npg-bar em, .npg-hbar em {
+  position: absolute; top: 1px; bottom: 1px; width: 1px;
+  background: var(--np-br-12); border-radius: 1px; pointer-events: none;
+}
+
+/* 悬浮提示（跟随鼠标） */
+.npg-tip {
+  position: fixed; left: 0; top: 0; z-index: 9999; max-width: 250px; padding: 8px 11px;
+  background: var(--np-card); color: var(--np-ink); border: 1px solid var(--np-br-25);
+  border-radius: 10px; box-shadow: 0 10px 24px -12px var(--np-sh-2);
+  font-size: 12px; line-height: 1.5; pointer-events: none;
+  opacity: 0; visibility: hidden; transition: opacity .12s ease;
+}
+.npg-tip.on { opacity: 1; visibility: visible; }
+.npg-tip b { display: block; margin-bottom: 2px; font-size: 12.5px; }
+.npg-tip span { color: var(--np-ink-3); }
+
+/* 点方块之后的「当天明细」：每个目标一行，没打的直接给补记入口 */
+.npg-day { width: min(460px, 100%); }
+.npg-day-list { margin: 2px 0; }
+.npg-day-row { display: flex; align-items: center; gap: 9px; padding: 9px 0; border-top: 1px solid var(--np-br-08); }
+.npg-day-row:first-child { border-top: 0; }
+.npg-day-row .nm { flex: 1; min-width: 0; font-size: 14px; color: var(--np-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.npg-day-row .val { flex: none; font-size: 12.5px; color: var(--np-ink-3); font-variant-numeric: tabular-nums; }
+.npg-day-row .val b { color: var(--np-ink); }
+.npg-day-row .npg-btn { flex: none; min-height: 38px; padding: 0 13px; font-size: 13px; }
+.npg-day-note { margin-top: 8px; font-size: 11.5px; line-height: 1.6; color: var(--np-ink-4); }
+
+/* 交互反馈：卡片轻浮起（只动阴影与描边，不做位移 —— 位移会让「点击落点」漂移） */
+.npg-goal, .npg-hrow { transition: box-shadow .18s ease, border-color .18s ease; }
+.npg-goal:hover, .npg-hrow:hover { box-shadow: 0 10px 26px -14px var(--np-sh-2); border-color: var(--np-brand-line2); }
+.npg-btn:focus-visible, .npg-icon-btn:focus-visible, .npg-hfilt:focus-visible,
+.npg-subtab:focus-visible, .npg-toggle:focus-visible, .npg-colors button:focus-visible {
+  outline: 2px solid var(--np-brand); outline-offset: 2px;
+}
+@keyframes npgFlash {
+  0%, 100% { box-shadow: 0 0 0 0 transparent; }
+  35% { box-shadow: 0 0 0 3px var(--np-brand-line1); }
+}
+.npg-goal.npg-flash { animation: npgFlash 1.4s ease; }
+
+/* ── 窄屏 ──────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* 首页那张卡的标题行：说明文字较长，窄屏让它自己占一行，别把「学习目标」挤成竖排 */
+  .npg-home .card-title { flex-wrap: wrap; }
+  .npg-home .card-title .hint { margin-left: 0; flex-basis: 100%; }
+  /* 打卡方块那张卡的标题里也有长说明，同样让它整行落下 */
+  .npg-card-title { flex-wrap: wrap; }
+  .npg-hint-inline { flex-basis: 100%; margin-left: 0; }
+  .npg-heat-foot { flex-direction: column; align-items: flex-start; }
+  /* 打卡方块的控件：窄屏换行左对齐；翻月份的箭头撑到 42px，手指够得着 */
+  .npg-hctl { justify-content: flex-start; }
+  .npg-hseg-btn { min-height: 40px; padding: 0 14px; font-size: 13px; }
+  .npg-hnav { width: 100%; justify-content: space-between; }
+  .npg-hnav-btn { width: 42px; height: 42px; }
+  .npg-hnav-now { min-height: 42px; }
+  .npg-hnav-lbl { flex: 1; }
+  .npg-day-row { flex-wrap: wrap; }
+  .npg-hrow { flex-wrap: wrap; }
+  .npg-hmain { flex-basis: calc(100% - 22px); }
+  .npg-hacts { flex-basis: 100%; margin-top: 10px; }
+  .npg-hacts .npg-btn { flex: 1; }
+  .npg-hacts .npg-hdone { flex: 1; justify-content: center; }
+  .npg-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* 仪表盘：标题行竖排、编辑按钮整宽；工具条按钮撑到 44px，手指够得着 */
+  .npg-dash-head { flex-direction: column; align-items: stretch; }
+  .npg-dash-head .npg-btn { width: 100%; }
+  .npg-w-btn { width: 44px; height: 44px; }
+  .npg-shelf-btn { min-height: 44px; }
+  .npg-wacts { flex-basis: 100%; margin-top: 8px; }
+  .npg-wrow2 { flex-wrap: wrap; }   /* ★ 配上一条：按钮整体落到第二行，才不会挤破一行 */
+  .npg-wacts .npg-btn { flex: 1; }
+  .npg-wlog { flex-wrap: wrap; }
+  .npg-wlog .vals { flex-basis: 100%; padding-left: 18px; }
+  .npg-grid { grid-template-columns: 1fr; }
+  .npg-row2 { grid-template-columns: 1fr; }
+  .npg-goal-head .sp { margin-left: 0; }
+  .npg-actions { flex-direction: column; }
+}

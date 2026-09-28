@@ -33,9 +33,12 @@
 
 页面：GET /journals
        （页顶「今日更新」板块 = 当天 00:00 之后**获取到**的文章跨刊汇总，
-        与视图一同源同口径，都由服务端按 obtained_ts 切好，前端只做区域/搜索过滤；
+        与视图一同源同口径，都由服务端按 obtained_ts 切好，前端只做区域/搜索过滤，
+        再按刊分组呈现（组头给刊名/区域/条数，组内按时刻倒序）；
         视图一「近 60 天」另有前端「全部展开 / 收起全部」总开关，
-       靠 `_MAX_EXPAND_PER_CARD` 保证下发量够铺开；见 GEO_TRANSLATE_ARCHITECTURE.md §15.4）
+        靠 `_MAX_EXPAND_PER_CARD` 保证下发量够铺开；见 GEO_TRANSLATE_ARCHITECTURE.md §15.4）
+      （卡片顺序不再按 journals.json 的固定次序，改为**当天有更新的刊排前**、
+        其余按最近一次获取时间倒序，见 _build() 里的 rows.sort）
 接口：GET /api/journals/list     （两个视图的数据一次性返回，另含 `today` 切片）
 """
 import re
@@ -243,6 +246,9 @@ def _collect_recent(name, ledger, updates, pending, buffer_, ts_map, cutoff, now
                 'issue': str(a.get('issue') or ''),
                 'obtained_at': dt.isoformat(timespec='seconds') if dt else '',
                 'obtained_label': _date_label(dt, now),
+                # 当天条目一律是「今天」，MM-DD 无信息量；「今日更新」板块改用它显示时刻。
+                # 60 天卡片仍用 obtained_label（跨日跨月，日期才有意义）。
+                'obtained_hm': dt.strftime('%H:%M') if dt else '',
                 'obtained_ts': dt.timestamp() if dt else 0.0,
             })
 
@@ -351,6 +357,8 @@ def _build():
             site = (j.get('website') or '').strip()
 
             # 今日切片：无获取时间的条目无法证明是今天到的，一律不计入
+            has_today = False
+            today_count = 0
             for a in articles:
                 ts = a.get('obtained_ts') or 0
                 if not ts:
@@ -360,6 +368,8 @@ def _build():
                         continue
                 except Exception:
                     continue
+                has_today = True
+                today_count += 1
                 item = dict(a)
                 item['journal'] = name
                 item['journal_url'] = site
@@ -385,6 +395,11 @@ def _build():
                 'article_total': len(articles),
                 'articles': articles[:_MAX_EXPAND_PER_CARD],
                 'article_newest': articles[0]['obtained_label'] if articles else '',
+                # 排序用：本刊 60 天内最新一次的获取时刻（articles 已按时间倒序）
+                'article_newest_ts': articles[0]['obtained_ts'] if articles else 0.0,
+                # 当天是否有货 / 当天几条 —— 卡片排序与「今日 +N」标记都靠它
+                'has_today': has_today,
+                'today_count': today_count,
                 'article_undated': astat['undated'],
                 'doc_url': doc_url,
                 # — 主题归档 —
@@ -398,6 +413,13 @@ def _build():
             topic_total += len(topic)
             if topic:
                 topic_journals += 1
+
+        # ★ 卡片排序：**当天有更新的刊排最前**，其余按「最近一次获取时间」倒序。
+        #   此前是完全按 journals.json 的固定次序，最新的刊常常被压到屏幕外。
+        #   用稳定排序（Python sort 稳定），键相同的卡片保持 journals.json 原始次序，
+        #   所以同一档位内的相对位置不会乱跳 —— 刷新页面不会看到卡片"随机"换位。
+        #   没有文章（article_newest_ts=0）的刊自然沉到本区域最底。
+        rows.sort(key=lambda r: (0 if r['has_today'] else 1, -r['article_newest_ts']))
 
         if rows:
             groups.append({
