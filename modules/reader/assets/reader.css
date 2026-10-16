@@ -161,9 +161,21 @@
 @keyframes kp-shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 
 /* ═══════════ 文本层 ═══════════
-   变量语义已查证 pdf.js 自带查看器：--total-scale-factor 恒为 1
-   （--font-height 本身就是 CSS px，再乘一次会被二次缩放）。
-   位置用百分比、字号用 px，两者都以「已缩放的页面盒子」为基准。 */
+   变量合同与 pdf.js 6.3 官方保持一致（web/pdf_viewer.css + src/display/text_layer.js）：
+   · --font-height 由 TextLayer 以 **PDF 点**（viewport.rawDims 原始单位）写入，
+     不随缩放变化；
+   · 字号 = calc(--text-scale-factor × --font-height)，其中
+     --text-scale-factor = --total-scale-factor × --min-font-size，
+     --total-scale-factor = --scale-factor × --user-unit；
+   · --scale-factor 由 kpdf/kernel-pdfjs.js 的 createTextLayer 按视口实际缩放
+     （CSS px / 点 = scale × 96/72）内联覆写 —— 漏设它整层文字会按 1pt=1px
+     排版，选区框与画布笔画差一个页面缩放倍数（2026-10 实测踩坑：fontRatio≈0.49）；
+   · --min-font-size 由 TextLayer 构造时实测浏览器最小字号写入，
+     --min-font-size-inv 必须同步取倒数，把字号放大部分用 scale() 抵回来；
+   · left/top 是百分比，与缩放无关；容器盒子由 createTextLayer 显式设为
+     「未旋转页面」尺寸（见 kernel-pdfjs.js），旋转变换见下方
+     [data-main-rotation] 规则 —— 这套「未旋转排版 + 容器级旋转变换」
+     与官方 pdf_viewer.css 完全一致。 */
 .kp-textLayer {
   position: absolute; inset: 0; overflow: clip; line-height: 1;
   text-align: initial; letter-spacing: normal; word-spacing: normal;
@@ -173,11 +185,18 @@
 
   --scale-factor: 1;
   --user-unit: 1;
-  --total-scale-factor: 1;
+  --total-scale-factor: calc(var(--scale-factor) * var(--user-unit));
   --min-font-size: 1;
-  --min-font-size-inv: 1;
+  --min-font-size-inv: calc(1 / var(--min-font-size));
   --text-scale-factor: calc(var(--total-scale-factor) * var(--min-font-size));
 }
+/* 旋转映射：span 在未旋转页面空间排版，容器按 TextLayer 写入的
+   data-main-rotation 属性把未旋转盒子旋回页槽（transform-origin 已为 0 0）。
+   与官方 pdf_viewer.css 的全局 [data-main-rotation] 规则同值，这里收窄到
+   .kp-textLayer 避免误伤其他元素。 */
+.kp-textLayer[data-main-rotation="90"] { transform: rotate(90deg) translateY(-100%); }
+.kp-textLayer[data-main-rotation="180"] { transform: rotate(180deg) translate(-100%, -100%); }
+.kp-textLayer[data-main-rotation="270"] { transform: rotate(270deg) translateX(-100%); }
 .kp-textLayer span, .kp-textLayer br {
   color: transparent; position: absolute; white-space: pre;
   cursor: text; transform-origin: 0% 0%; user-select: text;

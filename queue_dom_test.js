@@ -81,8 +81,8 @@ async function run(payload) {
 /* ── 测试数据 ── */
 const DOC_WITH_JOBS = {
   ok: true, queue_size: 2,
-  stats: { queued: 1, translating: 2, done: 1, failed: 1, cancelled: 1,
-           total: 6, active: 3, by_kind: { translate: 5, stitch: 1 } },
+  stats: { queued: 1, translating: 2, done: 2, failed: 1, cancelled: 1,
+           total: 7, active: 3, by_kind: { translate: 5, stitch: 2 } },
   items: [
     { job_id: 'a', kind: 'translate', display: '翻译', name: 'paper_translating.pdf',
       status: 'translating', progress: 42.0, percent: 42.0,
@@ -107,6 +107,19 @@ const DOC_WITH_JOBS = {
       status: 'translating', progress: 0, percent: 17.0,
       created_at: 1757724200, elapsed: 8, message: '匹配优化中',
       original_url: null, mono_url: null, dual_url: null, queue_position: 0 },
+    // ★ 已完成的拼合任务：带 result（成品图指引）—— 队列页要能点进去看成图。
+    //   字段与 web_app._queue_snapshot 的白名单一致（filename/url/download_url/
+    //   size_kb/width/height），不带 meta（那是模块 tasks 表的完整版）。
+    { job_id: 'g', kind: 'stitch', display: '拼合', name: '拼合 T2-C 91 张',
+      status: 'done', progress: 0, percent: 100,
+      created_at: 1757724300, ended_at: 1757724800, elapsed: 500,
+      original_url: null, mono_url: null, dual_url: null, queue_position: 0,
+      result: { filename: 'pano_abc123456789.png',
+                url: '/api/stitch/result/pano_abc123456789.png',
+                download_url: '/api/stitch/result/pano_abc123456789.png/dl',
+                public_url: 'http://<nas-host>/<share>',
+                public_download_url: 'http://<nas-host>/<share>',
+                size_kb: 46592, width: 9876, height: 5432 } },
   ],
 };
 const TITLE = {
@@ -146,6 +159,32 @@ const PAYLOAD_BUSY = { ok: true, active: true, doc: DOC_WITH_JOBS, title: TITLE 
   ok(has(out, '拼合中 17%'), '拼合任务显示「拼合中 17%」（措辞随种类变）');
   ok(has(out, '>拼合<'), '拼合任务种类名渲染为「拼合」');
   ok(has(out, '>翻译<'), '翻译任务种类名渲染为「翻译」');
+
+  section('拼合已完成：成品图入口（走 NAS 入口）');
+  ok(has(out, '>查看成图<'), '已完成拼合任务带「查看成图」链接');
+  ok(has(out, 'href="http://<nas-host>/<share>"'),
+    '查看链接用 NAS 对外入口的绝对地址（不是本机相对路径）');
+  ok(has(out, 'href="http://<nas-host>/<share>"'),
+    '下载链接同样走 NAS 入口（/dl 附件下载）');
+  ok(!has(out, 'href="/api/stitch/result/pano_abc123456789.png"'),
+    '不再输出相对路径链接（相对路径从别人机器上看就是本机，分享即废）');
+  ok(has(out, '9876×5432'), '显示成品图尺寸（9876×5432）');
+  ok(has(out, '45.5MB'), '显示成品图体积（46592KB → 45.5MB）');
+  // 运行中的拼合任务不该出现成品图入口（后端 result 为 None）
+  ok((out.match(/查看成图/g) || []).length === 1,
+    '仅已完成任务有「查看成图」（运行中任务不出现）',
+    '出现 ' + (out.match(/查看成图/g) || []).length + ' 次');
+
+  // 老快照只有相对 url（没有 public_url）时不能变成死链接
+  const legacy = await run({ ok: true, active: false,
+    doc: { ok: true, queue_size: 0, stats: {}, items: [
+      { job_id: 'y', kind: 'stitch', display: '拼合', name: '拼合 老快照',
+        status: 'done', progress: 0, percent: 100,
+        result: { filename: 'pano_old.png', url: '/api/stitch/result/pano_old.png',
+                  width: 100, height: 50 } } ] },
+    title: TITLE });
+  ok(has(legacy.els.body.innerHTML, 'href="/api/stitch/result/pano_old.png"'),
+    '老快照（只有相对 url）退回相对链接，不裂');
 
   section('有任务时：位次 / 耗时 / 链接');
   ok(has(out, '第 2 位'), '排队任务显示排队位次（第 2 位）');

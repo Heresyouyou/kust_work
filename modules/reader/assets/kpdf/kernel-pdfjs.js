@@ -165,7 +165,33 @@ class PdfjsKernelPage {
     const tc = await this._page.getTextContent({ includeMarkedContent: false });
     const { mod } = await loadKernel();
     const { TextLayer } = mod;
+    // 关键：text_layer.js 把 --font-height 写成「PDF 点」值（取自 viewport.rawDims，
+    // 未乘缩放），字号靠 --scale-factor 换算成 CSS px。不设置这个变量，整层文本会
+    // 按 1pt=1px 排版 —— 选区框与画布笔画差一个页面缩放倍数。
+    // 口径与官方查看器一致（pdf_page_view.js #setDimensions / pdf_viewer.js
+    // #setScaleUpdatePages）：--scale-factor = viewport.scale（scale × 96/72，
+    // 不含 pixelRatio、不含 userUnit）；--user-unit 仅 ≠1 时显式设置。
+    // 必须在 new TextLayer 之前设：其构造会调 setLayerDimensions 读
+    // --total-scale-factor 算容器尺寸。
+    container.style.setProperty("--scale-factor", viewport.scale);
+    if (viewport.userUnit && viewport.userUnit !== 1) {
+      container.style.setProperty("--user-unit", viewport.userUnit);
+    }
     const layer = new TextLayer({ textContentSource: tc, container, viewport });
+    // 容器必须是「未旋转页面」尺寸的盒子。text_layer.js 的 span 一直在未旋转
+    // 页面空间排版（#transform 取自 viewport.rawDims，旋转只写 data-main-rotation
+    // 属性），旋转 90/270 时由 CSS 变换 [data-main-rotation] 把整个盒子映射回
+    // 页槽 —— 与官方 pdf_viewer.css 是同款设计。若容器被拉成页槽尺寸（旋转后
+    // 页槽宽高已互换），旋转变换就会对不上，划词整体错位。
+    // 这里显式按未旋转尺寸设置，顺带避开 CSS round() 的浏览器版本依赖。
+    // setLayerDimensions 在上面 new TextLayer 里已尝试写宽高（未定义
+    // --scale-round-x 时无效），这里的后置赋值才是最终生效值。
+    {
+      const { pageWidth, pageHeight } = viewport.rawDims;
+      const unit = viewport.scale * (viewport.userUnit || 1);   // = --total-scale-factor
+      container.style.width = `${pageWidth * unit}px`;
+      container.style.height = `${pageHeight * unit}px`;
+    }
     // 6.x 的 render() 是 fire-and-forget：内部用 stream pump 把 span 铺到 DOM 上。
     // 我们暴露一个「render 调度完 + 一帧」就 resolve 的 promise，
     // 调用方 await 它之后就能拿到已经铺好的文本层（用来勾选 / 拷贝 / 搜索对齐）。

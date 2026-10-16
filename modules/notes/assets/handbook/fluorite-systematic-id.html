@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>透明矿物系统鉴定 · 萤石（按定向切面组织）</title>
+<style>
+  :root {
+    --bg: #FFFFFF; --bg2: #F5F8F9; --rule: #D8E2E4;
+    --ink: #1D2B30; --muted: #64787F; --text-secondary: #3D5158;
+    --accent: #2C6E75; --accent-hover: #235A60; --accent-soft: #EAF3F3;
+    --brand-text: #1A464B; --border: #D8E2E4; --brand: #2C6E75;
+    --brand-soft: #EAF3F3; --brand-soft-strong: #D8E9EA;
+    --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg2); color: var(--ink);
+    font-family: "Source Han Serif SC", "Noto Serif CJK SC", "SimSun", serif;
+    font-size: 15px; line-height: 1.75;
+  }
+  .page { max-width: 900px; margin: 0 auto; background: var(--bg); padding: 40px 46px 56px; box-shadow: 0 0 18px rgba(29,43,48,.07); }
+  header { border-bottom: 3px solid var(--brand); padding-bottom: var(--s4); margin-bottom: var(--s5); }
+  .kicker { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; font-size: 12.5px; letter-spacing: 3px; color: var(--accent); font-weight: 700; }
+  h1 { font-size: 26px; margin: 6px 0 8px; color: var(--brand-text); }
+  .sub { color: var(--muted); font-size: 13.5px; }
+  h2 { font-size: 19px; color: var(--brand-text); border-left: 4px solid var(--brand); padding-left: 10px; margin: 38px 0 10px; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
+  h2 .step-tag { display: inline-block; font-size: 12px; background: var(--brand); color: #fff; border-radius: 4px; padding: 1px 8px; vertical-align: 3px; margin-right: 8px; letter-spacing: 1px; }
+  h3 { font-size: 15.5px; color: var(--brand-text); margin: 18px 0 6px; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
+  p { margin: 8px 0; }
+  .req { background: var(--brand-soft); border: 1px solid var(--brand-soft-strong); border-radius: 8px; padding: 10px 14px; font-size: 13.5px; color: var(--brand-text); }
+  .req a { color: var(--accent); }
+  .tbl-title { font-size: 12.5px; color: var(--muted); margin: 0 0 4px; font-family: "Microsoft YaHei", sans-serif; }
+  .table-wrap { width: 100%; overflow-x: auto; margin: 10px 0 14px; }
+  table.rwd-card { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  table.rwd-card th, table.rwd-card td { border: 1px solid var(--border); padding: 7px 10px; vertical-align: top; text-align: left; }
+  table.rwd-card th[scope="row"] { background: var(--brand-soft); color: var(--brand-text); font-family: "Microsoft YaHei", sans-serif; font-weight: 600; white-space: nowrap; }
+  table.rwd-card thead th { background: var(--brand-soft-strong); color: var(--brand-text); font-family: "Microsoft YaHei", sans-serif; }
+  .op { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; font-size: 12px; color: #fff; background: #4E8A8F; border-radius: 3px; padding: 0 6px; margin-right: 4px; white-space: nowrap; }
+  .why { font-weight: 700; color: var(--brand-text); }
+  .thus { font-weight: 700; color: #8A5A00; }
+  .fig { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px 8px; margin: 14px 0 18px; }
+  .fig-title { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; font-size: 13.5px; font-weight: 700; color: var(--brand-text); margin-bottom: 4px; }
+  .fig svg { width: 100%; height: auto; display: block; }
+  .fig-cap { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+  .concl { background: #FBF6E9; border: 1px solid #E8D9A8; border-radius: 8px; padding: 10px 14px; font-size: 13.5px; }
+  .concl strong { color: #8A5A00; }
+  .note { font-size: 12.5px; color: var(--muted); border-top: 1px dashed var(--border); padding-top: 8px; margin-top: 12px; }
+  .note a { color: var(--accent); }
+  .sum-final { background: var(--brand-soft); border: 2px solid var(--brand); border-radius: 10px; padding: 14px 18px; text-align: center; font-size: 17px; }
+  .sum-final strong { color: var(--brand-text); }
+  footer { border-top: 1px solid var(--rule); margin-top: 40px; padding-top: 14px; font-size: 12.5px; color: var(--muted); }
+  ul { margin: 6px 0; padding-left: 22px; }
+  li { margin: 3px 0; }
+  @media (max-width: 640px) { .page { padding: 20px 16px 32px; } h1 { font-size: 21px; } }
+  @media print { body { background: #fff; } .page { box-shadow: none; padding: 10mm 12mm; max-width: none; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="kicker">透明矿物系统鉴定 · 实操记录</div>
+  <h1>萤石综合鉴定记录（按定向切面组织）</h1>
+  <p class="sub">样品：××-05（石英-萤石脉）&nbsp;·&nbsp; 物镜 10×40&nbsp;·&nbsp;鉴定人：（考生姓名）&nbsp;·&nbsp;日期：2026-__-__</p>
+  <div class="req"><strong>记录要求</strong>（原始题板）：系统测定某矿物的光学性质；记录要求：绘图并加简单说明。（一）找 ⊥OA 的切面——特征：正交镜下全消光（近于⊥OA 为一级灰黑）。测定：1) 轴性 2) 光性符号。（二）找 ∥光轴面的切面——特征：具最高干涉色。测定：1) 最高干涉色 2) Ng、Np 的颜色 3) 消光类型、消光角、延性符号。（三）⊥C 的切面——测定：1) 解理的组数和等级 2) 突起等级 3) 解理夹角 4) Nm 的颜色 5) 消光类型。（四）综合各切面的形态，绘出晶形。（五）综合以上各点写出：1.晶形 2.解理（组数、等级）3.解理夹角 4.多色性和吸收性公式 5.突起等级 6.最高干涉色 7.消光类型 8.消光角 9.延性符号 10.轴性 11.光性符号。<br><strong>均质体适配</strong>：萤石为等轴晶系均质体，光率体退化为球——无定向切面概念，题板（一）（二）（三）相应改写为"全消光观察 → 锥光排除假全消光 → 单偏光任意切面测定"的双证据链路线（详见各章）。</div>
+</header>
+
+<!-- ===================== 路线总览 ===================== -->
+<h2><span class="step-tag">路线</span>鉴定总路线与均质体的双证据链（无定向切面）</h2>
+<p>系统鉴定按"定向切面"取样——但该路线的前提是非均质体具有光率体主轴。萤石为<strong>等轴晶系均质体</strong>矿物，光率体退化为<strong>球</strong>，任意方向光学性质全同，<strong>不存在 ⊥OA、∥光轴面、⊥C 等定向切面的差别</strong>。因此题板路线对均质体改写为<strong>双证据链</strong>：① 正交镜下多颗粒任意方位均全消光（证据一）；② 锥光验证无任何干涉图——排除"垂直光轴切面的假全消光"（证据二）——两条证据确立均质体后，再在单偏光下于<strong>任意切面</strong>测颜色、解理、突起、晶形（各切面性质全同）。整体路线见下图。</p>
+
+<div class="fig">
+  <div class="fig-title">图 A&nbsp;均质体鉴定路线与任意切面的全同性（示意）</div>
+  <svg viewBox="0 0 880 330" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="萤石八面体晶习示意与任意切面全同性、双证据链鉴定路线">
+    <defs>
+      <marker id="fa1" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#2C6E75"/></marker>
+    </defs>
+    <!-- 晶体（八面体晶习，{111}解理方向与之呼应） -->
+    <g>
+      <polygon points="245,38 155,112 335,112" fill="#DCE9EA" stroke="#4E8A8F" stroke-width="1.5"/>
+      <polygon points="245,38 335,112 335,188 245,262" fill="#C4D9DB" stroke="#4E8A8F" stroke-width="1.5"/>
+      <polygon points="155,112 245,262 155,188" fill="#C4D9DB" stroke="#4E8A8F" stroke-width="1.5"/>
+      <polygon points="155,112 335,112 335,188 155,188" fill="#EAF3F3" stroke="#4E8A8F" stroke-width="1.5"/>
+      <polygon points="245,38 155,188 155,112" fill="#E2ECEE" stroke="#4E8A8F" stroke-width="1.5"/>
+      <line x1="245" y1="38" x2="245" y2="262" stroke="#9DBFC2" stroke-width="0.9" stroke-dasharray="4 4"/>
+      <line x1="155" y1="112" x2="335" y2="188" stroke="#9DBFC2" stroke-width="0.9" stroke-dasharray="4 4"/>
+      <line x1="335" y1="112" x2="155" y2="188" stroke="#9DBFC2" stroke-width="0.9" stroke-dasharray="4 4"/>
+      <text x="245" y="296" font-size="12" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">等轴晶系（八面体~立方体晶习）· 光学各向同性</text>
+    </g>
+    <!-- 任意切面椭圆 -->
+    <g>
+      <ellipse cx="205" cy="165" rx="98" ry="34" fill="#3E7CB1" fill-opacity="0.14" stroke="#3E7CB1" stroke-width="2" stroke-dasharray="7 4" transform="rotate(-18 205 165)"/>
+      <ellipse cx="285" cy="140" rx="86" ry="28" fill="#3E7CB1" fill-opacity="0.10" stroke="#7FA8C9" stroke-width="1.6" stroke-dasharray="7 4" transform="rotate(38 285 140)"/>
+      <line x1="120" y1="200" x2="40" y2="238" stroke="#3E7CB1" stroke-width="1.2" marker-end="url(#fa1)"/>
+      <rect x="18" y="238" width="210" height="72" rx="7" fill="#FFFFFF" stroke="#3E7CB1" stroke-width="1.2"/>
+      <text x="30" y="258" font-size="12.5" font-weight="bold" fill="#2B5F8E" font-family="Microsoft YaHei, sans-serif">任意切面：性质全同</text>
+      <text x="30" y="276" font-size="11" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">无色 · 负高突起 · {111}解理 60°/120°</text>
+      <text x="30" y="292" font-size="11" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">正交偏光全消光（无定向差别）</text>
+      <text x="30" y="306" font-size="11" fill="#64787F" font-family="Microsoft YaHei, sans-serif">光率体=球 → 无定向切面概念</text>
+    </g>
+    <!-- 证据一框 -->
+    <rect x="472" y="52" width="200" height="92" rx="7" fill="#FFFFFF" stroke="#B3402E" stroke-width="1.2"/>
+    <text x="484" y="72" font-size="13" font-weight="bold" fill="#9A3526" font-family="Microsoft YaHei, sans-serif">证据一（步骤一）：全消光</text>
+    <text x="484" y="91" font-size="11.5" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">正交镜下多颗粒、任意方位</text>
+    <text x="484" y="107" font-size="11.5" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">均永久全黑、插试板无反应</text>
+    <text x="484" y="123" font-size="11.5" fill="#64787F" font-family="Microsoft YaHei, sans-serif">→ 均质体或⊥光轴切面（待排除）</text>
+    <!-- 证据二框 -->
+    <rect x="472" y="158" width="200" height="92" rx="7" fill="#FFFFFF" stroke="#B3402E" stroke-width="1.2"/>
+    <text x="484" y="178" font-size="13" font-weight="bold" fill="#9A3526" font-family="Microsoft YaHei, sans-serif">证据二（步骤二）：锥光验证</text>
+    <text x="484" y="197" font-size="11.5" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">任何颗粒、任何方位均无干涉图</text>
+    <text x="484" y="213" font-size="11.5" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">（无黑十字、无双曲臂、无色圈）</text>
+    <text x="484" y="229" font-size="11.5" fill="#64787F" font-family="Microsoft YaHei, sans-serif">→ 排除⊥光轴切面假全消光</text>
+    <!-- 结论框 -->
+    <rect x="678" y="52" width="184" height="198" rx="7" fill="#EAF3F3" stroke="#2C6E75" stroke-width="1.2"/>
+    <text x="690" y="76" font-size="12.5" font-weight="bold" fill="#1A464B" font-family="Microsoft YaHei, sans-serif">双证据链结论</text>
+    <text x="690" y="98" font-size="11.5" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">证据一 + 证据二</text>
+    <text x="690" y="118" font-size="12.5" font-weight="bold" fill="#9A3526" font-family="Microsoft YaHei, sans-serif">→ 均质体（等轴晶系）</text>
+    <text x="690" y="142" font-size="11.5" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">轴性：均质体</text>
+    <text x="690" y="160" font-size="11.5" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">光性符号：—（不适用）</text>
+    <text x="690" y="178" font-size="11.5" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">2V：—（无光轴）</text>
+    <text x="690" y="202" font-size="11" fill="#64787F" font-family="Microsoft YaHei, sans-serif">随后单偏光任意切面测：</text>
+    <text x="690" y="220" font-size="11" fill="#64787F" font-family="Microsoft YaHei, sans-serif">颜色、解理、突起、晶形</text>
+    <text x="690" y="238" font-size="11" fill="#64787F" font-family="Microsoft YaHei, sans-serif">（步骤三，各切面全同）</text>
+  </svg>
+  <div class="fig-cap">均质体判定的两条证据缺一不可：只凭"正交全消光"会与非均质体的垂直光轴切面混淆（一轴/二轴晶仅个别特定切面消光，锥光下必见干涉图；均质体任意切面全消光且锥光永无干涉图）。确立均质体后，单偏光各项测定在任意切面进行即可——各切面性质全同，这正是均质体与一切非均质体的操作分野。</div>
+</div>
+
+<!-- ===================== （一）全消光观察 ===================== -->
+<h2 id="s1"><span class="step-tag">（一）</span>找"全消光"的切面 —— 均质体证据链之一：多颗粒任意方位均全消光</h2>
+
+<div class="table-wrap">
+  <p class="tbl-title">表 1&nbsp;正交偏光全消光观察记录（三段式；题板（一）之均质体改写）</p>
+  <table class="rwd-card">
+    <tbody>
+      <tr><th scope="row">寻找切面</th><td><span class="op">操作</span>正交偏光下转物台 360° 观察目标颗粒明暗变化；换 <strong>3~5 个不同切面方位的颗粒</strong>重复观察。<br><span class="op">现象</span><span class="why">∵</span>所有目标颗粒在任意方位<strong>始终全黑（全消光）</strong>，无四次明暗交替；与之交生的石英颗粒正常四次消光（对照证明偏光系统正常、薄片合格）。<br><span class="op">结论</span><span class="thus">∴</span>全消光 → <strong>均质体或非均质体垂直光轴切面</strong>——一轴/二轴晶仅个别特定切面（⊥光轴）消光，须锥光排除（见（二））。</td></tr>
+      <tr><th scope="row">干涉色检查</th><td><span class="op">操作</span>正交偏光全片寻找目标颗粒的任何干涉色；插入石膏试板、λ/4 试板验证。<br><span class="op">现象</span><span class="why">∵</span>全部颗粒任意方位均<strong>无干涉色（永久全黑）</strong>，插入任何试板<strong>也无反应</strong>。<br><span class="op">结论</span><span class="thus">∴</span>无干涉色 → 无双折射 → 与全消光互为印证；对照"高级白"（方解石，亮白闪变）与"低级序"（石英，灰白~黄），<strong>永久全黑为均质体专属</strong>。</td></tr>
+      <tr><th scope="row">附：消光类型</th><td><strong>—（全消光，无消光位可言）</strong>。均质体各方向光学性质全同，正交偏光下无明暗变化，不可臆造消光数据。</td></tr>
+      <tr><th scope="row">附：消光角</th><td><strong>—（全消光，无消光位可言）</strong>。题板（二）之"消光类型、消光角"对均质体不适用，如实注明。</td></tr>
+      <tr><th scope="row">附：延性符号</th><td><strong>—（均质体各向同性，无延性概念）</strong>。延性以双折射为前提，均质体无从谈起。</td></tr>
+      <tr><th scope="row">附：双晶</th><td><span class="op">操作</span>正交偏光转物台 360° 检查双晶缝。<br><span class="op">现象</span><span class="why">∵</span>全消光下无双晶可见——未见任何双晶纹（萤石虽可有{111}穿插双晶，但薄片镜下通常不可辨）。<br><span class="op">结论</span><span class="thus">∴</span>如实记录"未见"，不臆造。</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="fig">
+  <div class="fig-title">图 B&nbsp;正交偏光"全消光"判读（证据一）：多颗粒任意方位均全黑</div>
+  <svg viewBox="0 0 880 388" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="萤石正交偏光全消光判读：多颗粒全黑与石英对照、插试板无反应、三种消光对照排除">
+    <defs>
+      <marker id="fb" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#64787F"/></marker>
+    </defs>
+    <!-- 左：多颗粒全黑+石英对照 -->
+    <g>
+      <text x="160" y="40" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">① 多颗粒任意方位：永久全黑</text>
+      <rect x="36" y="56" width="248" height="220" fill="#FDFDFD" stroke="#64787F" stroke-width="1.5"/>
+      <line x1="36" y1="166" x2="284" y2="166" stroke="#B9C8CC" stroke-width="1"/>
+      <line x1="160" y1="56" x2="160" y2="276" stroke="#B9C8CC" stroke-width="1"/>
+      <polygon points="66,86 128,74 150,130 96,146" fill="#2E3438" stroke="#1A464B" stroke-width="1.6"/>
+      <polygon points="180,96 250,88 262,140 196,150" fill="#2E3438" stroke="#1A464B" stroke-width="1.6"/>
+      <polygon points="90,200 168,190 178,244 100,252" fill="#2E3438" stroke="#1A464B" stroke-width="1.6"/>
+      <polygon points="200,196 262,206 252,256 196,248" fill="#DCE9EA" stroke="#4E8A8F" stroke-width="1.6"/>
+      <text x="228" y="230" font-size="10.5" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">石英（对照）</text>
+      <path d="M 62,172 A 26 26 0 1 1 62,173.1" fill="none" stroke="#64787F" stroke-width="2" marker-end="url(#fb)"/>
+      <text x="86" y="182" font-size="11" fill="#64787F" font-family="Microsoft YaHei, sans-serif">转 360°</text>
+      <text x="160" y="300" font-size="12.5" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">目标颗粒（黑）任意方位不变</text>
+      <text x="160" y="318" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">石英正常四次消光 → 偏光系统正常</text>
+    </g>
+    <!-- 分隔线 -->
+    <line x1="306" y1="30" x2="306" y2="360" stroke="#D8E2E4" stroke-width="1"/>
+    <!-- 中：插试板无反应 -->
+    <g>
+      <text x="450" y="40" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">② 插任何试板：均无反应</text>
+      <rect x="330" y="56" width="240" height="220" fill="#FDFDFD" stroke="#64787F" stroke-width="1.5"/>
+      <line x1="330" y1="166" x2="570" y2="166" stroke="#B9C8CC" stroke-width="1"/>
+      <line x1="450" y1="56" x2="450" y2="276" stroke="#B9C8CC" stroke-width="1"/>
+      <polygon points="372,90 528,90 528,242 372,242" fill="#2E3438" stroke="#1A464B" stroke-width="1.8"/>
+      <line x1="352" y1="252" x2="548" y2="80" stroke="#64787F" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#fb)"/>
+      <text x="450" y="272" font-size="11" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">插入石膏试板 / λ/4 试板</text>
+      <text x="450" y="300" font-size="12.5" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">无双折射 → 无光程差可加减</text>
+      <text x="450" y="318" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">→ 与全消光互证，永久全黑</text>
+    </g>
+    <!-- 分隔线 -->
+    <line x1="596" y1="30" x2="596" y2="360" stroke="#D8E2E4" stroke-width="1"/>
+    <!-- 右：三种"黑/白"对照 -->
+    <g>
+      <text x="735" y="40" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">③ 三种"黑/白"速辨</text>
+      <circle cx="640" cy="112" r="34" fill="#2E3438" stroke="#1A464B" stroke-width="1.6"/>
+      <text x="640" y="162" font-size="10.5" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">均质体</text>
+      <text x="640" y="176" font-size="10.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">永久全黑</text>
+      <circle cx="735" cy="112" r="34" fill="#2E3438" stroke="#1A464B" stroke-width="1.6"/>
+      <rect x="727" y="86" width="16" height="52" fill="#FDFDFD" opacity="0.92"/>
+      <rect x="717" y="102" width="36" height="10" fill="#FDFDFD" opacity="0.92"/>
+      <text x="735" y="162" font-size="10.5" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">⊥OA 切面</text>
+      <text x="735" y="176" font-size="10.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">个别颗粒消光</text>
+      <circle cx="830" cy="112" r="34" fill="#F2F0E8" stroke="#8A6508" stroke-width="1.6"/>
+      <text x="830" y="162" font-size="10.5" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">高级白</text>
+      <text x="830" y="176" font-size="10.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">亮白闪变</text>
+      <text x="735" y="216" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">全消光 ≠ 结论"均质体"</text>
+      <text x="735" y="234" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">还须锥光排除⊥光轴切面</text>
+      <text x="735" y="252" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">（非均质体仅个别切面消光）</text>
+      <text x="735" y="286" font-size="12.5" font-weight="bold" fill="#9A3526" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">多颗粒全黑 + 试板无反应</text>
+      <text x="735" y="304" font-size="12.5" font-weight="bold" fill="#9A3526" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">→ 证据一成立</text>
+    </g>
+    <!-- 底部结论条 -->
+    <rect x="20" y="340" width="840" height="36" rx="7" fill="#FBF6E9" stroke="#E8D9A8"/>
+    <text x="440" y="363" font-size="13" font-weight="bold" fill="#8A6508" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">证据一：多颗粒任意方位永久全消光、插试板无反应 → 均质体或⊥光轴切面（待锥光排除，见（二））</text>
+  </svg>
+  <div class="fig-cap">"全消光"本身不是均质体的充分判据——非均质体的垂直光轴切面同样全消光，但一轴/二轴晶只有个别特定切面如此；均质体是任意切面、任何颗粒全消光。因此观察必须"多颗粒+任意方位"，并以相邻石英的正常四次消光作对照（证明偏光系统与薄片均正常）。对照颗粒这一步是防"设备假象"的防御性记录。</div>
+</div>
+
+<!-- ===================== （二）锥光验证 ===================== -->
+<h2 id="s2"><span class="step-tag">（二）</span>锥光验证无任何干涉图 —— 均质体证据链之二：排除垂直光轴切面的假全消光</h2>
+
+<div class="table-wrap">
+  <p class="tbl-title">表 2&nbsp;锥光验证记录（三段式；题板（二）之均质体改写）</p>
+  <table class="rwd-card">
+    <tbody>
+      <tr><th scope="row">验证操作</th><td><span class="op">操作</span>换 40× 物镜准焦，推入聚光镜与勃氏镜，在<strong>多个</strong>全消光颗粒上逐一观察锥光视域；任何方位、任何颗粒重复检查。<br><span class="op">现象</span><span class="why">∵</span>视域<strong>全黑</strong>——无黑十字、无双曲臂、无色圈；任何颗粒、任何方位均<strong>无干涉图</strong>。<br><span class="op">结论</span><span class="thus">∴</span>无干涉图 → 排除"非均质体垂直光轴切面"（那样应见黑十字等干涉图）→ <strong>确证均质体</strong>（等轴晶系光学各向同性）。双证据链完成。</td></tr>
+      <tr><th scope="row">排除逻辑</th><td><span class="op">说明</span>若全消光源于"垂直光轴切面"：一轴晶⊥OA 切面锥光必见<strong>黑十字（+色圈）</strong>，二轴晶垂直光轴面/Bxa 切面必见<strong>黑十字或双曲臂</strong>；而今任何颗粒、任何方位均无干涉图——与"个别特定切面才消光"的非均质体矛盾 → 只能是均质体。<br><span class="op">结论</span><span class="thus">∴</span>证据一（任意切面全消光）+ 证据二（锥光无干涉图）= <strong>均质体判定的完整双证据链</strong>。</td></tr>
+      <tr><th scope="row">轴性</th><td><span class="op">操作</span>综合证据一与证据二两项观察。<br><span class="op">现象</span><span class="why">∵</span>全部颗粒永久全消光；锥光无任何干涉图。<br><span class="op">结论</span><span class="thus">∴</span><strong>均质体（等轴晶系）</strong>——不具一轴/二轴晶轴性；非均质体的找切面、插试板、测延性等光性测定流程均不适用。</td></tr>
+      <tr><th scope="row">光性符号</th><td><strong>—（不适用）</strong>。均质体无双折射、无光率体主轴，不存在光性正负；题板（一）之"轴性、光性符号"测定对均质体以双证据链作答。</td></tr>
+      <tr><th scope="row">2V（估计）</th><td><strong>—（均质体无光轴）</strong>。</td></tr>
+      <tr><th scope="row">附：异常干涉色防御</th><td><span class="op">操作</span>全片复核是否存在个别颗粒局部微弱灰色的"异常干涉色"。<br><span class="op">现象</span><span class="why">∵</span>本薄片未见（若见极微弱一级灰，为应变所致假象）。<br><span class="op">结论</span><span class="thus">∴</span>异常干涉色注明成因、不作鉴定依据——防止误判为非均质体的防御性记录。</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="fig">
+  <div class="fig-title">图 C&nbsp;锥光验证（证据二）：无任何干涉图 —— 与一轴晶、二轴晶对照</div>
+  <svg viewBox="0 0 880 388" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="萤石锥光视域全黑与一轴晶黑十字、二轴晶双曲臂对照，排除垂直光轴切面假全消光">
+    <defs>
+      <marker id="fc" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#64787F"/></marker>
+    </defs>
+    <!-- 左：萤石锥光全黑 -->
+    <g>
+      <circle cx="145" cy="140" r="112" fill="#1D2B30" stroke="#64787F" stroke-width="2"/>
+      <line x1="33" y1="140" x2="257" y2="140" stroke="#4A565C" stroke-width="1"/>
+      <line x1="145" y1="28" x2="145" y2="252" stroke="#4A565C" stroke-width="1"/>
+      <text x="145" y="88" font-size="13" font-weight="bold" fill="#9AA7AB" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">视域全黑</text>
+      <text x="145" y="196" font-size="11.5" fill="#8A959B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">无黑十字 · 无双曲臂 · 无色圈</text>
+      <text x="145" y="282" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">① 萤石（任何颗粒、任何方位）</text>
+      <text x="145" y="300" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">40×+勃氏镜+聚光镜，逐一验证</text>
+    </g>
+    <!-- 中：对照一轴晶 -->
+    <g>
+      <circle cx="440" cy="140" r="112" fill="#FDFDFD" stroke="#64787F" stroke-width="2"/>
+      <line x1="328" y1="140" x2="552" y2="140" stroke="#B9C8CC" stroke-width="1"/>
+      <line x1="440" y1="28" x2="440" y2="252" stroke="#B9C8CC" stroke-width="1"/>
+      <circle cx="440" cy="140" r="58" fill="none" stroke="#B9C8CC" stroke-width="1" stroke-dasharray="4 4"/>
+      <rect x="425" y="30" width="30" height="220" fill="#1D2B30"/>
+      <rect x="330" y="125" width="220" height="30" fill="#1D2B30"/>
+      <circle cx="440" cy="140" r="6" fill="#FDFDFD" stroke="#1A464B" stroke-width="2"/>
+      <text x="440" y="282" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">② 对照：一轴晶⊥OA 切面</text>
+      <text x="440" y="300" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">假全消光——锥光必见黑十字</text>
+    </g>
+    <!-- 右：对照二轴晶 -->
+    <g>
+      <circle cx="735" cy="140" r="112" fill="#FDFDFD" stroke="#64787F" stroke-width="2"/>
+      <line x1="623" y1="140" x2="847" y2="140" stroke="#B9C8CC" stroke-width="1"/>
+      <line x1="735" y1="28" x2="735" y2="252" stroke="#B9C8CC" stroke-width="1"/>
+      <rect x="725" y="55" width="20" height="170" fill="#1D2B30" transform="rotate(-14 735 140)"/>
+      <rect x="725" y="55" width="20" height="170" fill="#1D2B30" transform="rotate(14 735 140)"/>
+      <path d="M 735,30 A 110 110 0 0 0 625,140 L 645,140 A 90 90 0 0 1 735,50 Z" fill="#1D2B30" fill-opacity="0.85"/>
+      <path d="M 735,250 A 110 110 0 0 0 845,140 L 825,140 A 90 90 0 0 1 735,230 Z" fill="#1D2B30" fill-opacity="0.85"/>
+      <path d="M 845,80 A 105 105 0 0 1 847,120" fill="none" stroke="#64787F" stroke-width="1.8" marker-end="url(#fc)"/>
+      <text x="852" y="70" font-size="11" fill="#64787F" font-family="Microsoft YaHei, sans-serif">45°</text>
+      <text x="735" y="282" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">③ 对照：二轴晶（45° 位）</text>
+      <text x="735" y="300" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">黑十字分裂为双曲臂</text>
+    </g>
+    <!-- 推理链 -->
+    <rect x="20" y="322" width="840" height="54" rx="8" fill="#EAF3F3" stroke="#2C6E75" stroke-width="1.2"/>
+    <text x="440" y="345" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">推理链：全消光颗粒锥光无任何干涉图 → 若为⊥光轴切面应见黑十字/双曲臂 → 排除非均质体假全消光（仅个别切面消光）</text>
+    <text x="440" y="366" font-size="13.5" font-weight="bold" fill="#9A3526" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">结论：证据一 + 证据二 → 均质体（等轴晶系）· 轴性=均质体 · 光性符号不适用 · 2V 无</text>
+  </svg>
+  <div class="fig-cap">锥光验证是均质体鉴定的"判决性实验"：非均质体的全消光仅出现于个别特定切面，且这些切面在锥光下必显干涉图（一轴晶黑十字不分裂、二轴晶 45° 位分裂为双曲臂）；均质体则任何颗粒、任何方位都既全消光又无干涉图。把两个"对照图"画进答卷，即是完整的排除法论证。</div>
+</div>
+
+<!-- ===================== （三）单偏光任意切面 ===================== -->
+<h2 id="s3"><span class="step-tag">（三）</span>单偏光下任意切面测定 —— 颜色、解理、突起、晶形（各切面性质全同）</h2>
+
+<div class="table-wrap">
+  <p class="tbl-title">表 3&nbsp;单偏光任意切面记录（三段式；题板（三）之均质体改写）</p>
+  <table class="rwd-card">
+    <tbody>
+      <tr><th scope="row">切面选择说明</th><td><span class="op">说明</span>均质体光率体为球，<strong>任意切面性质全同</strong>——题板（三）"⊥C 的切面"对均质体不构成定向约束，任选目标颗粒清晰切面即可完成颜色、解理、突起、晶形的全部测定；多查几个颗粒互证。</td></tr>
+      <tr><th scope="row">1）颜色（Nm 位置）与多色性</th><td><span class="op">操作</span>单偏光转物台 360° 观察颜色与浓淡变化；多颗粒复核。<br><span class="op">现象</span><span class="why">∵</span>任意方位均<strong>无色透明</strong>（手标本的紫色在标准 0.03 mm 薄片中不显色），转台一周颜色浓淡纹丝不动。<br><span class="op">结论</span><span class="thus">∴</span><strong>无色、无多色性</strong>——各方向光学性质全同（均质体无多色性概念），颜色记录以薄片实测为准。</td></tr>
+      <tr><th scope="row">2）解理组数与等级</th><td><span class="op">操作</span>40× 下寻找解理缝发育的切面，转物台测两组解理缝交角；多查几个颗粒统计组数。<br><span class="op">现象</span><span class="why">∵</span>可见<strong>两组~三组平直完全解理缝</strong>，交角约 <strong>60°/120°</strong>，常互相交截围成三角形、四边形网络。<br><span class="op">结论</span><span class="thus">∴</span><strong>完全解理、交角 60°/120°、多组交截</strong> → 八面体{111}解理——萤石区别于石榴石（同为均质体但无解理）的关键。</td></tr>
+      <tr><th scope="row">3）解理夹角</th><td><span class="op">操作</span>转物台使第一组解理缝平行纵十字丝读数 b₁，续转至第二组平行读 b₂；复测 2 颗。<br><span class="op">现象</span><span class="why">∵</span>b₂−b₁≈<strong>60°</strong>（补角 120°），多颗粒一致。<br><span class="op">结论</span><span class="thus">∴</span><strong>解理夹角 60°/120°</strong>（对照：方解石 75°/105°、角闪石 56°/124°、辉石 87°/93°——数字对照是考场速判关键）。</td></tr>
+      <tr><th scope="row">4）突起等级</th><td><span class="op">操作</span>缩小光圈，选矿物-树胶边界平直处，微升镜筒观察边缘亮线移动；结合糙面与边缘宽窄综合判断。<br><span class="op">现象</span><span class="why">∵</span>颗粒表面<strong>糙面极显著（似磨砂）</strong>、边缘为<strong>很宽的暗带</strong>；提升镜筒，边缘亮线<strong>向树胶（颗粒外）移动</strong>。<br><span class="op">结论</span><span class="thus">∴</span>贝克线移向折射率高的一方=树胶 → n＜1.54；糙面极显著、边缘暗带极宽 → 折射率差极大 → <strong>负高突起</strong>（n=1.434，与树胶差 0.1 以上）——糙面、宽暗带、贝克线外移三现象互相印证。</td></tr>
+      <tr><th scope="row">5）消光类型（附）</th><td><strong>—（全消光，无消光位可言）</strong>。与（一）所据现象一致、互为印证；题板（三）之"消光类型"对均质体以全消光作答。</td></tr>
+      <tr><th scope="row">6）晶形与产状</th><td><span class="op">操作</span>10× 扫视全片观察目标颗粒轮廓与分布；40× 看切面形态。<br><span class="op">现象</span><span class="why">∵</span>目标颗粒呈粒状、边界平直，常沿石英颗粒边缘或裂隙分布；部分切面呈<strong>四边形轮廓</strong>。<br><span class="op">结论</span><span class="thus">∴</span>他形~半自形粒状，具等轴晶系晶体轮廓（立方体~八面体晶习的切面表现）——与石英共生的热液脉产状吻合。</td></tr>
+      <tr><th scope="row">附：包裹体与蚀变</th><td><span class="op">操作</span>单偏光+正交偏光逐颗粒检查。<br><span class="op">现象</span><span class="why">∵</span>糙面极显著（见突起行）；未见蚀变交代。<br><span class="op">结论</span><span class="thus">∴</span>糙面极显著已并入突起记录；无蚀变，记录备查。</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="fig">
+  <div class="fig-title">图 D&nbsp;单偏光任意切面：{111} 完全解理 60°/120° · 负高突起三现象</div>
+  <svg viewBox="0 0 880 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="萤石任意切面：多组完全解理交截成60度120度网络、糙面显著、宽暗带、贝克线移向树胶示负高突起">
+    <defs>
+      <marker id="fd" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#B3402E"/></marker>
+      <marker id="fe" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#64787F"/></marker>
+    </defs>
+    <!-- 左：解理网络 -->
+    <g>
+      <text x="215" y="36" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">① {111} 完全解理：多组交截网络</text>
+      <polygon points="105,70 320,60 335,185 240,235 90,205" fill="#EDEDF4" stroke="#4E8A8F" stroke-width="1.8"/>
+      <line x1="105" y1="70" x2="290" y2="225" stroke="#2C6E75" stroke-width="1.5"/>
+      <line x1="150" y1="62" x2="318" y2="180" stroke="#2C6E75" stroke-width="1.5"/>
+      <line x1="320" y1="60" x2="130" y2="215" stroke="#8A5A00" stroke-width="1.5"/>
+      <line x1="335" y1="90" x2="160" y2="228" stroke="#8A5A00" stroke-width="1.5"/>
+      <line x1="90" y1="120" x2="330" y2="130" stroke="#7A8A8F" stroke-width="1.3"/>
+      <path d="M 160,168 A 34 34 0 0 1 186,146" fill="none" stroke="#B3402E" stroke-width="1.5"/>
+      <text x="184" y="142" font-size="14" font-weight="bold" fill="#B03A5B" font-family="Microsoft YaHei, sans-serif">60°</text>
+      <text x="118" y="196" font-size="12" font-weight="bold" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">120°</text>
+      <text x="215" y="264" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">两组~三组平直完全解理缝交截，围成三角形/四边形网络</text>
+      <text x="215" y="282" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">→ 八面体{111}解理（b₂−b₁≈60°，复测 2 颗）</text>
+      <text x="215" y="306" font-size="11" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">对照石榴石（均质体）无解理——同为均质体的关键分野</text>
+    </g>
+    <!-- 分隔 -->
+    <line x1="440" y1="30" x2="440" y2="330" stroke="#D8E2E4" stroke-width="1"/>
+    <!-- 右：负高突起三现象 -->
+    <g>
+      <text x="655" y="36" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">② 负高突起：三现象互相印证</text>
+      <!-- 糙面颗粒 -->
+      <path d="M 545,58 L 770,52 L 782,150 L 700,180 L 540,160 Z" fill="#D8D8E2" stroke="#4E8A8F" stroke-width="1.8"/>
+      <g fill="#8A8AA0" opacity="0.75">
+        <circle cx="580" cy="80" r="2"/><circle cx="612" cy="72" r="2"/><circle cx="648" cy="84" r="2"/><circle cx="684" cy="70" r="2"/>
+        <circle cx="716" cy="86" r="2"/><circle cx="748" cy="76" r="2"/><circle cx="596" cy="108" r="2"/><circle cx="634" cy="102" r="2"/>
+        <circle cx="668" cy="116" r="2"/><circle cx="706" cy="104" r="2"/><circle cx="740" cy="112" r="2"/><circle cx="568" cy="130" r="2"/>
+        <circle cx="606" cy="128" r="2"/><circle cx="646" cy="136" r="2"/><circle cx="688" cy="132" r="2"/><circle cx="724" cy="140" r="2"/>
+        <circle cx="590" cy="152" r="2"/><circle cx="630" cy="156" r="2"/><circle cx="676" cy="152" r="2"/><circle cx="712" cy="158" r="2"/>
+      </g>
+      <text x="655" y="196" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">现象一：糙面极显著（似磨砂）+ 边缘很宽暗带</text>
+      <!-- 贝克线 -->
+      <text x="655" y="226" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">现象二：微升镜筒 → 贝克线移向树胶（颗粒外）</text>
+      <line x1="640" y1="238" x2="610" y2="238" stroke="#B3402E" stroke-width="1.8" marker-end="url(#fd)"/>
+      <rect x="490" y="248" width="60" height="26" fill="#D8D8E2" stroke="#4E8A8F" stroke-width="1.4"/>
+      <text x="520" y="266" font-size="11.5" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">矿物</text>
+      <rect x="550" y="248" width="60" height="26" fill="#FDFDFD" stroke="#9AA7AB" stroke-width="1.4"/>
+      <text x="580" y="266" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">树胶</text>
+      <text x="640" y="266" font-size="11" fill="#64787F" font-family="Microsoft YaHei, sans-serif">n=1.434（差 0.1+）</text>
+      <text x="655" y="300" font-size="12.5" font-weight="bold" fill="#B03A5B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">现象三：无色（薄片不显紫）→ 负高突起</text>
+      <text x="655" y="318" font-size="11" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">无色均质体中"负高突起+八面体解理"唯一常见组合</text>
+    </g>
+  </svg>
+  <div class="fig-cap">负高突起要写出三个现象（糙面、宽暗带、贝克线外移）互相印证——只报"负高突起"不写现象链是常见失分点。解理夹角 60°/120° 与方解石（75°/105°）、角闪石（56°/124°）数字相近，务必以复测算差为准；多组交截围成三角形/四边形网络是{111}解理的空间表现，画进图里即是加分项。</div>
+</div>
+
+<!-- ===================== （四）晶形 ===================== -->
+<h2 id="s4"><span class="step-tag">（四）</span>综合各切面的形态，绘出晶形</h2>
+
+<div class="fig">
+  <div class="fig-title">图 E&nbsp;晶形综合：等轴粒状视图 + 解理网络切面视图</div>
+  <svg viewBox="0 0 880 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="萤石晶形综合图：八面体至立方体晶习视图与解理网络切面视图">
+    <defs>
+      <marker id="ff" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L9,5 L0,10 z" fill="#2C6E75"/></marker>
+    </defs>
+    <!-- 左：等轴晶习视图 -->
+    <g>
+      <polygon points="185,42 115,102 255,102" fill="#DCE9EA" stroke="#4E8A8F" stroke-width="1.8"/>
+      <polygon points="185,42 255,102 255,172 185,232" fill="#C4D9DB" stroke="#4E8A8F" stroke-width="1.8"/>
+      <polygon points="115,102 185,232 115,172" fill="#C4D9DB" stroke="#4E8A8F" stroke-width="1.8"/>
+      <polygon points="115,102 255,102 255,172 115,172" fill="#EAF3F3" stroke="#4E8A8F" stroke-width="1.8"/>
+      <polygon points="185,42 115,172 115,102" fill="#E2ECEE" stroke="#4E8A8F" stroke-width="1.8"/>
+      <text x="185" y="266" font-size="12.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">晶习视图：八面体（{111}解理方向与之呼应）</text>
+      <text x="185" y="284" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">等轴晶系 · 他形~半自形粒状 · 负高突起</text>
+    </g>
+    <!-- 中：综合箭头 -->
+    <g>
+      <line x1="310" y1="150" x2="420" y2="150" stroke="#2C6E75" stroke-width="2.5" marker-end="url(#ff)"/>
+      <text x="365" y="132" font-size="13" font-weight="bold" fill="#2C6E75" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">综合</text>
+      <text x="365" y="176" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">晶形复原</text>
+    </g>
+    <!-- 右：切面视图 -->
+    <g>
+      <polygon points="510,60 700,52 714,168 640,216 498,190" fill="#EDEDF4" stroke="#4E8A8F" stroke-width="2"/>
+      <line x1="510" y1="72" x2="672" y2="204" stroke="#2C6E75" stroke-width="1.5"/>
+      <line x1="560" y1="56" x2="700" y2="158" stroke="#2C6E75" stroke-width="1.5"/>
+      <line x1="700" y1="52" x2="522" y2="182" stroke="#8A5A00" stroke-width="1.5"/>
+      <line x1="712" y1="80" x2="548" y2="204" stroke="#8A5A00" stroke-width="1.5"/>
+      <text x="610" y="126" font-size="13" font-weight="bold" fill="#B03A5B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">60°/120°</text>
+      <text x="606" y="266" font-size="12.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">切面视图：粒状轮廓 + 解理交截网络</text>
+      <text x="606" y="284" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">永久全消光（均质体）· 无色 · 负高突起</text>
+    </g>
+    <!-- 右侧结论 -->
+    <rect x="740" y="60" width="120" height="180" rx="8" fill="#EAF3F3" stroke="#2C6E75" stroke-width="1.2"/>
+    <text x="800" y="88" font-size="12.5" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">晶形结论</text>
+    <text x="800" y="112" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">他形~半自形粒状</text>
+    <text x="800" y="132" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">（等轴晶系：立方体~</text>
+    <text x="800" y="152" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">八面体晶习切面轮廓）</text>
+    <text x="800" y="176" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">沿石英边缘/裂隙分布</text>
+    <text x="800" y="196" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">→ 等轴晶系</text>
+    <text x="800" y="214" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">均质体（双证据链）</text>
+  </svg>
+  <div class="fig-cap">考试作图建议：分别绘晶习简图（八面体轮廓，标注{111}解理方向）与切面简图（粒状轮廓 + 多组解理缝交截网络、标注 60°/120°、"全消光"），两图并置即为完整的"绘出晶形"答案；部分切面呈四边形轮廓（等轴晶系晶习的切面表现）、沿石英颗粒边缘或裂隙分布的产状注明更佳。</div>
+</div>
+
+<!-- ===================== （五）汇总 ===================== -->
+<h2 id="s5"><span class="step-tag">（五）</span>综合以上各点写出鉴定结果（11 项）</h2>
+
+<div class="table-wrap">
+  <p class="tbl-title">表 4&nbsp;萤石系统鉴定结果汇总</p>
+  <table class="rwd-card">
+    <thead>
+      <tr><th style="width:44px">序号</th><th style="width:180px">项目</th><th>测定结果</th><th style="width:130px">测定切面</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>晶形</td><td>他形~半自形粒状（等轴晶系；部分切面四边形轮廓；沿石英边缘/裂隙分布）</td><td>任意切面</td></tr>
+      <tr><td>2</td><td>解理（组数、等级）</td><td><strong>两组~三组完全解理</strong>（八面体{111}，多组交截围成网络）</td><td>任意切面</td></tr>
+      <tr><td>3</td><td>解理夹角</td><td><strong>60°/120°</strong>（b₂−b₁≈60°，复测 2 颗）</td><td>任意切面</td></tr>
+      <tr><td>4</td><td>多色性和吸收性公式</td><td>无色（薄片中不显紫色）、无多色性（均质体各方向全同）</td><td>任意切面</td></tr>
+      <tr><td>5</td><td>突起等级</td><td><strong>负高突起</strong>（n=1.434；糙面极显著、边缘宽暗带、贝克线移向树胶）</td><td>任意切面</td></tr>
+      <tr><td>6</td><td>最高干涉色</td><td>—（永久全黑、无干涉色；插任何试板无反应——无双折射）</td><td>—</td></tr>
+      <tr><td>7</td><td>消光类型</td><td><strong>全消光</strong>（多颗粒任意方位永久全黑，无消光位）</td><td>任意切面</td></tr>
+      <tr><td>8</td><td>消光角</td><td>—（全消光，无消光位可言）</td><td>—</td></tr>
+      <tr><td>9</td><td>延性符号</td><td>—（均质体各向同性，无延性概念）</td><td>—</td></tr>
+      <tr><td>10</td><td>轴性</td><td><strong>均质体（等轴晶系）</strong>——双证据链：多颗粒全消光 + 锥光无干涉图</td><td>任意切面+锥光</td></tr>
+      <tr><td>11</td><td>光性符号</td><td>—（不适用；均质体无双折射、无光率体主轴）</td><td>—</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="sum-final">定名：<strong>萤石（Fluorite）</strong><br><span style="font-size:13px; font-weight:400; color:#3D5158;">依据链：负高突起（糙面极显著、宽暗带、贝克线移向树胶，n=1.434）· {111} 完全解理 60°/120° 多组交截 · 永久全消光 + 锥光无干涉图（均质体双证据链）· 与石英共生（热液脉产状吻合）——无色均质体中"负高突起+八面体解理"的唯一常见组合</span></div>
+
+<p class="note"><strong>与手册的对应</strong>：本记录按"定向切面"题板组织并作均质体适配，与《晶体光学与岩矿镜下鉴定知识手册》7.5 记录三按"观察系统"组织（单偏光→正交→锥光）的记录内容等价、数据同源；均质体判读原理见手册 3.5，萤石系统背景与易混对照见手册 5.4，光性参数见手册 8.1 速查总表。<strong>均质体适配要点</strong>：光率体退化为球、无定向切面概念——题板（一）（二）改写为"全消光观察→锥光排除假全消光"的双证据链，（三）改写为单偏光任意切面测定（各切面性质全同）；消光角、延性、双晶、干涉图等不适用项逐行写"—+原因"，切忌留空或删行。定向切面组织的同源范本见<a href="hornblende-systematic-id.html">普通角闪石全记录</a>（二轴晶，格式基准）；返回<a href="mineral-microscopy-handbook.html">知识手册</a>。</p>
+
+<footer>晶体光学与岩矿镜下鉴定 · 实操记录系列 · 2026-10-12 制作 &nbsp;|&nbsp; 光学常数与《晶体光学》通行教材及手册核定值逐项核对一致</footer>
+
+</div>
+</body>
+</html>

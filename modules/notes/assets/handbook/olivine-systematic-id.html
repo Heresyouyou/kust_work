@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>透明矿物系统鉴定 · 橄榄石（按观察系统组织）</title>
+<style>
+  :root {
+    --bg: #FFFFFF; --bg2: #F5F8F9; --rule: #D8E2E4;
+    --ink: #1D2B30; --muted: #64787F; --text-secondary: #3D5158;
+    --accent: #2C6E75; --accent-hover: #235A60; --accent-soft: #EAF3F3;
+    --brand-text: #1A464B; --border: #D8E2E4; --brand: #2C6E75;
+    --brand-soft: #EAF3F3; --brand-soft-strong: #D8E9EA;
+    --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg2); color: var(--ink);
+    font-family: "Source Han Serif SC", "Noto Serif CJK SC", "SimSun", serif;
+    font-size: 15px; line-height: 1.75;
+  }
+  .page { max-width: 900px; margin: 0 auto; background: var(--bg); padding: 40px 46px 56px; box-shadow: 0 0 18px rgba(29,43,48,.07); }
+  header { border-bottom: 3px solid var(--brand); padding-bottom: var(--s4); margin-bottom: var(--s5); }
+  .kicker { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; font-size: 12.5px; letter-spacing: 3px; color: var(--accent); font-weight: 700; }
+  h1 { font-size: 26px; margin: 6px 0 8px; color: var(--brand-text); }
+  .sub { color: var(--muted); font-size: 13.5px; }
+  h2 { font-size: 19px; color: var(--brand-text); border-left: 4px solid var(--brand); padding-left: 10px; margin: 38px 0 10px; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
+  h2 .step-tag { display: inline-block; font-size: 12px; background: var(--brand); color: #fff; border-radius: 4px; padding: 1px 8px; vertical-align: 3px; margin-right: 8px; letter-spacing: 1px; }
+  h3 { font-size: 15.5px; color: var(--brand-text); margin: 18px 0 6px; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
+  p { margin: 8px 0; }
+  .req { background: var(--brand-soft); border: 1px solid var(--brand-soft-strong); border-radius: 8px; padding: 10px 14px; font-size: 13.5px; color: var(--brand-text); }
+  .req a { color: var(--accent); }
+  .tbl-title { font-size: 12.5px; color: var(--muted); margin: 0 0 4px; font-family: "Microsoft YaHei", sans-serif; }
+  .table-wrap { width: 100%; overflow-x: auto; margin: 10px 0 14px; }
+  table.rwd-card { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  table.rwd-card th, table.rwd-card td { border: 1px solid var(--border); padding: 7px 10px; vertical-align: top; text-align: left; }
+  table.rwd-card th[scope="row"] { background: var(--brand-soft); color: var(--brand-text); font-family: "Microsoft YaHei", sans-serif; font-weight: 600; white-space: nowrap; }
+  table.rwd-card thead th { background: var(--brand-soft-strong); color: var(--brand-text); font-family: "Microsoft YaHei", sans-serif; }
+  .op { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; font-size: 12px; color: #fff; background: #4E8A8F; border-radius: 3px; padding: 0 6px; margin-right: 4px; white-space: nowrap; }
+  .why { font-weight: 700; color: var(--brand-text); }
+  .thus { font-weight: 700; color: #8A5A00; }
+  .fig { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px 8px; margin: 14px 0 18px; }
+  .fig-title { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; font-size: 13.5px; font-weight: 700; color: var(--brand-text); margin-bottom: 4px; }
+  .fig svg { width: 100%; height: auto; display: block; }
+  .fig-cap { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+  .concl { background: #FBF6E9; border: 1px solid #E8D9A8; border-radius: 8px; padding: 10px 14px; font-size: 13.5px; }
+  .concl strong { color: #8A5A00; }
+  .note { font-size: 12.5px; color: var(--muted); border-top: 1px dashed var(--border); padding-top: 8px; margin-top: 12px; }
+  .note a { color: var(--accent); }
+  .sum-final { background: var(--brand-soft); border: 2px solid var(--brand); border-radius: 10px; padding: 14px 18px; text-align: center; font-size: 17px; }
+  .sum-final strong { color: var(--brand-text); }
+  footer { border-top: 1px solid var(--rule); margin-top: 40px; padding-top: 14px; font-size: 12.5px; color: var(--muted); }
+  ul { margin: 6px 0; padding-left: 22px; }
+  li { margin: 3px 0; }
+  @media (max-width: 640px) { .page { padding: 20px 16px 32px; } h1 { font-size: 21px; } }
+  @media print { body { background: #fff; } .page { box-shadow: none; padding: 10mm 12mm; max-width: none; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="kicker">透明矿物系统鉴定 · 实操记录</div>
+  <h1>橄榄石综合鉴定记录（按观察系统组织）</h1>
+  <p class="sub">样品：××-09（橄榄辉长岩）&nbsp;·&nbsp; 物镜 10×40&nbsp;·&nbsp;鉴定人：（考生姓名）&nbsp;·&nbsp;日期：2026-__-__</p>
+  <div class="req"><strong>记录要求</strong>（原始题板）：系统测定某矿物的光学性质；记录要求：绘图并加简单说明。本页按"单偏光→正交偏光→锥光"三大观察系统逐项记录；消光角、延性等不可测项逐行写明原因；按定向切面组织的作答范本见<a href="hornblende-systematic-id.html">普通角闪石全记录</a>。</div>
+</header>
+
+<!-- ===================== 路线总览 ===================== -->
+<h2><span class="step-tag">路线</span>鉴定总路线与关键特征总览</h2>
+<p>橄榄石为斜方晶系二轴晶矿物（光性随成分渐变）。鉴定主线："三件套"——<strong>无色等轴粒状、无解理、网状弯曲裂纹</strong>（似干裂泥地）+ <strong>正高突起</strong>（单偏光）→ <strong>二级顶部~三级初鲜艳干涉色</strong>（全片最亮，石英楔法 n=2）（正交偏光）→ <strong>二轴晶（+）、2V 很大</strong>（双曲臂近直）（锥光）+ <strong>蛇纹石化网环蚀变</strong>。消光类型、消光角、延性三项均不可测，但每项都要写明原因——留空或臆造数据是双倍失分。</p>
+
+<div class="fig">
+  <div class="fig-title">图 A&nbsp;橄榄石等轴粒状、网状裂纹与"平直解理缝 ×× 弯曲裂纹"之辨（示意）</div>
+  <svg viewBox="0 0 880 350" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="橄榄石等轴粒状网状弯曲裂纹蛇纹石化网环与平直解理缝对比示意">
+    <defs>
+      <marker id="oA1" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#2C6E75"/></marker>
+      <marker id="oA2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#64787F"/></marker>
+    </defs>
+    <!-- 左：等轴粒状+网状裂纹+蛇纹石化 -->
+    <g>
+      <rect x="30" y="42" width="370" height="250" rx="8" fill="#FDFDFD" stroke="#D8E2E4"/>
+      <text x="215" y="30" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">① 等轴粒状 + 网状裂纹 + 蛇纹石化网环（单偏光）</text>
+      <path d="M 70,95 Q 140,62 215,80 Q 275,94 280,150 Q 284,205 225,225 Q 150,245 92,215 Q 55,185 60,140 Q 62,110 70,95 Z" fill="#EAF3F3" stroke="#4E8A8F" stroke-width="1.8"/>
+      <path d="M 100,110 Q 150,120 180,100 Q 210,85 240,120 Q 250,150 230,175" fill="none" stroke="#8A9BA0" stroke-width="1.3"/>
+      <path d="M 100,110 Q 120,150 100,185 Q 120,210 170,200" fill="none" stroke="#8A9BA0" stroke-width="1.3"/>
+      <path d="M 180,100 Q 200,140 170,200 M 230,175 Q 195,185 170,200" fill="none" stroke="#8A9BA0" stroke-width="1.3"/>
+      <path d="M 95,101 Q 150,70 218,86 Q 272,100 277,152 Q 281,203 223,222 Q 152,241 95,212 Q 60,184 65,141 Q 67,112 95,101 Z" fill="none" stroke="#6FA05A" stroke-width="7" stroke-opacity="0.45"/>
+      <text x="300" y="66" font-size="11.5" fill="#4E7A3A" font-family="Microsoft YaHei, sans-serif">网环：蛇纹石</text>
+      <text x="300" y="84" font-size="11.5" fill="#4E7A3A" font-family="Microsoft YaHei, sans-serif">沿裂纹交代</text>
+      <line x1="298" y1="70" x2="252" y2="98" stroke="#4E7A3A" stroke-width="1" marker-end="url(#oA2)"/>
+      <text x="215" y="288" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">裂纹弯曲、分支、宽度不一，切割颗粒似干裂泥地</text>
+      <text x="215" y="306" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">脆性矿物受应力崩裂——区别于平直的解理缝</text>
+    </g>
+    <!-- 分隔线 -->
+    <line x1="440" y1="30" x2="440" y2="320" stroke="#D8E2E4" stroke-width="1"/>
+    <!-- 右：平直 vs 弯曲 -->
+    <g>
+      <rect x="470" y="42" width="380" height="250" rx="8" fill="#FDFDFD" stroke="#D8E2E4"/>
+      <text x="660" y="30" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">② 辉石（平直解理）× 橄榄石（弯曲裂纹）</text>
+      <rect x="500" y="70" width="150" height="180" rx="6" fill="#F7FBFB" stroke="#B9C8CC" stroke-width="1.2"/>
+      <line x1="530" y1="80" x2="540" y2="240" stroke="#2C6E75" stroke-width="2"/>
+      <line x1="590" y1="80" x2="600" y2="240" stroke="#2C6E75" stroke-width="2"/>
+      <line x1="510" y1="110" x2="640" y2="120" stroke="#2C6E75" stroke-width="1.6"/>
+      <text x="575" y="60" font-size="11.5" fill="#2C6E75" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">辉石：成组平直解理缝</text>
+      <text x="575" y="272" font-size="11" fill="#2C6E75" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">方向固定、可测夹角</text>
+      <rect x="680" y="70" width="150" height="180" rx="6" fill="#F7FBFB" stroke="#B9C8CC" stroke-width="1.2"/>
+      <path d="M 700,90 Q 740,105 715,135 Q 690,160 730,180 Q 780,195 760,230" fill="none" stroke="#B3402E" stroke-width="1.8"/>
+      <path d="M 740,80 Q 760,120 800,130 M 715,135 Q 760,140 790,175 M 730,180 Q 700,205 730,235" fill="none" stroke="#B3402E" stroke-width="1.4"/>
+      <text x="755" y="60" font-size="11.5" fill="#B3402E" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">橄榄石：网状弯曲裂纹</text>
+      <text x="755" y="272" font-size="11" fill="#B3402E" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">无固定方向、不成组</text>
+    </g>
+  </svg>
+  <div class="fig-cap">"无解理+裂纹网+蛇纹石化"三件套写全即锁定答案；40× 逐颗粒寻找时须刻意区分"平直缝"与"弯曲裂纹"——把弯曲裂纹误记为解理，是与辉石混淆的第一步错。</div>
+</div>
+
+<!-- ===================== （一）单偏光 ===================== -->
+<h2 id="s1"><span class="step-tag">（一）</span>单偏光系统 —— 晶形、颜色、突起、解理</h2>
+
+<div class="table-wrap">
+  <p class="tbl-title">表 1&nbsp;单偏光系统记录（三段式）</p>
+  <table class="rwd-card">
+    <tbody>
+      <tr><th scope="row">晶形</th><td><span class="op">操作</span>10× 扫视全片观察轮廓与内部裂纹。<br><span class="op">现象</span><span class="why">∵</span>目标矿物等轴粒状、轮廓圆滑（他形~半自形）；几乎所有颗粒被<strong>不规则网状弯曲裂纹</strong>切割，似干裂泥地。<br><span class="op">结论</span><span class="thus">∴</span><strong>粒状、无固定晶形轮廓</strong>；裂纹网为第一识别线索（脆性矿物受应力崩裂，区别于平直的解理缝）。</td></tr>
+      <tr><th scope="row">颜色与多色性</th><td><span class="op">操作</span>单偏光转物台 360° 连续观察。<br><span class="op">现象</span><span class="why">∵</span>任意方位均无色透明。<br><span class="op">结论</span><span class="thus">∴</span><strong>无色、无多色性</strong>。</td></tr>
+      <tr><th scope="row">突起与贝克线</th><td><span class="op">操作</span>缩小光圈，微升镜筒观察贝克线；结合糙面与边缘宽窄。<br><span class="op">现象</span><span class="why">∵</span>贝克线移向矿物、移动迅速明显；糙面显著、边缘粗亮。<br><span class="op">结论</span><span class="thus">∴</span><strong>正高突起</strong>（橄榄石 n≈1.66~1.72，与辉石同级）。</td></tr>
+      <tr><th scope="row">解理</th><td><span class="op">操作</span>40× 逐颗粒寻找平直成组解理缝，注意区分"平直缝"与"弯曲裂纹"。<br><span class="op">现象</span><span class="why">∵</span>未见任何平直成组解理缝；仅见弯曲、分支、宽度不一的裂纹。<br><span class="op">结论</span><span class="thus">∴</span><strong>无解理</strong>（解理极不完全、薄片中不显现）——与辉石（两组 87°/93°）的根本区别；"无解理+裂纹网"为橄榄石招牌。</td></tr>
+      <tr><th scope="row">糙面 · 蚀变 · 包裹体</th><td><span class="op">操作</span>单偏光+正交偏光逐颗粒检查裂纹内部与边缘。<br><span class="op">现象</span><span class="why">∵</span>裂纹两侧及颗粒边缘被浅绿~无色细鳞片/纤维状矿物交代，呈网环状；该矿物低突起、一级灰白干涉色。<br><span class="op">结论</span><span class="thus">∴</span><strong>蛇纹石化沿裂纹网进行（网环结构）</strong>——橄榄石特征蚀变；次生矿物单列，不计原生含量。</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===================== （二）正交偏光 ===================== -->
+<h2 id="s2"><span class="step-tag">（二）</span>正交偏光系统 —— 消光、干涉色、延性、双晶</h2>
+
+<div class="table-wrap">
+  <p class="tbl-title">表 2&nbsp;正交偏光系统记录（三段式）</p>
+  <table class="rwd-card">
+    <tbody>
+      <tr><th scope="row">消光类型</th><td><span class="op">操作</span>正交偏光转物台观察明暗交替；寻找可与消光位对比的参照（解理缝/晶棱/双晶缝）。<br><span class="op">现象</span><span class="why">∵</span>颗粒正常四次明暗交替；但无平直解理缝、无双晶缝、晶棱圆滑——消光位无参照方向可比。<br><span class="op">结论</span><span class="thus">∴</span>消光类型<strong>不可测</strong>（无参照方向）——斜方晶系理论为平行消光，如实注明原因、不臆造数据。</td></tr>
+      <tr><th scope="row">消光角</th><td><strong>—（无解理缝与晶棱参照，不可测）</strong>。写明原因即是"如实记录"的得分点。</td></tr>
+      <tr><th scope="row">最高干涉色与级序</th><td><span class="op">操作</span>正交偏光逐视域对比取最高干涉色；45° 最亮位插 λ/4 板判升降；石英楔补偿至灰黑后缓慢抽出数紫红带。<br><span class="op">现象</span><span class="why">∵</span>最高干涉色鲜艳夺目——蓝、绿、黄、橙红交替（全片最亮矿物）；插 λ/4 板后降低（异名，直接补偿）；石英楔至灰黑，抽出过程观察到 <strong>2 次</strong>紫红色带。<br><span class="op">结论</span><span class="thus">∴</span>紫红带 n=2 → 级序 = n+1 = 三级内 → <strong>最高干涉色二级顶部~三级初</strong>；R≈1100~1200 nm，Δ≈0.037~0.040，与橄榄石完全一致（高突起+高双折射+无解理组合自洽）。</td></tr>
+      <tr><th scope="row">延性符号</th><td><strong>—（他形粒状无可测延长方向）</strong>。注明原因。</td></tr>
+      <tr><th scope="row">双晶</th><td><span class="op">操作</span>正交偏光转物台 360°。<br><span class="op">现象</span><span class="why">∵</span>未见解理缝以外任何双晶缝。<br><span class="op">结论</span><span class="thus">∴</span><strong>无双晶</strong>。</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="fig">
+  <div class="fig-title">图 B&nbsp;级序测定（石英楔 n=2）与三项"不可测"的如实记录（示意）</div>
+  <svg viewBox="0 0 880 330" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="橄榄石石英楔法级序测定与不可测项如实记录示意">
+    <defs>
+      <marker id="oB1" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#2C6E75"/></marker>
+    </defs>
+    <!-- 左：级序测定 -->
+    <g>
+      <text x="215" y="40" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">① 45° 位：全片最亮（蓝绿黄橙红交替）</text>
+      <circle cx="130" cy="130" r="72" fill="#5FA88C" stroke="#64787F" stroke-width="1.8"/>
+      <path d="M 130,58 A 72 72 0 0 1 202,130 L 130,130 Z" fill="#3E7CB1"/>
+      <path d="M 130,202 A 72 72 0 0 1 58,130 L 130,130 Z" fill="#3E7CB1"/>
+      <path d="M 202,130 A 72 72 0 0 1 130,202 L 130,130 Z" fill="#E39B38"/>
+      <circle cx="130" cy="130" r="6" fill="#FDFDFD" stroke="#1A464B" stroke-width="1.5"/>
+      <text x="130" y="228" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">λ/4 板：降低（异名）</text>
+      <text x="300" y="110" font-size="12.5" font-weight="bold" fill="#1A464B" font-family="Microsoft YaHei, sans-serif">石英楔抽出：</text>
+      <text x="300" y="132" font-size="12" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">灰黑 → 紫红(1)</text>
+      <text x="300" y="152" font-size="12" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">→ 黄绿 → 紫红(2)</text>
+      <text x="300" y="172" font-size="12" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">→ 恢复鲜艳色</text>
+      <text x="300" y="196" font-size="12.5" font-weight="bold" fill="#2C6E75" font-family="Microsoft YaHei, sans-serif">n=2 → 三级序内</text>
+      <path d="M 292,120 L 208,126" fill="none" stroke="#2C6E75" stroke-width="1.4" marker-end="url(#oB1)"/>
+    </g>
+    <!-- 右：不可测三行 -->
+    <g>
+      <rect x="490" y="60" width="370" height="230" rx="9" fill="#FDFDFD" stroke="#D8E2E4"/>
+      <text x="675" y="88" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">② 三项不可测：每行写明原因</text>
+      <rect x="512" y="104" width="326" height="46" rx="6" fill="#EAF3F3" stroke="#4E8A8F" stroke-width="1"/>
+      <text x="526" y="123" font-size="12.5" font-weight="bold" fill="#1A464B" font-family="Microsoft YaHei, sans-serif">消光类型 —</text>
+      <text x="612" y="123" font-size="12" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">无解理缝/晶棱参照，不可测</text>
+      <text x="526" y="141" font-size="11.5" fill="#64787F" font-family="Microsoft YaHei, sans-serif">（斜方晶系理论平行消光，注明即可）</text>
+      <rect x="512" y="158" width="326" height="46" rx="6" fill="#EAF3F3" stroke="#4E8A8F" stroke-width="1"/>
+      <text x="526" y="177" font-size="12.5" font-weight="bold" fill="#1A464B" font-family="Microsoft YaHei, sans-serif">消光角 —</text>
+      <text x="596" y="177" font-size="12" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">同上，无参照方向</text>
+      <text x="526" y="195" font-size="11.5" fill="#64787F" font-family="Microsoft YaHei, sans-serif">（写明原因即是"如实记录"得分点）</text>
+      <rect x="512" y="212" width="326" height="46" rx="6" fill="#EAF3F3" stroke="#4E8A8F" stroke-width="1"/>
+      <text x="526" y="231" font-size="12.5" font-weight="bold" fill="#1A464B" font-family="Microsoft YaHei, sans-serif">延性符号 —</text>
+      <text x="600" y="231" font-size="12" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">他形粒状无可测延长方向</text>
+      <text x="526" y="249" font-size="11.5" fill="#64787F" font-family="Microsoft YaHei, sans-serif">（切忌硬造"正/负延性"）</text>
+      <text x="675" y="278" font-size="11.5" fill="#B3402E" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">留空或臆造数据 = 双倍失分</text>
+    </g>
+  </svg>
+  <div class="fig-cap">橄榄石是"不可测项"最集中的矿物：消光类型、消光角、延性三项全部不可测。记录规范是每行写"—+原因"，与可测项同样工整——"知道不能测什么"与"会测"同等重要。</div>
+</div>
+
+<!-- ===================== （三）锥光 ===================== -->
+<h2 id="s3"><span class="step-tag">（三）</span>锥光系统 —— 轴性、光性符号、2V</h2>
+
+<div class="table-wrap">
+  <p class="tbl-title">表 3&nbsp;锥光系统记录（三段式）</p>
+  <table class="rwd-card">
+    <tbody>
+      <tr><th scope="row">干涉图</th><td><span class="op">操作</span>换 40× 物镜、推入勃氏镜；找干涉色最低（一级灰白）颗粒；转 45°。<br><span class="op">现象</span><span class="why">∵</span>黑十字分裂为两条<strong>近于平直</strong>的双曲黑臂，光轴出露点相距很远、接近视域边缘；转回 90° 复合。<br><span class="op">结论</span><span class="thus">∴</span>黑十字分裂 → <strong>二轴晶</strong>垂直 Bxa 图；双曲臂近直 → 2V 很大。</td></tr>
+      <tr><th scope="row">轴性与光性符号</th><td><span class="op">操作</span>45° 位（光轴点连线∥NE-SW）插石膏试板；观察凹、凸侧升降。<br><span class="op">现象</span><span class="why">∵</span>凹侧（两臂之间）<strong>降低变黄</strong>、凸侧升高变蓝。<br><span class="op">结论</span><span class="thus">∴</span>凹侧沿连线为快光 → Bxo=Np → Bxa=Ng → <strong>二轴晶正光性（+）</strong>；注明：橄榄石光性随成分渐变（富镁端员为正、富铁端员为负、2V 过 90° 换号），本颗粒判为镁质（贵橄榄石）。</td></tr>
+      <tr><th scope="row">2V（估计）</th><td><span class="op">操作</span>45° 位估计光轴点间距与双曲臂弯曲度。<br><span class="op">现象</span><span class="why">∵</span>双曲臂近直、光轴点近视域边缘。<br><span class="op">结论</span><span class="thus">∴</span>2V <strong>很大</strong>（≈80°~90°）。</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="fig">
+  <div class="fig-title">图 C&nbsp;2V 很大判读（双曲臂近直）×× 光性随成分渐变 · 石榴石对照</div>
+  <svg viewBox="0 0 880 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="橄榄石2V很大双曲臂近直干涉图与光性随成分渐变及石榴石均质体对照">
+    <defs>
+      <marker id="oC1" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#2C6E75"/></marker>
+    </defs>
+    <!-- 左：橄榄石干涉图 -->
+    <g>
+      <circle cx="160" cy="140" r="112" fill="#FDFDFD" stroke="#64787F" stroke-width="2"/>
+      <path d="M 118,40 C 108,90 108,190 118,240" fill="none" stroke="#1D2B30" stroke-width="12"/>
+      <path d="M 202,40 C 212,90 212,190 202,240" fill="none" stroke="#1D2B30" stroke-width="12"/>
+      <circle cx="106" cy="140" r="5" fill="#B3402E"/>
+      <circle cx="214" cy="140" r="5" fill="#B3402E"/>
+      <text x="106" y="122" font-size="11" fill="#B3402E" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">光轴点</text>
+      <text x="214" y="122" font-size="11" fill="#B3402E" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">光轴点</text>
+      <path d="M 118,40 C 108,90 108,190 118,240" fill="none" stroke="#2C6E75" stroke-width="1.4" stroke-dasharray="5 4"/>
+      <text x="160" y="282" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">① 双曲臂近直、光轴点近视域边缘</text>
+      <text x="160" y="300" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">2V 很大（≈80°~90°）· 二轴晶</text>
+    </g>
+    <!-- 中：光性渐变 -->
+    <g>
+      <text x="475" y="60" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">② 光性随成分渐变（Mg→Fe）</text>
+      <rect x="355" y="90" width="240" height="30" rx="15" fill="#EAF3F3" stroke="#4E8A8F" stroke-width="1.4"/>
+      <rect x="355" y="90" width="120" height="30" rx="15" fill="#DCE9EA"/>
+      <text x="415" y="110" font-size="12.5" font-weight="bold" fill="#2C6E75" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">镁橄榄石（+）</text>
+      <text x="535" y="110" font-size="12.5" font-weight="bold" fill="#B3402E" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">铁橄榄石（−）</text>
+      <line x1="475" y1="132" x2="475" y2="152" stroke="#64787F" stroke-width="1.4" marker-end="url(#oC1)"/>
+      <text x="475" y="172" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">2V 随 Fe 增大连续变化，过 90° 换号</text>
+      <rect x="355" y="190" width="240" height="60" rx="8" fill="#FBF6E9" stroke="#8A6508" stroke-width="1.3"/>
+      <text x="475" y="214" font-size="12" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">本颗粒：凹侧变黄 →（+）</text>
+      <text x="475" y="236" font-size="12.5" font-weight="bold" fill="#8A5A00" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">判为镁质（贵橄榄石）</text>
+      <text x="475" y="300" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">把渐变规律写进记录=展示知识面</text>
+    </g>
+    <!-- 右：石榴石对照 -->
+    <g>
+      <circle cx="745" cy="140" r="112" fill="#1D2B30" stroke="#64787F" stroke-width="2"/>
+      <text x="745" y="145" font-size="13" font-weight="bold" fill="#FDFDFD" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">全消光</text>
+      <text x="745" y="282" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">③ 石榴石对照（同为高突起无解理）</text>
+      <text x="745" y="300" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">均质全消光 ×× 橄榄石鲜艳干涉色</text>
+    </g>
+    <!-- 推理链 -->
+    <rect x="20" y="324" width="840" height="58" rx="8" fill="#EAF3F3" stroke="#2C6E75" stroke-width="1.2"/>
+    <text x="440" y="347" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">推理链：双曲臂近直 → 2V 很大；凹侧（两臂间）变黄 = 连线方向快光 → Bxo=Np、Bxa=Ng</text>
+    <text x="440" y="370" font-size="13.5" font-weight="bold" fill="#2C6E75" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">结论：二轴晶，正光性（+，镁质贵橄榄石），2V 很大（≈80°~90°）</text>
+  </svg>
+  <div class="fig-cap">与石榴石对照：同为无解理高突起矿物，石榴石均质全消光（正极高突起+淡粉色），橄榄石鲜艳干涉色（正高突起+无色）——正交偏光一开一合，一眼分野。</div>
+</div>
+
+<!-- ===================== （四）汇总 ===================== -->
+<h2 id="s4"><span class="step-tag">（四）</span>综合以上各点写出鉴定结果（11 项）</h2>
+
+<div class="table-wrap">
+  <p class="tbl-title">表 4&nbsp;橄榄石系统鉴定结果汇总</p>
+  <table class="rwd-card">
+    <thead>
+      <tr><th style="width:44px">序号</th><th style="width:180px">项目</th><th>测定结果</th><th style="width:110px">测定系统</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>晶形</td><td>等轴粒状，轮廓圆滑，网状弯曲裂纹发育</td><td>单偏光</td></tr>
+      <tr><td>2</td><td>解理（组数、等级）</td><td><strong>无解理</strong>（仅不规则弯曲裂纹）</td><td>单偏光</td></tr>
+      <tr><td>3</td><td>解理夹角</td><td>—（无解理）</td><td>单偏光</td></tr>
+      <tr><td>4</td><td>多色性和吸收性公式</td><td>无色、无多色性</td><td>单偏光</td></tr>
+      <tr><td>5</td><td>突起等级</td><td><strong>正高突起</strong>（n≈1.66~1.72，贝克线移动迅速明显）</td><td>单偏光</td></tr>
+      <tr><td>6</td><td>最高干涉色</td><td><strong>二级顶部~三级初</strong>（全片最亮；石英楔法 n=2）</td><td>正交偏光</td></tr>
+      <tr><td>7</td><td>消光类型</td><td>—（无参照方向不可测；理论平行消光）</td><td>正交偏光</td></tr>
+      <tr><td>8</td><td>消光角</td><td>—（无解理缝与晶棱参照，不可测）</td><td>正交偏光</td></tr>
+      <tr><td>9</td><td>延性符号</td><td>—（他形粒状无可测延长方向）</td><td>正交偏光</td></tr>
+      <tr><td>10</td><td>轴性</td><td><strong>二轴晶</strong>（黑十字分裂，双曲臂近直）</td><td>锥光</td></tr>
+      <tr><td>11</td><td>光性符号</td><td><strong>正光性（+，镁质）</strong>；2V 很大（≈80°~90°，随成分渐变）</td><td>锥光</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="sum-final">定名：<strong>橄榄石（贵橄榄石，Olivine）</strong><br><span style="font-size:13px; font-weight:400; color:#3D5158;">依据链：无色等轴粒状 · 无解理+网状裂纹 · 正高突起 · 二级顶~三级初鲜艳干涉色（石英楔法 n=2）· 蛇纹石化网环蚀变 · 二轴晶（+）2V 很大（双曲臂近直）</span></div>
+
+<p class="note"><strong>与手册的对应</strong>：本记录与《晶体光学与岩矿镜下鉴定知识手册》7.5 记录七内容同源；橄榄石速查与石榴石对照见手册 6.2 主要造岩矿物速查，光性参数见手册 8.1 速查总表。按定向切面组织的作答范本见<a href="hornblende-systematic-id.html">普通角闪石全记录</a>；返回<a href="mineral-microscopy-handbook.html">知识手册</a>。</p>
+
+<footer>晶体光学与岩矿镜下鉴定 · 实操记录系列 · 2026-10-12 制作 &nbsp;|&nbsp; 光学常数与《晶体光学》通行教材及手册核定值逐项核对一致</footer>
+
+</div>
+</body>
+</html>

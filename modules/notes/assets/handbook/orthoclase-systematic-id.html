@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>透明矿物系统鉴定 · 正长石（按观察系统组织）</title>
+<style>
+  :root {
+    --bg: #FFFFFF; --bg2: #F5F8F9; --rule: #D8E2E4;
+    --ink: #1D2B30; --muted: #64787F; --text-secondary: #3D5158;
+    --accent: #2C6E75; --accent-hover: #235A60; --accent-soft: #EAF3F3;
+    --brand-text: #1A464B; --border: #D8E2E4; --brand: #2C6E75;
+    --brand-soft: #EAF3F3; --brand-soft-strong: #D8E9EA;
+    --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg2); color: var(--ink);
+    font-family: "Source Han Serif SC", "Noto Serif CJK SC", "SimSun", serif;
+    font-size: 15px; line-height: 1.75;
+  }
+  .page { max-width: 900px; margin: 0 auto; background: var(--bg); padding: 40px 46px 56px; box-shadow: 0 0 18px rgba(29,43,48,.07); }
+  header { border-bottom: 3px solid var(--brand); padding-bottom: var(--s4); margin-bottom: var(--s5); }
+  .kicker { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; font-size: 12.5px; letter-spacing: 3px; color: var(--accent); font-weight: 700; }
+  h1 { font-size: 26px; margin: 6px 0 8px; color: var(--brand-text); }
+  .sub { color: var(--muted); font-size: 13.5px; }
+  h2 { font-size: 19px; color: var(--brand-text); border-left: 4px solid var(--brand); padding-left: 10px; margin: 38px 0 10px; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
+  h2 .step-tag { display: inline-block; font-size: 12px; background: var(--brand); color: #fff; border-radius: 4px; padding: 1px 8px; vertical-align: 3px; margin-right: 8px; letter-spacing: 1px; }
+  h3 { font-size: 15.5px; color: var(--brand-text); margin: 18px 0 6px; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
+  p { margin: 8px 0; }
+  .req { background: var(--brand-soft); border: 1px solid var(--brand-soft-strong); border-radius: 8px; padding: 10px 14px; font-size: 13.5px; color: var(--brand-text); }
+  .req a { color: var(--accent); }
+  .tbl-title { font-size: 12.5px; color: var(--muted); margin: 0 0 4px; font-family: "Microsoft YaHei", sans-serif; }
+  .table-wrap { width: 100%; overflow-x: auto; margin: 10px 0 14px; }
+  table.rwd-card { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  table.rwd-card th, table.rwd-card td { border: 1px solid var(--border); padding: 7px 10px; vertical-align: top; text-align: left; }
+  table.rwd-card th[scope="row"] { background: var(--brand-soft); color: var(--brand-text); font-family: "Microsoft YaHei", sans-serif; font-weight: 600; white-space: nowrap; }
+  table.rwd-card thead th { background: var(--brand-soft-strong); color: var(--brand-text); font-family: "Microsoft YaHei", sans-serif; }
+  .op { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; font-size: 12px; color: #fff; background: #4E8A8F; border-radius: 3px; padding: 0 6px; margin-right: 4px; white-space: nowrap; }
+  .why { font-weight: 700; color: var(--brand-text); }
+  .thus { font-weight: 700; color: #8A5A00; }
+  .fig { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px 8px; margin: 14px 0 18px; }
+  .fig-title { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; font-size: 13.5px; font-weight: 700; color: var(--brand-text); margin-bottom: 4px; }
+  .fig svg { width: 100%; height: auto; display: block; }
+  .fig-cap { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+  .concl { background: #FBF6E9; border: 1px solid #E8D9A8; border-radius: 8px; padding: 10px 14px; font-size: 13.5px; }
+  .concl strong { color: #8A5A00; }
+  .note { font-size: 12.5px; color: var(--muted); border-top: 1px dashed var(--border); padding-top: 8px; margin-top: 12px; }
+  .note a { color: var(--accent); }
+  .sum-final { background: var(--brand-soft); border: 2px solid var(--brand); border-radius: 10px; padding: 14px 18px; text-align: center; font-size: 17px; }
+  .sum-final strong { color: var(--brand-text); }
+  footer { border-top: 1px solid var(--rule); margin-top: 40px; padding-top: 14px; font-size: 12.5px; color: var(--muted); }
+  ul { margin: 6px 0; padding-left: 22px; }
+  li { margin: 3px 0; }
+  @media (max-width: 640px) { .page { padding: 20px 16px 32px; } h1 { font-size: 21px; } }
+  @media print { body { background: #fff; } .page { box-shadow: none; padding: 10mm 12mm; max-width: none; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="kicker">透明矿物系统鉴定 · 实操记录</div>
+  <h1>正长石综合鉴定记录（按观察系统组织）</h1>
+  <p class="sub">样品：××-14（黑云母花岗岩）&nbsp;·&nbsp; 物镜 10×40&nbsp;·&nbsp;鉴定人：（考生姓名）&nbsp;·&nbsp;日期：2026-__-__</p>
+  <div class="req"><strong>记录要求</strong>（原始题板）：系统测定某矿物的光学性质；记录要求：绘图并加简单说明。本页按"单偏光→正交偏光→锥光"三大观察系统逐项记录；卡氏双晶常见而非必有——找不到双晶不能排除正长石，靠其余特征链定名；延性"可正可负"如实记录、表面浑浊务必记入蚀变项；按定向切面组织的作答范本见<a href="hornblende-systematic-id.html">普通角闪石全记录</a>。</div>
+</header>
+
+<!-- ===================== 路线总览 ===================== -->
+<h2><span class="step-tag">路线</span>鉴定总路线与关键特征总览</h2>
+<p>正长石为单斜晶系二轴晶钾长石。鉴定主线："板柱状半自形~他形＋<strong>表面浅褐色土状浑浊</strong>（高岭石化）"→ <strong>负低突起</strong>（Np 1.518~Ng 1.526＜树胶 1.54；贝克线移向树胶，与相邻石英方向相反）＋<strong>两组完全解理交角约 90°</strong>（{001}∧{010}）（单偏光）→ <strong>一级灰白干涉色</strong>（Δ≈0.008，与石英同级）＋<strong>小角度斜消光</strong>（5°~15°）＋<strong>卡氏双晶</strong>（常见而非必有）（正交偏光）→ <strong>二轴晶负光性（−）、2V 大</strong>（60°~80°，双曲臂顶点间距宽、光轴点近视域边缘；凹侧变蓝）（锥光）。考场速判组合："浑浊＋两组直角解理＋负低突起＋卡氏双晶"；与石英同视域时"贝克线方向相反＋解理两组对无"秒判。</p>
+
+<div class="fig">
+  <div class="fig-title">图 A&nbsp;表面浑浊与两组直角解理、与相邻石英贝克线方向相反（示意）</div>
+  <svg viewBox="0 0 880 350" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="正长石表面高岭石化浑浊两组直角解理与相邻石英贝克线方向相反示意">
+    <defs>
+      <marker id="orA1" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#2C6E75"/></marker>
+      <marker id="orA2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#B3402E"/></marker>
+    </defs>
+    <!-- 左：晶形+浑浊+解理 -->
+    <g>
+      <rect x="30" y="42" width="370" height="250" rx="8" fill="#FDFDFD" stroke="#D8E2E4"/>
+      <text x="215" y="30" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">① 板柱状半自形晶＋高岭石化浑浊＋两组直角解理</text>
+      <polygon points="75,80 235,70 250,170 245,255 85,265" fill="#F5EFE6" stroke="#8A7A5C" stroke-width="1.8"/>
+      <circle cx="110" cy="110" r="2.5" fill="#C9B99A"/>
+      <circle cx="150" cy="95" r="2.5" fill="#C9B99A"/>
+      <circle cx="195" cy="105" r="2.5" fill="#C9B99A"/>
+      <circle cx="230" cy="130" r="2.5" fill="#C9B99A"/>
+      <circle cx="100" cy="150" r="2.5" fill="#C9B99A"/>
+      <circle cx="140" cy="135" r="2.5" fill="#C9B99A"/>
+      <circle cx="185" cy="150" r="2.5" fill="#C9B99A"/>
+      <circle cx="220" cy="175" r="2.5" fill="#C9B99A"/>
+      <circle cx="115" cy="190" r="2.5" fill="#C9B99A"/>
+      <circle cx="160" cy="180" r="2.5" fill="#C9B99A"/>
+      <circle cx="200" cy="205" r="2.5" fill="#C9B99A"/>
+      <circle cx="140" cy="220" r="2.5" fill="#C9B99A"/>
+      <circle cx="175" cy="235" r="2.5" fill="#C9B99A"/>
+      <circle cx="105" cy="235" r="2.5" fill="#C9B99A"/>
+      <line x1="130" y1="76" x2="138" y2="262" stroke="#2C6E75" stroke-width="2"/>
+      <line x1="190" y1="74" x2="198" y2="260" stroke="#2C6E75" stroke-width="2"/>
+      <line x1="80" y1="140" x2="245" y2="132" stroke="#2C6E75" stroke-width="1.6"/>
+      <line x1="82" y1="205" x2="247" y2="197" stroke="#2C6E75" stroke-width="1.6"/>
+      <path d="M 163,148 L 163,163 L 178,163" fill="none" stroke="#B3402E" stroke-width="1.4"/>
+      <text x="255" y="120" font-size="11.5" fill="#2C6E75" font-family="Microsoft YaHei, sans-serif">{001}∧{010}≈90°</text>
+      <text x="255" y="140" font-size="11.5" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">部分切面</text>
+      <text x="255" y="158" font-size="11.5" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">只见一组</text>
+      <text x="163" y="286" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">表面弥漫浅褐色土状浑浊＝高岭石化（钾长石标志性表观）</text>
+      <text x="163" y="304" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">板柱状半自形~他形 · 0.5~2 mm · 局部解理缝见绢云母细鳞片</text>
+    </g>
+    <!-- 分隔线 -->
+    <line x1="440" y1="30" x2="440" y2="320" stroke="#D8E2E4" stroke-width="1"/>
+    <!-- 右：贝克线方向相反 -->
+    <g>
+      <rect x="470" y="42" width="380" height="250" rx="8" fill="#FDFDFD" stroke="#D8E2E4"/>
+      <text x="660" y="30" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">② 微升镜筒：与相邻石英贝克线方向相反</text>
+      <text x="560" y="66" font-size="11.5" fill="#8A7A5C" font-weight="bold" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">正长石（N≈1.52）</text>
+      <polygon points="500,80 610,75 620,200 505,205" fill="#F5EFE6" stroke="#8A7A5C" stroke-width="1.8"/>
+      <circle cx="530" cy="100" r="2" fill="#C9B99A"/>
+      <circle cx="560" cy="92" r="2" fill="#C9B99A"/>
+      <circle cx="590" cy="105" r="2" fill="#C9B99A"/>
+      <circle cx="545" cy="125" r="2" fill="#C9B99A"/>
+      <circle cx="575" cy="140" r="2" fill="#C9B99A"/>
+      <circle cx="540" cy="160" r="2" fill="#C9B99A"/>
+      <circle cx="590" cy="170" r="2" fill="#C9B99A"/>
+      <circle cx="560" cy="185" r="2" fill="#C9B99A"/>
+      <path d="M 620,140 L 648,140" stroke="#B3402E" stroke-width="2.2" marker-end="url(#orA2)"/>
+      <text x="560" y="228" font-size="11.5" fill="#B3402E" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">亮带外移 → 移向树胶</text>
+      <text x="760" y="66" font-size="11.5" fill="#2C6E75" font-weight="bold" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">石英（N≈1.55）</text>
+      <polygon points="700,80 810,75 820,200 705,205" fill="#F2F7F7" stroke="#B9C8CC" stroke-width="1.8"/>
+      <path d="M 672,140 L 700,140" stroke="#2C6E75" stroke-width="2.2" marker-end="url(#orA1)"/>
+      <text x="760" y="228" font-size="11.5" fill="#2C6E75" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">亮带内移 → 移向石英</text>
+      <rect x="490" y="244" width="340" height="38" rx="7" fill="#FBF6E9" stroke="#8A6508" stroke-width="1.2"/>
+      <text x="660" y="268" font-size="12" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">∴ 正长石 N＜树胶（1.54）→ 负低突起（与石英方向相反）</text>
+      <text x="660" y="306" font-size="11.5" fill="#B3402E" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">同视域对比方向相反——正长石-石英相邻时最快的区分手段</text>
+    </g>
+  </svg>
+  <div class="fig-cap">"浑浊＋两组直角解理＋负低突起"是钾长石考场速判组合；与干净他形的石英同处一视域时，缩光圈微升镜筒看贝克线移动方向即可秒判两者，无需等待正交偏光确认。</div>
+</div>
+
+<!-- ===================== （一）单偏光 ===================== -->
+<h2 id="s1"><span class="step-tag">（一）</span>单偏光系统 —— 晶形、颜色、突起、解理</h2>
+
+<div class="table-wrap">
+  <p class="tbl-title">表 1&nbsp;单偏光系统记录（三段式）</p>
+  <table class="rwd-card">
+    <tbody>
+      <tr><th scope="row">晶形</th><td><span class="op">操作</span>10× 扫视全片找浅色粗颗粒；40× 观察轮廓、表面与解理。<br><span class="op">现象</span><span class="why">∵</span>板状~柱状半自形晶（0.5~2 mm），部分充填于其他颗粒间呈他形；轮廓较平直；表面弥漫<strong>浅褐色土状浑浊</strong>（高岭石化）。<br><span class="op">结论</span><span class="thus">∴</span>板柱状半自形~他形；表面浑浊为次生高岭土化——<strong>钾长石标志性表观</strong>。</td></tr>
+      <tr><th scope="row">颜色与多色性</th><td><span class="op">操作</span>单偏光转物台 360° 观察颜色与浓淡。<br><span class="op">现象</span><span class="why">∵</span>基性无色，因蚀变呈浅褐土色；转动载物台浓淡不变。<br><span class="op">结论</span><span class="thus">∴</span><strong>无色（蚀变染褐）、无多色性</strong>。</td></tr>
+      <tr><th scope="row">突起与贝克线</th><td><span class="op">操作</span>缩小光圈微升镜筒；与旁侧干净他形粒状矿物（石英）对比贝克线移动方向。<br><span class="op">现象</span><span class="why">∵</span>表面光滑、边缘细而清晰；贝克线<strong>移向树胶</strong>——同时相邻石英颗粒贝克线移向石英侧，两者方向相反。<br><span class="op">结论</span><span class="thus">∴</span>N＜树胶（1.54）→ <strong>负低突起</strong>（Np 1.518~Ng 1.526）；贝克线方向相反是正长石-石英相邻时最快的区分手段。</td></tr>
+      <tr><th scope="row">解理</th><td><span class="op">操作</span>40× 逐颗粒找平直成组解理缝。<br><span class="op">现象</span><span class="why">∵</span><strong>两组平直完全解理缝，交角约 90°</strong>（分别平行{001}与{010}）；部分切面只见一组。<br><span class="op">结论</span><span class="thus">∴</span>{001}、{010} 两组完全解理交角 90°——长石族解理特征。</td></tr>
+      <tr><th scope="row">糙面 · 蚀变 · 包裹体</th><td><span class="op">操作</span>单偏光＋正交偏光检查颗粒内部与解理缝。<br><span class="op">现象</span><span class="why">∵</span>表面弥漫高岭土化浑浊；局部见细小鳞片沿解理缝分布（绢云母化）；无特征包裹体。<br><span class="op">结论</span><span class="thus">∴</span><strong>高岭石化为主、局部绢云母化</strong>——钾长石典型蚀变组合，如实记入蚀变项。</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===================== （二）正交偏光 ===================== -->
+<h2 id="s2"><span class="step-tag">（二）</span>正交偏光系统 —— 消光、干涉色、延性、双晶</h2>
+
+<div class="table-wrap">
+  <p class="tbl-title">表 2&nbsp;正交偏光系统记录（三段式）</p>
+  <table class="rwd-card">
+    <tbody>
+      <tr><th scope="row">消光类型</th><td><span class="op">操作</span>正交偏光转物台 360°，选解理缝清晰的切面观察。<br><span class="op">现象</span><span class="why">∵</span>非全消光；解理缝平行十字丝时<strong>尚未消光</strong>，再转一小角度方消光——斜消光，消光角小。<br><span class="op">结论</span><span class="thus">∴</span><strong>小角度斜消光</strong>（近于平行消光~十余度，随切面方位而异）——单斜晶系钾长石特征。</td></tr>
+      <tr><th scope="row">消光角</th><td><span class="op">操作</span>解理缝平行纵十字丝记 0°，转至消光读角；换 3~5 个切面重复。<br><span class="op">现象</span><span class="why">∵</span>各切面消光角均小（约 5°~15°，方位不同而异）。<br><span class="op">结论</span><span class="thus">∴</span>消光角小——与斜长石（消光角随牌号增大）、普通角闪石（柱面消光角 12°~25°）对比可感知差异；精确值不作定名依据。</td></tr>
+      <tr><th scope="row">最高干涉色与级序</th><td><span class="op">操作</span>正交偏光全片搜索干涉色最高颗粒。<br><span class="op">现象</span><span class="why">∵</span>最高<strong>一级灰白</strong>，无鲜艳色带；与石英同级。<br><span class="op">结论</span><span class="thus">∴</span>Δ≈0.008 → 一级灰白——与石英的区分须靠解理＋双晶＋突起＋轴性，而非干涉色。</td></tr>
+      <tr><th scope="row">延性符号</th><td><span class="op">操作</span>选柱状切面转 45° 位插石膏试板。<br><span class="op">现象</span><span class="why">∵</span>不同切面升降色反应不一。<br><span class="op">结论</span><span class="thus">∴</span><strong>延性可正可负（不作判据）</strong>——如实记录，不臆造单一符号（防御性记录）。</td></tr>
+      <tr><th scope="row">双晶</th><td><span class="op">操作</span>正交偏光逐颗粒转物台观察双晶。<br><span class="op">现象</span><span class="why">∵</span>部分颗粒见<strong>卡氏双晶</strong>——两单体以平直结合面（∥{010}）拼合，转物台两半轮流消光、消光位对称于结合面；其余颗粒无双晶。<br><span class="op">结论</span><span class="thus">∴</span>卡氏双晶<strong>常见而非必有</strong>——找不到双晶不能排除正长石；与斜长石聚片双晶（多条细密平行条带）形态截然不同。</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="fig">
+  <div class="fig-title">图 B&nbsp;卡氏双晶 × 聚片双晶对照、小角度斜消光的判定（示意）</div>
+  <svg viewBox="0 0 880 330" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="正长石卡氏双晶与斜长石聚片双晶对照及小角度斜消光判定示意">
+    <defs>
+      <marker id="orB1" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#2C6E75"/></marker>
+      <marker id="orB2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#B3402E"/></marker>
+    </defs>
+    <!-- 左：双晶对照 -->
+    <g>
+      <text x="215" y="40" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">① 卡氏双晶（正长石）× 聚片双晶（斜长石）</text>
+      <rect x="70" y="80" width="140" height="150" fill="#EAF3F3" stroke="#8A7A5C" stroke-width="1.6"/>
+      <rect x="140" y="80" width="70" height="150" fill="#9DBFD9" stroke="#8A7A5C" stroke-width="1.6"/>
+      <line x1="140" y1="80" x2="140" y2="230" stroke="#B3402E" stroke-width="2.4"/>
+      <text x="140" y="250" font-size="11.5" fill="#B3402E" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">平直结合面∥{010}</text>
+      <text x="140" y="268" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">两单体轮流消光</text>
+      <text x="140" y="286" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">消光位对称于结合面</text>
+      <text x="140" y="70" font-size="11.5" fill="#8A7A5C" text-anchor="middle" font-weight="bold" font-family="Microsoft YaHei, sans-serif">卡氏双晶</text>
+      <rect x="290" y="80" width="140" height="150" fill="#FDFDFD" stroke="#4E8A8F" stroke-width="1.6"/>
+      <rect x="304" y="84" width="18" height="142" fill="#EAF3F3"/>
+      <rect x="322" y="84" width="18" height="142" fill="#9DBFD9"/>
+      <rect x="340" y="84" width="18" height="142" fill="#EAF3F3"/>
+      <rect x="358" y="84" width="18" height="142" fill="#9DBFD9"/>
+      <rect x="376" y="84" width="18" height="142" fill="#EAF3F3"/>
+      <rect x="394" y="84" width="18" height="142" fill="#9DBFD9"/>
+      <text x="360" y="250" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">细密平行条带（一粒 5 条以上）</text>
+      <text x="360" y="268" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">转物台条带轮流明暗交替</text>
+      <text x="360" y="70" font-size="11.5" fill="#2C6E75" text-anchor="middle" font-weight="bold" font-family="Microsoft YaHei, sans-serif">聚片双晶（对照）</text>
+      <text x="215" y="308" font-size="11.5" fill="#B3402E" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">一条粗结合面 × 一排细条带——形态截然不同</text>
+    </g>
+    <!-- 分隔线 -->
+    <line x1="440" y1="30" x2="440" y2="316" stroke="#D8E2E4" stroke-width="1"/>
+    <!-- 右：小角度斜消光 -->
+    <g>
+      <text x="660" y="40" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">② 小角度斜消光：解理缝∥十字丝时未消光</text>
+      <circle cx="660" cy="150" r="88" fill="#EAF3F3" stroke="#64787F" stroke-width="2"/>
+      <line x1="660" y1="62" x2="660" y2="238" stroke="#64787F" stroke-width="1.4" stroke-dasharray="6 5"/>
+      <line x1="572" y1="150" x2="748" y2="150" stroke="#64787F" stroke-width="1.4" stroke-dasharray="6 5"/>
+      <line x1="648" y1="66" x2="648" y2="234" stroke="#2C6E75" stroke-width="2.4"/>
+      <line x1="680" y1="72" x2="698" y2="228" stroke="#B3402E" stroke-width="1.6" stroke-dasharray="7 5"/>
+      <text x="636" y="98" font-size="11" fill="#2C6E75" text-anchor="end" font-family="Microsoft YaHei, sans-serif">解理缝∥纵十字丝</text>
+      <text x="700" y="98" font-size="11" fill="#B3402E" font-family="Microsoft YaHei, sans-serif">消光位</text>
+      <path d="M 652,92 A 60 60 0 0 1 686,96" fill="none" stroke="#B3402E" stroke-width="1.6" marker-end="url(#orB2)"/>
+      <text x="660" y="172" font-size="12" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">此时仍亮（未消光）</text>
+      <text x="660" y="192" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">再转一小角度（5°~15°）方消光</text>
+      <rect x="490" y="252" width="340" height="38" rx="7" fill="#FBF6E9" stroke="#8A6508" stroke-width="1.2"/>
+      <text x="660" y="276" font-size="12" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">∴ 小角度斜消光——单斜晶系钾长石（角闪石柱面 12°~25°）</text>
+      <text x="660" y="308" font-size="11.5" fill="#B3402E" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">卡氏双晶没有时不要硬找——单晶正长石常见，靠其余特征链定名</text>
+    </g>
+  </svg>
+  <div class="fig-cap">卡氏双晶与聚片双晶是钾长石-斜长石分野的第一判据；斜消光角度小是单斜钾长石的品格——记录时写"随切面方位而异、精确值不作定名依据"，体现测量而非背数的作答意识。</div>
+</div>
+
+<!-- ===================== （三）锥光 ===================== -->
+<h2 id="s3"><span class="step-tag">（三）</span>锥光系统 —— 轴性、光性符号、2V</h2>
+
+<div class="table-wrap">
+  <p class="tbl-title">表 3&nbsp;锥光系统记录（三段式）</p>
+  <table class="rwd-card">
+    <tbody>
+      <tr><th scope="row">干涉图</th><td><span class="op">操作</span>40×＋勃氏镜＋聚光镜，选干涉色中等颗粒观察。<br><span class="op">现象</span><span class="why">∵</span>黑十字分裂为两条弯曲黑臂，<strong>双曲臂顶点间距宽、光轴点靠近视域边缘</strong>。<br><span class="op">结论</span><span class="thus">∴</span>二轴晶，2V 大（黑臂分得开）。</td></tr>
+      <tr><th scope="row">轴性与光性符号</th><td><span class="op">操作</span>45° 位插石膏试板，观察双曲臂凹凸两侧色变。<br><span class="op">现象</span><span class="why">∵</span>双曲臂<strong>凹侧（顶点间）变蓝、凸侧变黄</strong>。<br><span class="op">结论</span><span class="thus">∴</span>Bxa=Np → <strong>二轴晶负光性（−）</strong>。</td></tr>
+      <tr><th scope="row">2V（估计）</th><td><span class="op">操作</span>由双曲臂顶点间距（光轴点位置）估计。<br><span class="op">现象</span><span class="why">∵</span>光轴点位于视域边缘内侧，顶点距大。<br><span class="op">结论</span><span class="thus">∴</span>2V <strong>大，约 60°~80°</strong>——与微斜长石（更大）和透长石（很小）区分的参考量。</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="fig">
+  <div class="fig-title">图 C&nbsp;2V 大干涉图、凹侧变蓝判负光性 · 钾长石三兄弟 2V 排队</div>
+  <svg viewBox="0 0 880 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="正长石二轴晶2V大干涉图凹侧变蓝判定负光性与钾长石2V对比">
+    <defs>
+      <marker id="orC1" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#2C6E75"/></marker>
+    </defs>
+    <!-- 左：2V大干涉图 -->
+    <g>
+      <circle cx="160" cy="140" r="110" fill="#FDFDFD" stroke="#64787F" stroke-width="2"/>
+      <path d="M 90,42 C 102,90 102,190 90,238" fill="none" stroke="#1D2B30" stroke-width="12"/>
+      <path d="M 230,42 C 218,90 218,190 230,238" fill="none" stroke="#1D2B30" stroke-width="12"/>
+      <circle cx="92" cy="140" r="5" fill="#B3402E"/>
+      <circle cx="228" cy="140" r="5" fill="#B3402E"/>
+      <text x="92" y="122" font-size="11" fill="#B3402E" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">光轴点</text>
+      <text x="228" y="122" font-size="11" fill="#B3402E" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">光轴点</text>
+      <text x="160" y="282" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">① 黑十字分裂 → 二轴晶</text>
+      <text x="160" y="302" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">顶点间距宽 · 光轴点近视域边缘 → 2V 大</text>
+    </g>
+    <!-- 中：光性判读 -->
+    <g>
+      <text x="460" y="56" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">② 45° 位插石膏板：凹凸两侧色变</text>
+      <circle cx="460" cy="150" r="95" fill="#FDFDFD" stroke="#64787F" stroke-width="2"/>
+      <ellipse cx="460" cy="150" rx="42" ry="62" fill="#7FA8C9" fill-opacity="0.55"/>
+      <ellipse cx="384" cy="150" rx="20" ry="52" fill="#E8C55A" fill-opacity="0.6"/>
+      <ellipse cx="536" cy="150" rx="20" ry="52" fill="#E8C55A" fill-opacity="0.6"/>
+      <path d="M 408,72 C 422,105 422,195 408,228" fill="none" stroke="#1D2B30" stroke-width="10"/>
+      <path d="M 512,72 C 498,105 498,195 512,228" fill="none" stroke="#1D2B30" stroke-width="10"/>
+      <circle cx="409" cy="150" r="4.5" fill="#B3402E"/>
+      <circle cx="511" cy="150" r="4.5" fill="#B3402E"/>
+      <text x="460" y="152" font-size="11.5" font-weight="bold" fill="#1F4E66" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">凹侧</text>
+      <text x="460" y="170" font-size="11.5" font-weight="bold" fill="#1F4E66" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">变蓝</text>
+      <text x="372" y="110" font-size="11.5" font-weight="bold" fill="#8A6508" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">凸侧变黄</text>
+      <text x="548" y="110" font-size="11.5" font-weight="bold" fill="#8A6508" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">凸侧变黄</text>
+      <text x="460" y="266" font-size="12.5" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">凹侧（顶点间，Bxa 区）变蓝</text>
+      <text x="460" y="286" font-size="12.5" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">→ Bxa=Np</text>
+      <text x="460" y="306" font-size="13" font-weight="bold" fill="#2C6E75" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">∴ 二轴晶，负光性（−）</text>
+    </g>
+    <!-- 右：2V排队 -->
+    <g>
+      <text x="755" y="56" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">③ 钾长石三兄弟 2V 排队</text>
+      <circle cx="680" cy="130" r="40" fill="#FDFDFD" stroke="#64787F" stroke-width="1.6"/>
+      <path d="M 668,94 C 672,110 672,150 668,166" fill="none" stroke="#1D2B30" stroke-width="7"/>
+      <path d="M 692,94 C 688,110 688,150 692,166" fill="none" stroke="#1D2B30" stroke-width="7"/>
+      <circle cx="673" cy="130" r="3" fill="#B3402E"/>
+      <circle cx="687" cy="130" r="3" fill="#B3402E"/>
+      <text x="680" y="190" font-size="11" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">透长石</text>
+      <text x="680" y="206" font-size="11" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">2V 很小</text>
+      <circle cx="755" cy="130" r="40" fill="#FDFDFD" stroke="#2C6E75" stroke-width="2.6"/>
+      <path d="M 731,96 C 738,112 738,148 731,164" fill="none" stroke="#1D2B30" stroke-width="7"/>
+      <path d="M 779,96 C 772,112 772,148 779,164" fill="none" stroke="#1D2B30" stroke-width="7"/>
+      <circle cx="734" cy="130" r="3" fill="#B3402E"/>
+      <circle cx="776" cy="130" r="3" fill="#B3402E"/>
+      <rect x="722" y="72" width="66" height="20" rx="10" fill="#2C6E75"/>
+      <text x="755" y="86" font-size="11" font-weight="bold" fill="#FFFFFF" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">本例 60°~80°</text>
+      <text x="755" y="190" font-size="11" font-weight="bold" fill="#2C6E75" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">正长石</text>
+      <text x="755" y="206" font-size="11" font-weight="bold" fill="#2C6E75" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">2V 大</text>
+      <circle cx="830" cy="130" r="40" fill="#FDFDFD" stroke="#64787F" stroke-width="1.6"/>
+      <path d="M 806,98 C 816,112 816,148 806,162" fill="none" stroke="#1D2B30" stroke-width="7"/>
+      <path d="M 854,98 C 844,112 844,148 854,162" fill="none" stroke="#1D2B30" stroke-width="7"/>
+      <circle cx="810" cy="130" r="3" fill="#B3402E"/>
+      <circle cx="849" cy="130" r="3" fill="#B3402E"/>
+      <text x="830" y="190" font-size="11" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">微斜长石</text>
+      <text x="830" y="206" font-size="11" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">2V 更大</text>
+      <text x="755" y="240" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">由双曲臂顶点间距估计 2V</text>
+      <text x="755" y="260" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">光轴点越靠边、臂越近直 → 2V 越大</text>
+      <text x="755" y="288" font-size="11.5" fill="#B3402E" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">微斜长石另见"格子状双晶"速判</text>
+      <text x="755" y="306" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">（本片未见，不展开）</text>
+    </g>
+    <!-- 推理链 -->
+    <rect x="20" y="324" width="840" height="58" rx="8" fill="#EAF3F3" stroke="#2C6E75" stroke-width="1.2"/>
+    <text x="440" y="347" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">推理链：黑十字分裂为双曲臂 → 二轴晶；凹侧（顶点间，Bxa 区）变蓝 → Bxa=Np</text>
+    <text x="440" y="370" font-size="13.5" font-weight="bold" fill="#2C6E75" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">结论：二轴晶，负光性（−），2V 大（约 60°~80°）——"浑浊+直角解理+负低突起+卡氏双晶"锁定正长石</text>
+  </svg>
+  <div class="fig-cap">凹侧变蓝=负光性是二轴晶判读口诀的正用；2V 排队把透长石-正长石-微斜长石串成一线——考场遇到钾长石，先估 2V 再找格子双晶，定名链条即完整。</div>
+</div>
+
+<!-- ===================== （四）汇总 ===================== -->
+<h2 id="s4"><span class="step-tag">（四）</span>综合以上各点写出鉴定结果（11 项）</h2>
+
+<div class="table-wrap">
+  <p class="tbl-title">表 4&nbsp;正长石系统鉴定结果汇总</p>
+  <table class="rwd-card">
+    <thead>
+      <tr><th style="width:44px">序号</th><th style="width:180px">项目</th><th>测定结果</th><th style="width:110px">测定系统</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>晶形</td><td>板状~柱状半自形~他形（0.5~2 mm），表面高岭石化土状浑浊</td><td>单偏光</td></tr>
+      <tr><td>2</td><td>解理（组数、等级）</td><td><strong>{001}、{010} 两组完全解理</strong></td><td>单偏光</td></tr>
+      <tr><td>3</td><td>解理夹角</td><td>约 90°</td><td>单偏光</td></tr>
+      <tr><td>4</td><td>多色性和吸收性公式</td><td>无色（蚀变染褐）、无多色性</td><td>单偏光</td></tr>
+      <tr><td>5</td><td>突起等级</td><td><strong>负低突起</strong>（Np 1.518~Ng 1.526；贝克线移向树胶，与相邻石英相反）</td><td>单偏光</td></tr>
+      <tr><td>6</td><td>最高干涉色</td><td>一级灰白（Δ≈0.008，与石英同级）</td><td>正交偏光</td></tr>
+      <tr><td>7</td><td>消光类型</td><td><strong>斜消光（小角度）</strong>，随切面方位而异</td><td>正交偏光</td></tr>
+      <tr><td>8</td><td>消光角</td><td>小（约 5°~15°；精确值不作定名依据）</td><td>正交偏光</td></tr>
+      <tr><td>9</td><td>延性符号</td><td>可正可负（不作判据）——如实记录</td><td>正交偏光</td></tr>
+      <tr><td>10</td><td>轴性</td><td><strong>二轴晶</strong>（黑十字分裂为双曲臂）</td><td>锥光</td></tr>
+      <tr><td>11</td><td>光性符号</td><td><strong>负光性（−）</strong>（凹侧变蓝，Bxa=Np）；2V 大（约 60°~80°）</td><td>锥光</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="sum-final">定名：<strong>正长石（Orthoclase，钾长石族）</strong><br><span style="font-size:13px; font-weight:400; color:#3D5158;">依据链：板柱状半自形~他形＋表面浑浊（高岭石化）· 负低突起（贝克线移向树胶，与石英相反）· 两组完全解理交角 90° · 一级灰白＋小角度斜消光 · 卡氏双晶或无双晶 · 二轴晶（−）2V 大（60°~80°）</span></div>
+
+<p class="note"><strong>与手册的对应</strong>：本记录与《晶体光学与岩矿镜下鉴定知识手册》7.5 记录十内容同源；正长石系统背景与易混对照见手册第五章，与斜长石区分三件套见记录十一"记录要点"，光性参数见手册 8.1 基础矿物光性速查总表。按定向切面组织的作答范本见<a href="hornblende-systematic-id.html">普通角闪石全记录</a>；返回<a href="mineral-microscopy-handbook.html">知识手册</a>。</p>
+
+<footer>晶体光学与岩矿镜下鉴定 · 实操记录系列 · 2026-10-12 制作 &nbsp;|&nbsp; 光学常数与《晶体光学》通行教材及手册核定值逐项核对一致</footer>
+
+</div>
+</body>
+</html>

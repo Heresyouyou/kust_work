@@ -19,12 +19,16 @@
 import logging
 
 from .archive import init_archive
+from .geokb_admin import init_geokb_admin
+from .geokb_public import init_geokb_public
 from .journals import init_journals
 from .news import init_news
+from .notes import init_notes
 from .palette import init_palette
 from .queue import init_queue
 from .reader import init_reader
 from .share import init_share
+from .software import init_software
 from .stitch import init_stitch
 from .story import init_story
 from .tasks import init_tasks
@@ -43,11 +47,15 @@ _MODULES = [
     ('科研配色', init_palette, False),
     ('三角计算', init_triangle, False),
     ('任务打卡', init_tasks, False),
+    ('笔记整理', init_notes, False),
     ('图像拼合', init_stitch, False),
     ('汇报说明书', init_story, False),
+    ('知识库浏览', init_geokb_public, False),
+    ('知识库管理', init_geokb_admin, False),
     ('任务队列', init_queue, True),
     ('PDF 阅读器', init_reader, False),
     ('内网共享', init_share, False),
+    ('常用软件', init_software, False),
 ]
 
 

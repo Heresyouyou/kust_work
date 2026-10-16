@@ -23,6 +23,7 @@
 web_app.py 的 RETENTION_SECONDS。若保留期短于 ARCHIVE_WINDOW_HOURS，
 窗口内自然会是空的 —— 两者必须一起调。
 """
+import os
 import re
 import time
 from pathlib import Path
@@ -38,6 +39,34 @@ _TEMPLATE = Path(__file__).parent / 'templates' / 'archive.html'
 
 # 展示窗口：只看最近 48 小时的文件（需与 web_app.py 的 RETENTION_SECONDS 匹配）
 ARCHIVE_WINDOW_HOURS = 48
+
+# 「对外入口」——下载按钮用它生成绝对地址。相对路径从别人机器上看就是「本机」，
+# 分享出去就废了（与 modules/stitch 同一约定）。
+# ★ 2026-10-10 起**跟随用户实际访问协议**：https 访问生成 https 链接，http 访问生成 http
+#   链接（http 环境混入 https 链接会打不开）。协议取自 X-Forwarded-Proto（见 ProxyFix）；
+#   无请求上下文时默认 https://kust.work。
+# 可用环境变量 PUBLIC_BASE 固定覆盖，设成空串则退回相对路径。
+_ENV_PUBLIC_BASE = os.environ.get('PUBLIC_BASE')  # None = 未设 → 跟随当前请求
+
+
+def _public_base() -> str:
+    """当前请求的对外入口（scheme 跟随实际访问协议）；无请求上下文时默认 https。"""
+    if _ENV_PUBLIC_BASE is not None:
+        return _ENV_PUBLIC_BASE.strip().rstrip('/')
+    try:
+        return request.host_url.rstrip('/')
+    except Exception:
+        return 'https://kust.work'
+
+
+def _dl_url(path: str) -> str:
+    """把相对资源路径套成对外绝对地址 + ?dl=1 强制附件下载。
+
+    PUBLIC_BASE 为空串时退回相对路径（但仍带 ?dl=1，靠本机服务端 as_attachment 下载）。
+    """
+    base = _public_base()
+    base = (base + path) if base else path
+    return base + '?dl=1'
 
 # 单次最多返回的论文数
 _LIMIT = 300
@@ -117,6 +146,8 @@ def _scan_variant(variant):
                 'size': st.st_size,
                 'mtime': st.st_mtime,
                 'url': '%s/%s' % (url_prefix, quote(p.name)),
+                # 下载按钮用绝对地址（NAS 对外入口），相对路径分享无效
+                'dl_url': _dl_url('%s/%s' % (url_prefix, quote(p.name))),
             })
     except OSError:
         return []
@@ -164,6 +195,7 @@ def _papers():
                 'size': f['size'] if f else 0,
                 'mtime': f['mtime'] if f else 0,
                 'url': f['url'] if f else None,
+                'dl_url': f['dl_url'] if f else None,
             })
         # 「在线阅读」直接进入阅读器双栏同步：必须有原文；优先中文，退路双语。
         # URL 由前端在渲染时拼，这里只把双 URL 给出来；缺译文就退单栏。

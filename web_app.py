@@ -1,4 +1,4 @@
-﻿"""
+"""
 GeoTranslate Web v4 — 原生 iframe PDF + 云端 DeepSeek / 本地 llama.cpp 双引擎翻译
 启动: py -3.12 web_app.py
 打开: http://127.0.0.1:5555
@@ -11,10 +11,33 @@ import os as _os_early
 _os_early.environ['OPENCV_OPENCL_RUNTIME'] = 'disabled'
 _os_early.environ['OPENCV_OPENCL_DEVICE'] = 'disabled'
 
+# ═══════════════════════════════════════════════════════════
+# 原生崩溃取证 —— 必须早于 onnxruntime / torch / cv2 加载
+# 2026-09-29：翻译跑到约 2 分钟时进程被 NVIDIA 用户态驱动带走。
+#   WER 报告：故障模块 nvwgf2umx.dll / 异常码 c0000005(访问违规) / 偏移 0x12a9d7
+#              （2026-09-28 10:28 的崩溃是同签名，两处逐字段一致）
+# 原生崩溃不产生 Python traceback，日志只是「凭空断掉」，事后完全无从定位 ——
+# 这正是本次排查绕远路的原因。faulthandler 在 Windows 上会接管访问违规等 Win32
+# 异常，把**崩溃当时的 Python 调用栈**落盘，是唯一能把「哪个 Python 调用踩到驱动」
+# 钉死的手段。
+# 单独落一个文件（不混进 flask.out.log）：stdout 重定向到文件时是块缓冲，
+# 崩溃瞬间缓冲区里的内容会整段丢失，取证不能用它。
+# ═══════════════════════════════════════════════════════════
+try:
+    import faulthandler as _fh
+    _fh_dir = _os_early.path.join(_os_early.path.dirname(
+        _os_early.path.abspath(__file__)), 'logs')
+    _os_early.makedirs(_fh_dir, exist_ok=True)
+    _fh_file = open(_os_early.path.join(_fh_dir, 'faulthandler.log'),
+                    'a', encoding='utf-8', buffering=1)   # 行缓冲，崩溃不丢现场
+    _fh.enable(file=_fh_file, all_threads=True)
+except Exception:
+    pass
+
 import os, sys, time, json, uuid, threading, logging, subprocess, shutil, glob, math, re
 from pathlib import Path
 from queue import Queue
-from flask import Flask, request, jsonify, send_from_directory, render_template_string, Response
+from flask import Flask, request, jsonify, send_from_directory, render_template_string, Response, redirect
 
 # ── 日志（★ 必须最先初始化）──
 # 下面的可选依赖（bilingual / nas_archive）在自己的 except 分支里就要用 logger,
@@ -48,6 +71,32 @@ except Exception as _nas_e:
 BASE = Path(__file__).parent.resolve()
 UPLOAD_DIR = BASE / 'uploads'
 TRANSLATED_DIR = BASE / 'translated'
+
+# 「对外入口」——队列下载按钮用它生成绝对地址（相对路径从别人机器上看就是「本机」，
+# 分享出去就废了）。与 modules/stitch、modules/archive 同一约定。
+# ★ 2026-10-10 起**跟随用户实际访问协议**：https 访问就生成 https 链接，http 访问就生成
+#   http 链接（否则 http 环境下混入 https 链接会打不开）。协议取自 X-Forwarded-Proto
+#   （见 ProxyFix）；无请求上下文（后台任务/离线）时默认 https://kust.work。
+# 可用环境变量 PUBLIC_BASE 固定覆盖，设成空串则退回相对路径。
+_ENV_PUBLIC_BASE = os.environ.get('PUBLIC_BASE')  # None = 未设 → 跟随当前请求
+
+
+def _public_base():
+    """当前请求的对外入口（scheme 跟随实际访问协议）；无请求上下文时默认 https。"""
+    if _ENV_PUBLIC_BASE is not None:
+        return _ENV_PUBLIC_BASE.strip().rstrip('/')
+    try:
+        return request.host_url.rstrip('/')
+    except Exception:
+        return 'https://kust.work'
+
+
+def _public_dl(path):
+    """相对资源路径 → 绝对下载地址（对外入口 + ?dl=1 强制附件下载）。"""
+    if not path:
+        return None
+    base = _public_base()
+    return (base + path if base else path) + '?dl=1'
 
 # ── 双语拼接版模式: lr=左右对照 / tb=上下对照 / alt=逐页交替 ──
 # 改这里即可全局切换，无需动其它代码
@@ -163,16 +212,67 @@ def _acquire_flask_lock():
     print(f'[锁] ✅ 拿锁成功 PID={os.getpid()} port={PORT}')
     return True
 
-# ── onnxruntime: DML 优先 + CPU fallback (GPU 加速 DocLayout-YOLO) ──
+# ── onnxruntime provider：DocLayout-YOLO 走哪个后端 ──
+# ★ 2026-09-29：默认从「DML 优先」改为 **CPU**。
+#   证据：全项目只有 DocLayout-YOLO 一处经 onnxruntime 走 DirectML
+#   （→ D3D12 → nvwgf2umx.dll），而 09-28 / 09-29 两次原生崩溃的故障模块
+#   正是这个 NVIDIA 用户态驱动，且异常码与偏移逐字段相同。
+#   翻译引擎已是云端 DeepSeek（零 GPU），整条翻译链路本就不需要显卡 ⇒
+#   用 CPU 跑版式检测（每篇多花十秒量级）换掉一条会把整个进程带崩、
+#   而且崩了连 Python 栈都留不下的驱动路径。
+#   恢复旧行为（DML 优先）：设环境变量 ORT_PROVIDER=dml 后重启。
+_ORT_PROVIDER = (os.environ.get('ORT_PROVIDER') or 'cpu').strip().lower()
 try:
     import onnxruntime as _ort
     _real_providers = _ort.get_available_providers()
-    if 'DmlExecutionProvider' in _real_providers:
+    if _ORT_PROVIDER == 'dml' and 'DmlExecutionProvider' in _real_providers:
         _ort.get_available_providers = lambda: ['DmlExecutionProvider', 'CPUExecutionProvider']
-    elif 'CUDAExecutionProvider' in _real_providers:
-        _ort.get_available_providers = lambda: ['CPUExecutionProvider']  # 避开 CUDA 801 错误
-except Exception:
-    pass
+    else:
+        # babeldoc 的 DocLayoutModel 只认 dml|cuda|cpu 三类（doclayout.py:114-122），
+        # 所以「只报 CPU」= 彻底不走 GPU，同时也不会误落到有 801 错误的 CUDA。
+        _ort.get_available_providers = lambda: ['CPUExecutionProvider']
+    print('[ORT] DocLayout provider = %s  (ORT_PROVIDER=%s, 实测可用 %s)'
+          % (_ort.get_available_providers(), _ORT_PROVIDER, _real_providers), flush=True)
+except Exception as _e:
+    print('[ORT] provider 设定失败（用库默认值）: %s' % _e, flush=True)
+
+# ── onnxruntime CPU EP 自旋等待：必须关掉（2026-09-29 根因修复）──
+# 现象：翻译能进队列，但 Parse Page Layout 阶段进度条长时间不动。
+#   _babel_callback.log 实测该阶段 28 页耗时 218.0s（7.79s/页），
+#   而同模型单页正常只要 0.48s ⇒ 慢了 17×。
+#
+# 实测根因（i7-13620H / 16 逻辑核 / ORT 1.24.4 / CPU EP）：
+#   session.intra_op.allow_spinning 默认为 1（自旋等待）。连续推理到第 12~13 次时
+#   单页耗时从 0.48s 断崖劣化到 7~9s 并**不再恢复**：
+#     [predict] #1~#4  = 0.47~0.49s
+#     [predict] #5~#28 = 7.07~9.26s   （累计 203.6s）
+#   纯独立脚本跑满 28 页同样复现（p1~p12 0.48s / p13~p28 7.04~9.75s），
+#   主线程栈确认卡在 onnxruntime_inference_collection.py:296 run 内部
+#   ⇒ 与 pdf 内容、与 BabelDOC 逻辑无关，就是 ORT 的线程自旋调度问题。
+#   设 allow_spinning='0' 后断崖消失（24/24 稳定，总耗时 26.5s）。
+#
+# 挂载点说明：babeldoc/docvision/doclayout.py:123 建 session 时只传了 providers，
+#   没有传 SessionOptions，因此无法从配置层关闭。这里包一层 InferenceSession，
+#   在没显式传 options 时补上（显式传了的调用方不受影响）。
+try:
+    import onnxruntime as _ort
+    if not getattr(_ort.InferenceSession, '_geotranslate_nospin', False):
+        _RealInferenceSession = _ort.InferenceSession
+
+        class _NoSpinInferenceSession(_RealInferenceSession):
+            _geotranslate_nospin = True
+
+            def __init__(self, path_or_bytes, sess_options=None, **kwargs):
+                if sess_options is None:
+                    sess_options = _ort.SessionOptions()
+                    sess_options.add_session_config_entry(
+                        'session.intra_op.allow_spinning', '0')
+                super().__init__(path_or_bytes, sess_options, **kwargs)
+
+        _ort.InferenceSession = _NoSpinInferenceSession
+    print('[ORT] CPU EP allow_spinning=0 (已关自旋等待)', flush=True)
+except Exception as _e:
+    print('[ORT] allow_spinning 补丁失败: %s' % _e, flush=True)
 
 # ── 预加载全局资源 (只加载一次, 所有翻译复用) ──
 # DocLayout-YOLO (PyTorch CPU 推理, 每次加载 ~5s!)
@@ -212,6 +312,11 @@ TRANSLATED_DIR.mkdir(exist_ok=True)
 
 # ── Flask ──
 app = Flask(__name__, static_folder=None)
+# 反代（NAS apache :443 设 X-Forwarded-Proto=https，:80 为 http）后，Werkzeug 默认只看到
+# 内层 http。ProxyFix 让 request.scheme/host_url 反映用户**实际访问的协议与主机**，
+# 从而对外链接（下载/分享）自动与访问环境一致。
+from werkzeug.middleware.proxy_fix import ProxyFix
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 # 显微拼图需要一次上传上百张原图（2752×2208 JPEG 约 5MB/张，91 张已达 485MB）。
 # 200MB 会让「100 张拼图」在传输层就被 413 拒绝，因此放宽到 2GB。
 # 注意：这是 Flask 层限制，wsgi/waitress 与任何反向代理（NAS 上的 nginx）
@@ -462,6 +567,35 @@ def _set_cache(response):
         response.headers['Cache-Control'] = 'no-cache'
     return response
 
+# ── 校园网探测：已移至 http 阶段（见 tools/http_redirect.py）──
+# 原 https 公网入口的「图片探针」已移除。改由 open.kust.work 的 http 入口先出判定页：
+# 浏览器 no-cors fetch 昆工认证端点 <server-ip>:9090（仅校园网内可达, 公网 IP
+# 不触发 LNA 授权弹窗）判内网, 可达 → https://kust.work<path>；否则 → https://open.kust.work<path>。
+
+# ── https 入口静默识别（open.kust.work → 先弹到 http 判定阶段）──
+# 直接从 https://open.kust.work 进来的用户, 在 https 页面上探测不了 http 信标
+# (混合内容拦截, 且 <server-ip>:9090 无 TLS 可用), 无法静默判内网。故把
+# 「导航型 HTML 请求」先 302 弹到 http 判定阶段(tools/http_redirect.py:5080),
+# 由它静默探测 9090 后分流。http 判定层会回写 __sp=1 会话 cookie; 带 cookie 再
+# 回到 https 时直接放行, 避免 https↔http 死循环。
+# 仅拦导航请求(GET + Accept 含 text/html), API/子资源不受影响; 只认 Host
+# open.kust.work, 内网入口 kust.work / 其它主机不触发。
+@app.before_request
+def _open_kust_https_silent_probe():
+    if request.method != 'GET':
+        return None
+    if (request.host or '').split(':')[0].lower() != 'open.kust.work':
+        return None
+    if request.cookies.get('__sp') == '1':
+        return None
+    if 'text/html' not in (request.headers.get('Accept') or '').lower():
+        return None
+    target = 'http://open.kust.work' + request.full_path.rstrip('?')
+    resp = redirect(target, code=302)
+    resp.headers['Cache-Control'] = 'no-store'
+    return resp
+
+
 # ── 翻译页 ──
 # 根路径 / 已交给门户（portal 包）接管，翻译页退到 /translate。
 # ⚠️ 前端 index.html 的 4 处 fetch 与后端产出的 PDF URL 都是「根绝对路径」，
@@ -637,16 +771,31 @@ def api_upload():
             'path': str(save_path),
             'status': 'queued',
             'progress': 0,
+            'percent': 0,
+            'progress_log': [],
             'message': '等待中...',
             'created_at': now,
             'started_at': 0,
             'ended_at': 0,
             'elapsed': 0,
             'error': None,
+            'last_progress_at': now,
             'original_url': original_url,
             'mono_url': None,
             'dual_url': None,
+            # ⚠️ 2026-10-16 修复：本入口此前**绕过 submit_task 手写 jobs 字典**，
+            # 缺 kind/hard_timeout/stall_timeout/cancelable，导致：
+            #   ① 硬超时 fallback 固定 30min，38.8MB/5页超大文件必被误杀；
+            #   ② stall 阈值 None → 看门狗直接跳过（大页 PDF 下反倒是蒙对了）；
+            #   ③ cancelable 缺失 → /api/cancel 恒返回 409，用户无法中断。
+            # 这里补齐；阈值随后由 _on_progress 按 BabelDOC 的页数自适应放大。
+            'kind': KIND_TRANSLATE,
+            'display': '翻译',
+            'hard_timeout': TRANSLATE_HARD_TIMEOUT,
+            'stall_timeout': TRANSLATE_STALL_TIMEOUT,
+            'cancelable': True,
             'cancel_event': threading.Event(),  # ⚠️ 用户取消信号
+            '_payload': {'path': str(save_path), 'name': fname},
         }
 
     QUEUE.put(job_id)
@@ -718,7 +867,20 @@ def _queue_worker():
                 t = threading.Thread(target=_run_job_safely, args=(job_id,),
                                      daemon=True, name='job-' + job_id[:8])
                 t.start()
-                t.join(_hard)
+                # 分段 join 并**每轮重读** hard_timeout —— 让 _on_progress 里的
+                # 「按页数自适应放大」有机会生效（2026-10-16：38.8MB/5页文件
+                # 固定 30min 必被误杀）。分段粒度 30s，与原一次性 join 总时长一致。
+                _waited = 0.0
+                while t.is_alive():
+                    t.join(30)
+                    _waited += 30
+                    if not t.is_alive():
+                        break
+                    with jobs_lock:
+                        j = jobs.get(job_id) or {}
+                        _hard = j.get('hard_timeout') or TRANSLATE_HARD_TIMEOUT
+                    if _waited >= _hard:
+                        break
 
                 if t.is_alive():
                     logger.error('Job %s 硬超时 %.0f 分钟未完成 → 放弃，队列继续消费',
@@ -906,7 +1068,7 @@ def _run_translate(job_id):
         'output':    2.0,
     }
     _STAGE_TO_GROUP = {
-        'Parse PDF and Create IR':      'parse',
+        'Parse PDF and Create Intermediate Representation': 'parse',
         'DetectScannedFile':             'parse',
         'Parse Page Layout':             'parse',
         'Parse Table':                   'parse',
@@ -920,7 +1082,7 @@ def _run_translate(job_id):
         'Save PDF':                      'output',
     }
     _STAGE_CN = {
-        'Parse PDF and Create IR':      '解析PDF结构',
+        'Parse PDF and Create Intermediate Representation': '解析PDF结构',
         'DetectScannedFile':             '检测扫描件',
         'Parse Page Layout':             '页面布局识别',
         'Parse Table':                   '表格识别',
@@ -934,13 +1096,38 @@ def _run_translate(job_id):
         'Save PDF':                      '保存PDF',
     }
 
+    # ── 超大页 PDF 的 stall/hard 自适应预算（2026-10-16 根因修复）──
+    # BabelDOC 的 Parse 阶段按「页」advance（il_creater.py:306 on_page_end），
+    # 38.8MB/5页的扫描大图单页解析（pdfminer + DocLayout-YOLO CPU）实测 5-10 分钟，
+    # 页与页之间没有任何进度回调。固定 stall=10min 会在某页解析途中误发
+    # cancel_event，该页完成的瞬间 _babel_callback 抛 CancelError（任务被误杀）；
+    # 固定 hard=30min 对 5 页大文件（仅解析就 ~30min）也不够。
+    # 首次拿到页数（stage_total）时把阈值抬到「页数 × 每页预算」。
+    _PARSE_PAGE_STALL = 12 * 60   # 每页无进度容忍 12 分钟
+    _PARSE_PAGE_HARD = 15 * 60    # 每页总预算 15 分钟（仅 parse 部分）
+
+    # BabelDOC 官方 stage 权重（用于组内按权重分配，替代原「组内简单平均」）。
+    # 简单平均的坑：parse 组 6 个 stage，只完成第 1 个的 20% → 0.67 → int() → 0，
+    # 前端进度永远显示 0%，看起来像卡死（2026-10-16 用户报障即此症状）。
+    try:
+        from babeldoc.high_level import TRANSLATE_STAGES as _BABEL_STAGES
+        _STAGE_W = {name: float(w) for name, w in _BABEL_STAGES}
+    except Exception:
+        _STAGE_W = {}
+
+    _GROUP_STAGE_W = {}
+    for _g in _GROUP_WEIGHT:
+        _stgs = [s for s, grp in _STAGE_TO_GROUP.items() if grp == _g]
+        _w = {s: _STAGE_W.get(s, 1.0) for s in _stgs}
+        _tw = sum(_w.values()) or 1.0
+        _GROUP_STAGE_W[_g] = {s: v / _tw for s, v in _w.items()}
+
     def _calc_overall(sp):
         total = 0.0
         for g, gw in _GROUP_WEIGHT.items():
-            stgs = [s for s, grp in _STAGE_TO_GROUP.items() if grp == g]
-            gp = sum(sp.get(s, 0.0) for s in stgs) / max(len(stgs), 1) / 100.0
-            total += gp * gw
-        return int(total)
+            for s, w in _GROUP_STAGE_W[g].items():
+                total += w * (sp.get(s, 0.0) / 100.0) * gw
+        return round(total, 1)
 
     def _on_progress(overall_pct, stage, cur, tot, stage_prog=None):
         try:
@@ -962,6 +1149,17 @@ def _run_translate(job_id):
                 elif tot > 0:
                     j['stage_progresses'][stage] = min(100.0, float(cur) / tot * 100.0)
                 j['progress'] = max(j.get('progress', 0), _calc_overall(j['stage_progresses']))
+                j['percent'] = int(j['progress'])
+                # ── 超大页 PDF 自适应超时（2026-10-16 修复）──
+                # BabelDOC Parse 阶段的 stage_total 就是「需翻译的页数」，
+                # 首帧回调即可拿到。按页数抬升 stall/hard，避免长页解析途中被误杀。
+                if _STAGE_TO_GROUP.get(stage) == 'parse' and tot >= 2:
+                    _need_stall = tot * _PARSE_PAGE_STALL
+                    _need_hard = tot * _PARSE_PAGE_HARD
+                    if _need_stall > (j.get('stall_timeout') or 0):
+                        j['stall_timeout'] = _need_stall
+                    if _need_hard > (j.get('hard_timeout') or 0):
+                        j['hard_timeout'] = _need_hard
                 j['current_stage'] = stage
                 j['last_progress_at'] = time.time()   # 看门狗据此判定「无进度」
                 cn = _STAGE_CN.get(stage, stage)
@@ -1161,11 +1359,15 @@ def api_debug():
 # ── 静态文件 ──
 @app.route('/uploads/<path:f>')
 def serve_upload(f):
-    return send_from_directory(str(UPLOAD_DIR), f)
+    # ?dl=1 → 强制附件下载（Content-Disposition: attachment）。下载按钮与分享出去的
+    # 绝对链接都带它；不带则保持内联，供 /PDFreader 在线预览。
+    return send_from_directory(str(UPLOAD_DIR), f,
+                               as_attachment=bool(request.args.get('dl')))
 
 @app.route('/translated/<path:f>')
 def serve_output(f):
-    return send_from_directory(str(TRANSLATED_DIR), f)
+    return send_from_directory(str(TRANSLATED_DIR), f,
+                               as_attachment=bool(request.args.get('dl')))
 
 # ══════════════════════════════════════════════════════════════
 #  门户 + 功能模块注册（方案 B：模块化单体）
@@ -1189,7 +1391,8 @@ def _queue_snapshot():
     """
     _FIELDS = ('job_id', 'kind', 'display', 'name', 'status', 'progress',
                'percent', 'message', 'created_at', 'started_at', 'ended_at',
-               'elapsed', 'error', 'original_url', 'mono_url', 'dual_url')
+               'elapsed', 'error', 'original_url', 'mono_url', 'dual_url',
+               'result')
     try:
         with jobs_lock:
             items = [{k: j.get(k) for k in _FIELDS} for j in jobs.values()]
@@ -1205,6 +1408,15 @@ def _queue_snapshot():
         pc = it.get('percent')
         it['percent'] = round(float(pc), 1) if isinstance(pc, (int, float)) else 0.0
         it['display'] = it.get('display') or _KIND_LABEL.get(it.get('kind')) or '任务'
+        # 「产物指引」白名单化：模块（如拼合）会把成品图地址写进 job['result']。
+        # 只放前端真正要用的键 —— 模块实测往里塞过 4095 条逐对判据明细的 meta，
+        # 而 /api/queue 是 2s 一次的高频轮询，不能背上无关的大字段。
+        r = it.get('result')
+        it['result'] = ({k: r.get(k) for k in
+                         ('filename', 'url', 'download_url',
+                          'public_url', 'public_download_url',
+                          'size_kb', 'width', 'height')}
+                        if isinstance(r, dict) else None)
         # 排队位次只对「还在队列里没开跑」的任务有意义
         pos = 0
         if it.get('status') == 'queued':
@@ -1213,6 +1425,10 @@ def _queue_snapshot():
             except ValueError:
                 pos = 0
         it['queue_position'] = pos
+        # 三版本下载地址：绝对 NAS 对外入口 + 强制附件下载（相对路径分享出去无效）
+        it['original_dl_url'] = _public_dl(it.get('original_url'))
+        it['mono_dl_url'] = _public_dl(it.get('mono_url'))
+        it['dual_dl_url'] = _public_dl(it.get('dual_url'))
 
     st = {'queued': 0, 'translating': 0, 'done': 0, 'failed': 0, 'cancelled': 0}
     by_kind = {}
@@ -1303,9 +1519,15 @@ if __name__ == '__main__':
         # waitress 默认 max_request_body_size=1GiB，会在 Flask 之前拦掉大上传，
         # 与 MAX_CONTENT_LENGTH 对齐到 2GiB，否则「上传 100 张」仍失败。
         # channel_timeout 放宽：大体积 multipart 上传耗时远超默认 120s。
+        # ★ 必须关掉 waitress 的「清理不可信代理头」默认行为，否则 ProxyFix 失效：
+        #   waitress 3.x 默认 clear_untrusted_proxy_headers=True，在没配 trusted_proxy 时
+        #   会把 X-Forwarded-Proto/Host **全部删掉**，导致上面 ProxyFix 读不到、对外链接
+        #   （下载/分享）永远退回内层 http。本机 5555 仅由 NAS 反代 + 局域网访问，
+        #   关掉清理、交给 ProxyFix 处理即可（NAS :443 发 https、:80 发 http）。
         waitress.serve(app, host='0.0.0.0', port=PORT, threads=8,
                        max_request_body_size=2 * 1024 * 1024 * 1024,
-                       channel_timeout=600)
+                       channel_timeout=600,
+                       clear_untrusted_proxy_headers=False)
     except ImportError:
         print('[启动] Flask 内置 WSGI (建议 pip install waitress)')
         app.run(host='0.0.0.0', port=PORT, threaded=True, debug=False, use_reloader=False)

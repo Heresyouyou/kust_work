@@ -37,6 +37,9 @@ def init_portal(app, get_active=None):
     """
     _runtime['get_active'] = get_active
     app.register_blueprint(portal_bp)
+    # 公网入口统一身份认证门禁（内网入口自动放行）
+    from .cas_gate import init_cas_gate
+    init_cas_gate(app)
     # 打印注册结果，便于启动时肉眼确认入口数量
     total = sum(len(m) for _, m in get_groups())
     online = sum(1 for _, ms in get_groups() for m in ms if m.get('status') in ('online', 'beta'))
@@ -127,11 +130,22 @@ def _request_path():
             → 127.0.0.1:5555。nginx 的 kust.work vhost 必定写
             `proxy_set_header X-Real-IP $remote_addr;`。
 
-    故以「nginx 注入的 X-Real-IP 是否存在」为判据：有 → 公网，无 → 内网。
-    该头由 nginx 覆盖写入（客户端伪造会被 $remote_addr 冲掉），内网通路不会
-    产生此头。2026-09-27 两条通路实测已验证。
+    2026-10-10 新增第三条通路（ChmlFrp 隧道）：
+      公网: 浏览器 → open.kust.work（ChmlFrp 节点）→ frpc → 127.0.0.1:5555。
+            这条链路**不经过 <server-ip> 的 nginx**，故没有 X-Real-IP，
+            单看头部会把它误判成内网 —— 需补一条「Host 判据」。
+
+    判据（满足其一即公网）：
+      1) 有 nginx 注入的 X-Real-IP（老公网链路；客户端伪造会被 $remote_addr 冲掉）；
+      2) Host 是公网入口：*.kust.work 子域（open.kust.work / www.kust.work …）
+         或公网 IP <server-ip>。裸域 kust.work 与内网 IP 走内网通路。
     """
-    return 'wan' if (request.headers.get('X-Real-IP') or '').strip() else 'lan'
+    if (request.headers.get('X-Real-IP') or '').strip():
+        return 'wan'
+    host = (request.host or '').split(':')[0].lower()
+    if host.endswith('.kust.work') or host == '<server-ip>':
+        return 'wan'
+    return 'lan'
 
 
 @portal_bp.route('/api/portal/health')

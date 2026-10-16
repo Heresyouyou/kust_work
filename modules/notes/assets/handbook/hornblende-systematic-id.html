@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>透明矿物系统鉴定 · 普通角闪石（按定向切面组织）</title>
+<style>
+  :root {
+    --bg: #FFFFFF; --bg2: #F5F8F9; --rule: #D8E2E4;
+    --ink: #1D2B30; --muted: #64787F; --text-secondary: #3D5158;
+    --accent: #2C6E75; --accent-hover: #235A60; --accent-soft: #EAF3F3;
+    --brand-text: #1A464B; --border: #D8E2E4; --brand: #2C6E75;
+    --brand-soft: #EAF3F3; --brand-soft-strong: #D8E9EA;
+    --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg2); color: var(--ink);
+    font-family: "Source Han Serif SC", "Noto Serif CJK SC", "SimSun", serif;
+    font-size: 15px; line-height: 1.75;
+  }
+  .page { max-width: 900px; margin: 0 auto; background: var(--bg); padding: 40px 46px 56px; box-shadow: 0 0 18px rgba(29,43,48,.07); }
+  header { border-bottom: 3px solid var(--brand); padding-bottom: var(--s4); margin-bottom: var(--s5); }
+  .kicker { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; font-size: 12.5px; letter-spacing: 3px; color: var(--accent); font-weight: 700; }
+  h1 { font-size: 26px; margin: 6px 0 8px; color: var(--brand-text); }
+  .sub { color: var(--muted); font-size: 13.5px; }
+  h2 { font-size: 19px; color: var(--brand-text); border-left: 4px solid var(--brand); padding-left: 10px; margin: 38px 0 10px; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
+  h2 .step-tag { display: inline-block; font-size: 12px; background: var(--brand); color: #fff; border-radius: 4px; padding: 1px 8px; vertical-align: 3px; margin-right: 8px; letter-spacing: 1px; }
+  h3 { font-size: 15.5px; color: var(--brand-text); margin: 18px 0 6px; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
+  p { margin: 8px 0; }
+  .req { background: var(--brand-soft); border: 1px solid var(--brand-soft-strong); border-radius: 8px; padding: 10px 14px; font-size: 13.5px; color: var(--brand-text); }
+  .tbl-title { font-size: 12.5px; color: var(--muted); margin: 0 0 4px; font-family: "Microsoft YaHei", sans-serif; }
+  .table-wrap { width: 100%; overflow-x: auto; margin: 10px 0 14px; }
+  table.rwd-card { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  table.rwd-card th, table.rwd-card td { border: 1px solid var(--border); padding: 7px 10px; vertical-align: top; text-align: left; }
+  table.rwd-card th[scope="row"] { background: var(--brand-soft); color: var(--brand-text); font-family: "Microsoft YaHei", sans-serif; font-weight: 600; white-space: nowrap; }
+  table.rwd-card thead th { background: var(--brand-soft-strong); color: var(--brand-text); font-family: "Microsoft YaHei", sans-serif; }
+  .op { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; font-size: 12px; color: #fff; background: #4E8A8F; border-radius: 3px; padding: 0 6px; margin-right: 4px; white-space: nowrap; }
+  .why { font-weight: 700; color: var(--brand-text); }
+  .thus { font-weight: 700; color: #8A5A00; }
+  .fig { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px 8px; margin: 14px 0 18px; }
+  .fig-title { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; font-size: 13.5px; font-weight: 700; color: var(--brand-text); margin-bottom: 4px; }
+  .fig svg { width: 100%; height: auto; display: block; }
+  .fig-cap { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+  .concl { background: #FBF6E9; border: 1px solid #E8D9A8; border-radius: 8px; padding: 10px 14px; font-size: 13.5px; }
+  .concl strong { color: #8A5A00; }
+  .note { font-size: 12.5px; color: var(--muted); border-top: 1px dashed var(--border); padding-top: 8px; margin-top: 12px; }
+  .sum-final { background: var(--brand-soft); border: 2px solid var(--brand); border-radius: 10px; padding: 14px 18px; text-align: center; font-size: 17px; }
+  .sum-final strong { color: var(--brand-text); }
+  footer { border-top: 1px solid var(--rule); margin-top: 40px; padding-top: 14px; font-size: 12.5px; color: var(--muted); }
+  ul { margin: 6px 0; padding-left: 22px; }
+  li { margin: 3px 0; }
+  @media (max-width: 640px) { .page { padding: 20px 16px 32px; } h1 { font-size: 21px; } }
+  @media print { body { background: #fff; } .page { box-shadow: none; padding: 10mm 12mm; max-width: none; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="kicker">透明矿物系统鉴定 · 实操记录</div>
+  <h1>普通角闪石综合鉴定记录（按定向切面组织）</h1>
+  <p class="sub">样品：××-08（角闪岩 / 闪长岩）&nbsp;·&nbsp; 物镜 10×40&nbsp;·&nbsp;鉴定人：（考生姓名）&nbsp;·&nbsp;日期：2026-__-__</p>
+  <div class="req"><strong>记录要求</strong>（原始题板）：系统测定某矿物的光学性质；记录要求：绘图并加简单说明。按顺序——（一）找 ⊥OA 的切面；（二）找 ∥光轴面的切面；（三）⊥C 的切面；（四）综合各切面的形态绘出晶形；（五）综合以上各点写出 11 项鉴定结果。</div>
+</header>
+
+<!-- ===================== 路线总览 ===================== -->
+<h2><span class="step-tag">路线</span>鉴定总路线与三种定向切面的方位</h2>
+<p>系统鉴定按"定向切面"取样：先在薄片中找到三种特定方位的切面，每种切面只测它所能提供的项目，最后汇总定名。三者的空间关系见下图。</p>
+
+<div class="fig">
+  <div class="fig-title">图 A&nbsp;三种定向切面在角闪石晶体中的方位（示意）</div>
+  <svg viewBox="0 0 880 330" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="角闪石柱状晶体及三种定向切面方位示意">
+    <defs>
+      <marker id="arrA" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#1A464B"/></marker>
+      <marker id="arrB" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#2C6E75"/></marker>
+    </defs>
+    <!-- 晶体柱体 -->
+    <g>
+      <polygon points="150,80 340,80 385,45 195,45" fill="#DCE9EA" stroke="#4E8A8F" stroke-width="1.5"/>
+      <polygon points="340,80 385,45 385,255 340,290" fill="#C4D9DB" stroke="#4E8A8F" stroke-width="1.5"/>
+      <rect x="150" y="80" width="190" height="210" fill="#EAF3F3" stroke="#4E8A8F" stroke-width="1.5"/>
+      <line x1="190" y1="80" x2="190" y2="290" stroke="#9DBFC2" stroke-width="0.8"/>
+      <line x1="230" y1="80" x2="230" y2="290" stroke="#9DBFC2" stroke-width="0.8"/>
+      <line x1="270" y1="80" x2="270" y2="290" stroke="#9DBFC2" stroke-width="0.8"/>
+      <line x1="310" y1="80" x2="310" y2="290" stroke="#9DBFC2" stroke-width="0.8"/>
+      <!-- c 轴 -->
+      <line x1="245" y1="300" x2="245" y2="18" stroke="#1A464B" stroke-width="2.2" marker-end="url(#arrA)"/>
+      <text x="255" y="26" font-size="15" font-weight="bold" fill="#1A464B" font-family="Georgia, serif" font-style="italic">c</text>
+      <text x="228" y="322" font-size="12" fill="#64787F" font-family="Microsoft YaHei, sans-serif">结晶轴 c（柱长方向）</text>
+    </g>
+    <!-- 切面1：⊥C 横切面（水平） -->
+    <g>
+      <ellipse cx="245" cy="185" rx="118" ry="30" fill="#3E7CB1" fill-opacity="0.18" stroke="#3E7CB1" stroke-width="2" stroke-dasharray="7 4"/>
+      <line x1="120" y1="185" x2="30" y2="240" stroke="#3E7CB1" stroke-width="1.2" marker-end="url(#arrB)"/>
+      <rect x="18" y="238" width="188" height="62" rx="7" fill="#FFFFFF" stroke="#3E7CB1" stroke-width="1.2"/>
+      <text x="30" y="258" font-size="13" font-weight="bold" fill="#2B5F8E" font-family="Microsoft YaHei, sans-serif">⊥C 横切面（步骤三）</text>
+      <text x="30" y="277" font-size="11.5" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">测：解理组数/等级、夹角、</text>
+      <text x="30" y="293" font-size="11.5" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">突起、Nm 颜色、消光类型</text>
+    </g>
+    <!-- 切面2：∥OAP 纵切面 -->
+    <g>
+      <rect x="332" y="86" width="46" height="196" fill="#B3402E" fill-opacity="0.14" stroke="#B3402E" stroke-width="2" stroke-dasharray="7 4"/>
+      <line x1="384" y1="110" x2="470" y2="88" stroke="#B3402E" stroke-width="1.2" marker-end="url(#arrB)"/>
+      <rect x="472" y="52" width="196" height="88" rx="7" fill="#FFFFFF" stroke="#B3402E" stroke-width="1.2"/>
+      <text x="484" y="72" font-size="13" font-weight="bold" fill="#9A3526" font-family="Microsoft YaHei, sans-serif">∥光轴面（步骤二）</text>
+      <text x="484" y="91" font-size="11.5" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">含 Ng、Np 两振动方向</text>
+      <text x="484" y="107" font-size="11.5" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">测：最高干涉色、Ng/Np 颜色、</text>
+      <text x="484" y="123" font-size="11.5" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">消光类型/消光角、延性符号</text>
+    </g>
+    <!-- 切面3：⊥OA 斜切面 -->
+    <g>
+      <polygon points="200,120 330,132 322,158 194,146" fill="#C99A18" fill-opacity="0.20" stroke="#B8860B" stroke-width="2" stroke-dasharray="7 4"/>
+      <line x1="258" y1="132" x2="196" y2="60" stroke="#B8860B" stroke-width="1.2" marker-end="url(#arrB)"/>
+      <rect x="18" y="36" width="188" height="66" rx="7" fill="#FFFFFF" stroke="#B8860B" stroke-width="1.2"/>
+      <text x="30" y="56" font-size="13" font-weight="bold" fill="#8A6508" font-family="Microsoft YaHei, sans-serif">⊥OA 切面（步骤一）</text>
+      <text x="30" y="75" font-size="11.5" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">正交镜下全消光（或一级灰黑）</text>
+      <text x="30" y="91" font-size="11.5" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">测：轴性、光性符号</text>
+    </g>
+    <!-- 说明 -->
+    <rect x="678" y="170" width="184" height="132" rx="7" fill="#EAF3F3" stroke="#2C6E75" stroke-width="1"/>
+    <text x="690" y="192" font-size="12.5" font-weight="bold" fill="#1A464B" font-family="Microsoft YaHei, sans-serif">判据速记</text>
+    <text x="690" y="212" font-size="11.5" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">全消光 → ⊥OA</text>
+    <text x="690" y="230" font-size="11.5" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">干涉色最高 → ∥OAP</text>
+    <text x="690" y="248" font-size="11.5" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">两组解理同现+干涉色低</text>
+    <text x="690" y="266" font-size="11.5" fill="#3D5158" font-family="Microsoft YaHei, sans-serif">→ ⊥C 横切面</text>
+    <text x="690" y="290" font-size="11" fill="#64787F" font-family="Microsoft YaHei, sans-serif">（虚线椭圆/条带=切面方位）</text>
+  </svg>
+  <div class="fig-cap">角闪石为单斜晶系长柱状习性，c 轴平行柱长；光轴面 ∥(010)。⊥OA 切面法线为光轴（位于光轴面内）；∥光轴面切面同时包含 Ng、Np，双折射率最大，干涉色最高。</div>
+</div>
+
+<!-- ===================== （一）⊥OA ===================== -->
+<h2 id="s1"><span class="step-tag">（一）</span>找 ⊥OA 的切面 —— 测轴性、光性符号</h2>
+
+<div class="table-wrap">
+  <p class="tbl-title">表 1&nbsp;⊥OA 切面记录（三段式）</p>
+  <table class="rwd-card">
+    <tbody>
+      <tr><th scope="row">寻找切面</th><td><span class="op">操作</span>正交偏光下逐视域缓转物台，搜寻 360° 内<strong>始终保持全消光</strong>的颗粒；严格全消光者难寻时，取<strong>一级灰黑</strong>（近 ⊥OA）颗粒。<br><span class="op">现象</span><span class="why">∵</span>一颗绿色短柱状颗粒全消光；单偏光下其颜色深浅不随转台变化。<br><span class="op">结论</span><span class="thus">∴</span>该切面 ⊥OA——光沿光轴传播不发生双折射，故全消光、无多色性变化。</td></tr>
+      <tr><th scope="row">1）轴性</th><td><span class="op">操作</span>换 40× 物镜准焦，推入聚光镜与勃氏镜，观察该颗粒干涉图；再转物台 360° 追踪黑臂行为。<br><span class="op">现象</span><span class="why">∵</span>视域中心一条<strong>直黑臂</strong>横贯（0° 位沿十字丝方向），臂两侧干涉色低（深灰）；转物台黑臂<strong>不消失、随物台弯曲</strong>，45° 位弯成明显弧形，弧的凸侧恒指一侧。<br><span class="op">结论</span><span class="thus">∴</span>单黑臂且转台弯曲 → <strong>二轴晶</strong>。（对照：一轴晶 ⊥OA 图为黑十字，转台时四臂同步旋转、<strong>永不分裂</strong>；本图无十字、仅单臂弯曲。）</td></tr>
+      <tr><th scope="row">2）光性符号</th><td><span class="op">操作</span>转至 45° 位（黑臂弯曲最大），先认准<strong>凸侧（指向 Bxa 出露方向）</strong>；沿 NE-SW 插入石膏试板（慢光 Ns∥试板长边），观察<strong>凸侧近光轴点处内圈</strong>颜色变化；拔出复核一次。<br><span class="op">现象</span><span class="why">∵</span>凸侧内圈<strong>升高变蓝</strong>，凹侧对称降低变黄。<br><span class="op">结论</span><span class="thus">∴</span>凸侧沿光轴面迹线振动的光为慢光（同名相加故升高）→ 凸侧（Bxa 方向）沿迹线振动趋于 <strong>Bxo</strong> → <strong>Bxo = Ng → Bxa = Np → 二轴晶负光性（−）</strong>。</td></tr>
+      <tr><th scope="row">附：2V 估计</th><td><span class="op">操作</span>观察黑臂弯曲程度与色圈疏密。<br><span class="op">现象</span><span class="why">∵</span>黑臂弯曲程度小、近于平直。<br><span class="op">结论</span><span class="thus">∴</span><strong>2V 大（约 60°~85°）</strong>——2V 越大黑臂越直。</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="fig">
+  <div class="fig-title">图 B&nbsp;垂直光轴（⊥OA）干涉图三步判读</div>
+  <svg viewBox="0 0 880 388" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="垂直光轴干涉图三步判读：0度直黑臂、45度弯曲、插石膏试板判读">
+    <defs>
+      <marker id="arrG" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#64787F"/></marker>
+      <marker id="arrY" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#8A6508"/></marker>
+    </defs>
+    <!-- 三个视域 -->
+    <!-- 左：0°位 -->
+    <g>
+      <circle cx="145" cy="140" r="112" fill="#FDFDFD" stroke="#64787F" stroke-width="2"/>
+      <line x1="33" y1="140" x2="257" y2="140" stroke="#B9C8CC" stroke-width="1"/>
+      <line x1="145" y1="28" x2="145" y2="252" stroke="#B9C8CC" stroke-width="1"/>
+      <rect x="130" y="30" width="30" height="220" fill="#1D2B30"/>
+      <circle cx="145" cy="140" r="6" fill="#FDFDFD" stroke="#1A464B" stroke-width="2"/>
+      <text x="160" y="146" font-size="12.5" font-weight="bold" fill="#1A464B" font-family="Microsoft YaHei, sans-serif">光轴点 OA</text>
+      <text x="145" y="282" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">① 0°位：直黑臂</text>
+      <text x="145" y="300" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">黑臂沿十字丝方向横贯视域</text>
+    </g>
+    <!-- 中：45°位弯曲 -->
+    <g>
+      <circle cx="440" cy="140" r="112" fill="#FDFDFD" stroke="#64787F" stroke-width="2"/>
+      <line x1="328" y1="140" x2="552" y2="140" stroke="#B9C8CC" stroke-width="1"/>
+      <line x1="440" y1="28" x2="440" y2="252" stroke="#B9C8CC" stroke-width="1"/>
+      <path d="M 388,42 Q 528,140 388,238" fill="none" stroke="#1D2B30" stroke-width="16" stroke-linecap="round"/>
+      <circle cx="448" cy="140" r="6" fill="#FDFDFD" stroke="#1A464B" stroke-width="2"/>
+      <line x1="520" y1="140" x2="500" y2="140" stroke="#2C6E75" stroke-width="0"/>
+      <path d="M 500,140 L 462,140" stroke="#B3402E" stroke-width="2" marker-end="url(#arrY)"/>
+      <text x="466" y="166" font-size="12.5" font-weight="bold" fill="#9A3526" font-family="Microsoft YaHei, sans-serif">凸侧 → Bxa</text>
+      <text x="382" y="92" font-size="12.5" font-weight="bold" fill="#3E7CB1" text-anchor="end" font-family="Microsoft YaHei, sans-serif">凹侧（Bxo 侧）</text>
+      <text x="440" y="282" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">② 45°位：黑臂弯曲成弧</text>
+      <text x="440" y="300" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">弧形黑臂 → 二轴晶；黑臂近直 → 2V 大</text>
+    </g>
+    <!-- 右：插试板 -->
+    <g>
+      <circle cx="735" cy="140" r="112" fill="#FDFDFD" stroke="#64787F" stroke-width="2"/>
+      <line x1="623" y1="140" x2="847" y2="140" stroke="#B9C8CC" stroke-width="1"/>
+      <line x1="735" y1="28" x2="735" y2="252" stroke="#B9C8CC" stroke-width="1"/>
+      <!-- 凸侧蓝色月牙 -->
+      <path d="M 683,42 Q 823,140 683,238 Q 762,190 762,140 Q 762,90 683,42 Z" fill="#2F6FBA" fill-opacity="0.38"/>
+      <!-- 凹侧黄色月牙 -->
+      <path d="M 683,42 Q 560,140 683,238 Q 648,190 648,140 Q 648,90 683,42 Z" fill="#E8B93E" fill-opacity="0.5"/>
+      <path d="M 683,42 Q 823,140 683,238" fill="none" stroke="#1D2B30" stroke-width="14" stroke-linecap="round"/>
+      <circle cx="691" cy="140" r="6" fill="#FDFDFD" stroke="#1A464B" stroke-width="2"/>
+      <text x="808" y="70" font-size="13" font-weight="bold" fill="#2B5F8E" font-family="Microsoft YaHei, sans-serif">蓝（升）</text>
+      <text x="596" y="220" font-size="13" font-weight="bold" fill="#8A6508" font-family="Microsoft YaHei, sans-serif">黄（降）</text>
+      <line x1="648" y1="238" x2="826" y2="60" stroke="#64787F" stroke-width="1.6" stroke-dasharray="6 4" marker-start="url(#arrG)"/>
+      <text x="818" y="248" font-size="11.5" fill="#64787F" font-family="Microsoft YaHei, sans-serif">试板慢光 Ns（NE–SW 插入）</text>
+      <text x="735" y="282" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">③ 插石膏试板判读</text>
+      <text x="735" y="300" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">看凸侧近光轴点处内圈颜色</text>
+    </g>
+    <!-- 推理链 -->
+    <rect x="20" y="322" width="840" height="54" rx="8" fill="#EAF3F3" stroke="#2C6E75" stroke-width="1.2"/>
+    <text x="440" y="345" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">推理链：凸侧变蓝（升高） → 凸侧沿光轴面迹线振动为慢光 → 该方向趋于 Bxo → Bxo = Ng → Bxa = Np</text>
+    <text x="440" y="366" font-size="13.5" font-weight="bold" fill="#9A3526" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">结论：二轴晶，负光性（−），2V 大</text>
+  </svg>
+  <div class="fig-cap">凸侧恒指向 Bxa 出露方向（步骤②先认准凸侧再插试板）。石膏试板慢光沿 NE–SW，与弯曲后的光轴面迹线方向一致：凸侧同名相加变蓝说明凸侧沿迹线振动的光是慢光；凸侧（Bxa 方向）沿迹线振动趋于 Bxo，慢光即 Bxo = Ng，故 Bxa = Np，负光性。</div>
+</div>
+
+<!-- ===================== （二）∥OAP ===================== -->
+<h2 id="s2"><span class="step-tag">（二）</span>找 ∥光轴面的切面 —— 最高干涉色、Ng/Np 颜色、消光、延性</h2>
+
+<div class="table-wrap">
+  <p class="tbl-title">表 2&nbsp;∥光轴面切面记录（三段式）</p>
+  <table class="rwd-card">
+    <tbody>
+      <tr><th scope="row">寻找切面</th><td><span class="op">操作</span>正交偏光下全片对比干涉色，取<strong>最鲜艳的长柱状颗粒</strong>。<br><span class="op">现象</span><span class="why">∵</span>全片最高干涉色集中于平行柱长延长的长柱颗粒。<br><span class="op">结论</span><span class="thus">∴</span>该切面 ∥光轴面——同时包含 Ng、Np 两振动方向 → 双折射率最大 → 干涉色最高。</td></tr>
+      <tr><th scope="row">1）最高干涉色</th><td><span class="op">操作</span>颗粒转至 45° 最亮位；插 λ/4 云母试板（R≈147nm）判断可补偿；缓插石英楔至颗粒灰黑（全补偿点），再缓抽出，数紫红色带出现次数。<br><span class="op">现象</span><span class="why">∵</span>最高干涉色蓝绿~黄绿，叠加上矿物本色偏暗（"绿上加绿"）；抽出过程紫红色带出现 <strong>1 次</strong>。<br><span class="op">结论</span><span class="thus">∴</span>级序 = 1 + 1 = 2 → <strong>最高干涉色二级中部</strong>（R≈550~800nm，Δ≈0.018~0.027，与角闪石 Δ=0.015~0.025 相符）。</td></tr>
+      <tr><th scope="row">2）Ng、Np 的颜色</th><td><span class="op">操作</span>45° 位插石膏试板辨方向——变蓝 → 柱长方向振动为<strong>慢光 Ng</strong>；回单偏光，分别把柱长方向、垂直柱长方向转至平行下偏光振动方向，记录颜色。<br><span class="op">现象</span><span class="why">∵</span>柱长方向<strong>深绿色</strong>，垂直柱长<strong>浅黄绿色</strong>；转台一周颜色两次最深、两次最浅。<br><span class="op">结论</span><span class="thus">∴</span><strong>Ng = 深绿、Np = 浅黄绿</strong>，多色性显著（Nm 颜色待 ⊥C 切面补测）。</td></tr>
+      <tr><th scope="row">3）消光类型</th><td><span class="op">操作</span>转物台至消光位，比较消光位与柱面纵解理缝方位。<br><span class="op">现象</span><span class="why">∵</span>消光时解理缝与十字丝<strong>斜交</strong>。<br><span class="op">结论</span><span class="thus">∴</span>柱面切面<strong>斜消光</strong>（单斜晶系特征；消光角见下）。</td></tr>
+      <tr><th scope="row">4）消光角</th><td><span class="op">操作</span>消光位读物台读数 a₁；转回解理缝平行竖丝读 a₂；|a₁−a₂| 取 ≤45° 小角；连测 3 颗。<br><span class="op">现象</span><span class="why">∵</span>三颗分别测得 17°、18°、19°。<br><span class="op">结论</span><span class="thus">∴</span><strong>Ng∧c = 18°（17°~19°）</strong>，落于普通角闪石 12°~25° 区间，排除单斜辉石（35°~48°）。</td></tr>
+      <tr><th scope="row">5）延性符号</th><td><span class="op">操作</span>柱长方向转至 NE–SW 45° 位（平行试板插入方向），插石膏试板。<br><span class="op">现象</span><span class="why">∵</span>干涉色<strong>升高变蓝</strong>。<br><span class="op">结论</span><span class="thus">∴</span>同名半径相加 → 延长方向振动的是慢光 Ng → <strong>正延性</strong>。</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="fig">
+  <div class="fig-title">图 C&nbsp;∥光轴面（柱面）切面：多色性 · 消光角 · 延性</div>
+  <svg viewBox="0 0 880 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="柱面切面三联图：多色性颜色对比、消光角18度测量、延性试板判读">
+    <defs>
+      <marker id="arrC" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#64787F"/></marker>
+      <marker id="arrD" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#1A464B"/></marker>
+    </defs>
+    <!-- 左：多色性 -->
+    <g>
+      <rect x="52" y="66" width="64" height="150" rx="4" fill="#1B5E20" stroke="#0E3D13" stroke-width="1.5"/>
+      <line x1="52" y1="88" x2="116" y2="88" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+      <line x1="52" y1="110" x2="116" y2="110" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+      <line x1="52" y1="132" x2="116" y2="132" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+      <line x1="52" y1="154" x2="116" y2="154" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+      <line x1="52" y1="176" x2="116" y2="176" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+      <line x1="52" y1="198" x2="116" y2="198" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+      <text x="84" y="52" font-size="12.5" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">Ng ∥ 柱长</text>
+      <text x="84" y="240" font-size="13" font-weight="bold" fill="#1B5E20" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">深绿色</text>
+      <rect x="158" y="66" width="64" height="150" rx="4" fill="#C5E1A5" stroke="#7CA84B" stroke-width="1.5"/>
+      <line x1="158" y1="88" x2="222" y2="88" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="1"/>
+      <line x1="158" y1="110" x2="222" y2="110" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="1"/>
+      <line x1="158" y1="132" x2="222" y2="132" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="1"/>
+      <line x1="158" y1="154" x2="222" y2="154" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="1"/>
+      <line x1="158" y1="176" x2="222" y2="176" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="1"/>
+      <line x1="158" y1="198" x2="222" y2="198" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="1"/>
+      <text x="190" y="52" font-size="12.5" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">Np ∥ 柱长</text>
+      <text x="190" y="240" font-size="13" font-weight="bold" fill="#5A7A2E" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">浅黄绿色</text>
+      <path d="M 130,285 A 26 26 0 1 1 130,286.1" fill="none" stroke="#64787F" stroke-width="2" marker-end="url(#arrC)"/>
+      <text x="160" y="290" font-size="12" fill="#64787F" font-family="Microsoft YaHei, sans-serif">转物台 360°，颜色两次最深、两次最浅</text>
+    </g>
+    <!-- 分隔线 -->
+    <line x1="300" y1="30" x2="300" y2="360" stroke="#D8E2E4" stroke-width="1"/>
+    <!-- 中：消光角 -->
+    <g>
+      <rect x="330" y="42" width="230" height="230" fill="#FDFDFD" stroke="#64787F" stroke-width="1.5"/>
+      <line x1="330" y1="157" x2="560" y2="157" stroke="#B9C8CC" stroke-width="1"/>
+      <line x1="445" y1="42" x2="445" y2="272" stroke="#B9C8CC" stroke-width="1"/>
+      <!-- 柱体（消光位：Ng 竖直） -->
+      <g transform="rotate(18 445 157)">
+        <rect x="427" y="72" width="36" height="170" rx="3" fill="#EAF3F3" stroke="#2C6E75" stroke-width="1.6"/>
+        <line x1="436" y1="72" x2="436" y2="242" stroke="#9DBFC2" stroke-width="0.9"/>
+        <line x1="445" y1="72" x2="445" y2="242" stroke="#9DBFC2" stroke-width="0.9"/>
+        <line x1="454" y1="72" x2="454" y2="242" stroke="#9DBFC2" stroke-width="0.9"/>
+      </g>
+      <!-- Ng 方向（竖丝） -->
+      <line x1="445" y1="60" x2="445" y2="100" stroke="#B3402E" stroke-width="2.2" marker-end="url(#arrD)"/>
+      <text x="452" y="66" font-size="12.5" font-weight="bold" fill="#B3402E" font-family="Georgia, serif" font-style="italic">Ng</text>
+      <!-- c 轴（解理缝方向） -->
+      <g transform="rotate(18 500 240)">
+        <line x1="470" y1="240" x2="545" y2="240" stroke="#1A464B" stroke-width="2" marker-end="url(#arrD)"/>
+      </g>
+      <text x="540" y="264" font-size="12.5" font-weight="bold" fill="#1A464B" font-family="Georgia, serif" font-style="italic">c（解理缝）</text>
+      <!-- 18° 弧 -->
+      <path d="M 445,120 A 46 46 0 0 1 489,134" fill="none" stroke="#8A6508" stroke-width="1.8"/>
+      <text x="474" y="116" font-size="13.5" font-weight="bold" fill="#8A6508" font-family="Microsoft YaHei, sans-serif">18°</text>
+      <text x="445" y="300" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">消光位：Ng 平行竖丝</text>
+      <text x="445" y="318" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">解理缝（c）与竖丝斜交 → 斜消光</text>
+      <text x="445" y="336" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">Ng∧c = |a₁−a₂| = 18°</text>
+    </g>
+    <!-- 分隔线 -->
+    <line x1="590" y1="30" x2="590" y2="360" stroke="#D8E2E4" stroke-width="1"/>
+    <!-- 右：延性 -->
+    <g>
+      <rect x="620" y="42" width="230" height="230" fill="#FDFDFD" stroke="#64787F" stroke-width="1.5"/>
+      <line x1="620" y1="157" x2="850" y2="157" stroke="#B9C8CC" stroke-width="1"/>
+      <line x1="735" y1="42" x2="735" y2="272" stroke="#B9C8CC" stroke-width="1"/>
+      <!-- 柱体 45° -->
+      <g transform="rotate(45 735 157)">
+        <rect x="717" y="82" width="36" height="150" rx="3" fill="#EAF3F3" stroke="#2C6E75" stroke-width="1.6"/>
+        <line x1="726" y1="82" x2="726" y2="232" stroke="#9DBFC2" stroke-width="0.9"/>
+        <line x1="735" y1="82" x2="735" y2="232" stroke="#9DBFC2" stroke-width="0.9"/>
+        <line x1="744" y1="82" x2="744" y2="232" stroke="#9DBFC2" stroke-width="0.9"/>
+      </g>
+      <line x1="640" y1="252" x2="830" y2="62" stroke="#64787F" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#arrC)"/>
+      <text x="760" y="270" font-size="11.5" fill="#64787F" font-family="Microsoft YaHei, sans-serif">石膏试板（Ns 沿 NE–SW）</text>
+      <rect x="672" y="46" width="126" height="26" rx="5" fill="#2F6FBA" fill-opacity="0.32"/>
+      <text x="735" y="64" font-size="12.5" font-weight="bold" fill="#2B5F8E" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">变蓝（升高）</text>
+      <text x="735" y="300" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">45°位：柱长平行试板慢光</text>
+      <text x="735" y="318" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">同名相加升高 → 延长方向为 Ng</text>
+      <text x="735" y="336" font-size="12.5" font-weight="bold" fill="#8A6508" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">正延性</text>
+    </g>
+    <!-- 底部结论条 -->
+    <rect x="20" y="354" width="840" height="34" rx="7" fill="#FBF6E9" stroke="#E8D9A8"/>
+    <text x="440" y="376" font-size="13" font-weight="bold" fill="#8A6508" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">最高干涉色二级中部 · Ng=深绿、Np=浅黄绿 · 斜消光 Ng∧c=18° · 正延性</text>
+  </svg>
+  <div class="fig-cap">多色性须在平行 c 轴的柱面切面（即 ∥光轴面切面，干涉色最高者）上测定——只有该切面能同时见到最深与最浅色。消光角测量三步：①转至消光位读 a₁；②解理缝转至平行竖丝读 a₂；③取小角 |a₁−a₂|。</div>
+</div>
+
+<!-- ===================== （三）⊥C ===================== -->
+<h2 id="s3"><span class="step-tag">（三）</span>⊥C 的切面 —— 解理、突起、夹角、Nm 颜色、消光</h2>
+
+<div class="table-wrap">
+  <p class="tbl-title">表 3&nbsp;⊥C 横切面记录（三段式）</p>
+  <table class="rwd-card">
+    <tbody>
+      <tr><th scope="row">寻找切面</th><td><span class="op">操作</span>找轮廓呈<strong>近菱形六边形</strong>、干涉色最低（一级灰）、多色性变化不明显的颗粒。<br><span class="op">现象</span><span class="why">∵</span>此类颗粒两组解理缝同时清晰展现。<br><span class="op">结论</span><span class="thus">∴</span>该切面 ⊥C（横切面）。</td></tr>
+      <tr><th scope="row">1）解理组数与等级</th><td><span class="op">操作</span>单偏光 40× 观察解理缝数量与形态。<br><span class="op">现象</span><span class="why">∵</span><strong>两组</strong>细密、平直、连续的平行解理缝。<br><span class="op">结论</span><span class="thus">∴</span>{110} 柱面解理<strong>两组、完全解理</strong>。</td></tr>
+      <tr><th scope="row">2）突起等级</th><td><span class="op">操作</span>缩小光圈，微升镜筒观察贝克线移动；结合糙面与边缘宽窄。<br><span class="op">现象</span><span class="why">∵</span>贝克线<strong>移向矿物</strong>；糙面微显、边缘中等清晰。<br><span class="op">结论</span><span class="thus">∴</span>n &gt; 树胶（1.54）→ 正突起；糙面微显 → <strong>正中突起</strong>（n≈1.62~1.68）。</td></tr>
+      <tr><th scope="row">3）解理夹角</th><td><span class="op">操作</span>第一组解理缝转至平行纵十字丝读物台刻度 b₁；续转至第二组平行读 b₂；复测 2 颗。<br><span class="op">现象</span><span class="why">∵</span>b₂ − b₁ = <strong>56°</strong>（补角 124°）。<br><span class="op">结论</span><span class="thus">∴</span>解理夹角 <strong>56°/124°</strong> → 角闪石型解理（排除辉石 87°/93°）。</td></tr>
+      <tr><th scope="row">4）Nm 的颜色</th><td><span class="op">操作</span>单偏光下转物台观察横切面颜色及变化。<br><span class="op">现象</span><span class="why">∵</span>横切面显<strong>绿色</strong>，转台深浅仅微变。<br><span class="op">结论</span><span class="thus">∴</span><strong>Nm = 绿</strong>。至此多色性公式完整：<strong>Ng=深绿、Nm=绿、Np=浅黄绿</strong>；吸收性 <strong>Ng &gt; Nm &gt; Np</strong>。</td></tr>
+      <tr><th scope="row">5）消光类型</th><td><span class="op">操作</span>正交偏光下转物台观察横切面消光。<br><span class="op">现象</span><span class="why">∵</span>两组解理缝的锐角/钝角平分线与十字丝方位一致时<strong>同时消光</strong>。<br><span class="op">结论</span><span class="thus">∴</span>横切面<strong>对称消光</strong>（与柱面斜消光互为印证，均为单斜晶系特征）。</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="fig">
+  <div class="fig-title">图 D&nbsp;⊥C 横切面：解理夹角 56°/124° · 对称消光</div>
+  <svg viewBox="0 0 880 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="角闪石横切面：近菱形六边形轮廓、两组解理缝交角56度和124度、对称消光示意">
+    <defs>
+      <marker id="arrE" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#64787F"/></marker>
+    </defs>
+    <!-- 左：解理夹角 -->
+    <g>
+      <polygon points="205,38 330,90 312,218 190,270 66,218 84,90" fill="#9CC49A" fill-opacity="0.45" stroke="#3F7A3D" stroke-width="2"/>
+      <!-- 解理组1：长对角方向（上-右下） -->
+      <g stroke="#1A464B" stroke-width="1.6">
+        <line x1="150" y1="72" x2="300" y2="252"/>
+        <line x1="120" y1="94" x2="270" y2="274" opacity="0.55"/>
+        <line x1="180" y1="50" x2="330" y2="230" opacity="0.55"/>
+      </g>
+      <!-- 解理组2：另一对角（右上-左下） -->
+      <g stroke="#1A464B" stroke-width="1.6">
+        <line x1="250" y1="60" x2="110" y2="250"/>
+        <line x1="290" y1="78" x2="150" y2="268" opacity="0.55"/>
+        <line x1="210" y1="42" x2="70" y2="232" opacity="0.55"/>
+      </g>
+      <!-- 角度弧 56°（锐角） -->
+      <path d="M 232,138 A 52 52 0 0 1 268,158" fill="none" stroke="#B3402E" stroke-width="2.2"/>
+      <text x="252" y="130" font-size="14" font-weight="bold" fill="#B3402E" font-family="Microsoft YaHei, sans-serif">56°</text>
+      <!-- 角度弧 124°（钝角） -->
+      <path d="M 232,138 A 52 52 0 0 0 196,128" fill="none" stroke="#3E7CB1" stroke-width="2.2"/>
+      <text x="152" y="118" font-size="14" font-weight="bold" fill="#3E7CB1" font-family="Microsoft YaHei, sans-serif">124°</text>
+      <text x="198" y="312" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">两组完全解理 {110}</text>
+      <text x="198" y="330" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">解理缝细密平直连续；横切面绿色（Nm=绿）</text>
+    </g>
+    <!-- 分隔 -->
+    <line x1="440" y1="30" x2="440" y2="330" stroke="#D8E2E4" stroke-width="1"/>
+    <!-- 右：对称消光 -->
+    <g>
+      <polygon points="655,58 760,102 745,208 642,250 540,208 555,102" fill="#9CC49A" fill-opacity="0.45" stroke="#3F7A3D" stroke-width="2"/>
+      <g stroke="#1A464B" stroke-width="1.6">
+        <line x1="612" y1="86" x2="736" y2="238"/>
+        <line x1="692" y1="76" x2="570" y2="228"/>
+      </g>
+      <!-- 十字丝（虚线） -->
+      <line x1="500" y1="156" x2="810" y2="156" stroke="#B3402E" stroke-width="1.4" stroke-dasharray="8 5"/>
+      <line x1="655" y1="36" x2="655" y2="272" stroke="#B3402E" stroke-width="1.4" stroke-dasharray="8 5"/>
+      <text x="655" y="28" font-size="11.5" fill="#B3402E" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">十字丝（虚线）</text>
+      <!-- 角平分线标注 -->
+      <text x="778" y="132" font-size="11.5" fill="#64787F" font-family="Microsoft YaHei, sans-serif">锐角平分线</text>
+      <text x="778" y="148" font-size="11.5" fill="#64787F" font-family="Microsoft YaHei, sans-serif">∥ 横丝</text>
+      <text x="655" y="312" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">对称消光：两组解理缝对称于十字丝</text>
+      <text x="655" y="330" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">此时同时消光（正交偏光最暗）</text>
+    </g>
+    <!-- 底部结论条 -->
+    <rect x="20" y="336" width="840" height="0" fill="none"/>
+  </svg>
+  <div class="fig-cap">横切面为近菱形六边形（晶体断面呈细长六边形）。测夹角时两次均以"解理缝平行纵十字丝"读数，锐角 56°、钝角 124° 互为补角——与单斜辉石 87°/93° 近直角形成对照，是角闪石/辉石区分的命脉依据。</div>
+</div>
+
+<!-- ===================== （四）晶形 ===================== -->
+<h2 id="s4"><span class="step-tag">（四）</span>综合各切面的形态，绘出晶形</h2>
+
+<div class="fig">
+  <div class="fig-title">图 E&nbsp;晶形综合：柱面视图 + 横切面视图</div>
+  <svg viewBox="0 0 880 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="角闪石晶形综合图：长柱状柱面视图与近菱形六边形横切面视图">
+    <defs>
+      <marker id="arrF" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L9,5 L0,10 z" fill="#2C6E75"/></marker>
+    </defs>
+    <!-- 左：柱面视图 -->
+    <g>
+      <polygon points="150,40 216,40 240,20 174,20" fill="#DCE9EA" stroke="#3F7A3D" stroke-width="1.8"/>
+      <rect x="150" y="40" width="66" height="200" fill="#DFF0DF" stroke="#3F7A3D" stroke-width="1.8"/>
+      <polygon points="216,40 240,20 240,220 216,240" fill="#C4D9DB" stroke="#3F7A3D" stroke-width="1.8"/>
+      <g stroke="#7FA87D" stroke-width="1">
+        <line x1="168" y1="40" x2="168" y2="240"/>
+        <line x1="186" y1="40" x2="186" y2="240"/>
+        <line x1="200" y1="40" x2="200" y2="240"/>
+      </g>
+      <text x="183" y="266" font-size="12.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">柱面：一组纵解理缝（∥c）</text>
+      <text x="183" y="284" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">斜消光 Ng∧c=18°、正延性</text>
+    </g>
+    <!-- 中：综合箭头 -->
+    <g>
+      <line x1="300" y1="150" x2="430" y2="150" stroke="#2C6E75" stroke-width="2.5" marker-end="url(#arrF)"/>
+      <text x="365" y="132" font-size="13" font-weight="bold" fill="#2C6E75" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">综合</text>
+      <text x="365" y="176" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">晶形复原</text>
+    </g>
+    <!-- 右：横切面视图 -->
+    <g>
+      <polygon points="600,30 706,74 690,182 586,226 486,182 500,74" fill="#9CC49A" fill-opacity="0.45" stroke="#3F7A3D" stroke-width="2"/>
+      <g stroke="#1A464B" stroke-width="1.6">
+        <line x1="556" y1="58" x2="676" y2="212"/>
+        <line x1="672" y1="50" x2="548" y2="204"/>
+      </g>
+      <text x="586" y="266" font-size="12.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">横切面：近菱形六边形</text>
+      <text x="586" y="284" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">两组解理 56°/124°、对称消光</text>
+    </g>
+    <!-- 右侧结论 -->
+    <rect x="740" y="60" width="120" height="180" rx="8" fill="#EAF3F3" stroke="#2C6E75" stroke-width="1.2"/>
+    <text x="800" y="88" font-size="12.5" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">晶形结论</text>
+    <text x="800" y="112" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">长柱状、针状</text>
+    <text x="800" y="132" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">自形~半自形</text>
+    <text x="800" y="152" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">横切面近菱形</text>
+    <text x="800" y="172" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">六边形</text>
+    <text x="800" y="196" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">→ 单斜晶系</text>
+    <text x="800" y="214" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">角闪石型晶习</text>
+  </svg>
+  <div class="fig-cap">考试作图建议：分别绘纵切面简图（长柱轮廓 + 平行柱长解理线 + 标注"斜消光 Ng∧c≈18°"）与横切面简图（六边形轮廓 + 两条对角解理线 + 标注 56°/124°），两图并置即为完整的"绘出晶形"答案。</div>
+</div>
+
+<!-- ===================== （五）汇总 ===================== -->
+<h2 id="s5"><span class="step-tag">（五）</span>综合以上各点写出鉴定结果（11 项）</h2>
+
+<div class="table-wrap">
+  <p class="tbl-title">表 4&nbsp;普通角闪石系统鉴定结果汇总</p>
+  <table class="rwd-card">
+    <thead>
+      <tr><th style="width:44px">序号</th><th style="width:180px">项目</th><th>测定结果</th><th style="width:120px">测定切面</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>晶形</td><td>长柱状、针状，自形~半自形；横切面近菱形六边形</td><td>柱面 + 横切面</td></tr>
+      <tr><td>2</td><td>解理（组数、等级）</td><td>{110} 柱面解理，两组，完全解理</td><td>⊥C</td></tr>
+      <tr><td>3</td><td>解理夹角</td><td><strong>56°/124°</strong></td><td>⊥C</td></tr>
+      <tr><td>4</td><td>多色性和吸收性公式</td><td>Ng=深绿、Nm=绿、Np=浅黄绿；<strong>Ng &gt; Nm &gt; Np</strong></td><td>∥OAP（Ng/Np）+ ⊥C（Nm）</td></tr>
+      <tr><td>5</td><td>突起等级</td><td>正中突起（n≈1.62~1.68）</td><td>⊥C（及任意切面）</td></tr>
+      <tr><td>6</td><td>最高干涉色</td><td>二级中部（蓝绿~黄绿，叠本色偏暗）</td><td>∥OAP</td></tr>
+      <tr><td>7</td><td>消光类型</td><td>柱面切面斜消光；横切面对称消光</td><td>∥OAP + ⊥C</td></tr>
+      <tr><td>8</td><td>消光角</td><td><strong>Ng∧c = 18°（17°~19°）</strong>，区间 12°~25°</td><td>∥OAP</td></tr>
+      <tr><td>9</td><td>延性符号</td><td>正延性（延长方向 = Ng）</td><td>∥OAP</td></tr>
+      <tr><td>10</td><td>轴性</td><td>二轴晶</td><td>⊥OA</td></tr>
+      <tr><td>11</td><td>光性符号</td><td><strong>负光性（−）</strong>，2V 大（约 60°~85°）</td><td>⊥OA</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="sum-final">定名：<strong>普通角闪石（Hornblende）</strong><br><span style="font-size:13px; font-weight:400; color:#3D5158;">依据链：绿色多色性显著（Ng=深绿、Nm=绿、Np=浅黄绿）· 两组完全解理 56°/124° · 斜消光 Ng∧c=18° · 最高干涉色二级中部 · 正延性 · 二轴晶（−）2V 大</span></div>
+
+<p class="note"><strong>与手册的对应</strong>：本记录按"定向切面"组织（题板要求），与《晶体光学与岩矿镜下鉴定知识手册》7.4 示范一按"观察系统"组织（单偏光→正交→锥光）的记录内容等价、数据同源；锥光判读原理见手册 3.3~3.4，角闪石参数卡见手册 5.4。两种框架考试均可直接作答，遇"按切面测定"类题目用本页框架。其余 11 种矿物全记录（<a href="quartz-systematic-id.html">石英</a>、<a href="calcite-systematic-id.html">方解石</a>、<a href="fluorite-systematic-id.html">萤石</a>、<a href="biotite-systematic-id.html">黑云母</a>、<a href="muscovite-systematic-id.html">白云母</a>、<a href="augite-systematic-id.html">普通辉石</a>、<a href="olivine-systematic-id.html">橄榄石</a>、<a href="apatite-systematic-id.html">磷灰石</a>、<a href="garnet-systematic-id.html">石榴石</a>、<a href="orthoclase-systematic-id.html">正长石</a>、<a href="plagioclase-systematic-id.html">斜长石</a>）数据同源；返回<a href="mineral-microscopy-handbook.html">知识手册</a>。</p>
+
+<footer>晶体光学与岩矿镜下鉴定 · 实操记录系列 · 2026-10-12 制作 &nbsp;|&nbsp; 光学常数与《晶体光学》通行教材及手册核定值逐项核对一致</footer>
+
+</div>
+</body>
+</html>

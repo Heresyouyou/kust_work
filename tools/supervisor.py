@@ -58,6 +58,8 @@ LOG_FILE = LOG_DIR / "supervisor.log"
 LOCK_FILE = ROOT / ".supervisor.lock"
 STOP_FILE = ROOT / ".supervisor_stop"                 # 存在 → 只监控不拉起
 QUIT_FILE = ROOT / ".supervisor_quit"                 # 存在 → 守护优雅退出
+RESTART_FLAG = ROOT / ".supervisor_restart_flask"     # 存在 → 下次守护启动时强制重启 Flask
+RESTART_HTTPREDIR_FLAG = ROOT / ".supervisor_restart_httpredir"  # 存在 → 下次守护启动时强制重启 httpredir
 PIDS_FILE = LOG_DIR / "supervisor_pids.json"
 
 CHECK_INTERVAL = 15          # 常规检查间隔 (秒)
@@ -162,6 +164,16 @@ def http_probe(url, timeout=3.0):
         return True, r.status
     except urllib.error.HTTPError as e:
         return True, e.code
+    except Exception:
+        return False, None
+
+
+def tcp_probe(host, port, timeout=3.0):
+    """TCP 连通性探测 (给不做 HTTP 探活的服务用, 如 TLS 终止层)。"""
+    import socket
+    try:
+        with socket.create_connection((host, port), timeout=timeout):
+            return True, None
     except Exception:
         return False, None
 
@@ -451,17 +463,113 @@ class TunnelService(Service):
 
 
 # ══════════════════════════════════════════════════════════════
+#  本地 TLS 终止层 (ChmlFrp https 隧道的本地 HTTPS 入口)
+# ══════════════════════════════════════════════════════════════
+# ChmlFrp 的 https 隧道是 **TLS 透传**(frps 只按 SNI 路由, 不终止 TLS), 证书必须挂在
+# 本地站点上; 而本地上游只讲明文 HTTP。本层用对应域名证书在本地终结 TLS, 再把解密
+# 后的字节转发给上游明文端口。frpc.ini 里该隧道的 local_port 须指向本层端口。
+# 两个域名各起一个实例, 同一个 tls_front.py, 靠 TLS_FRONT_* 环境变量区分:
+#   · open.kust.work → 监听 5443, 上游 5555, 证书 SSL\open.kust.work\
+#   · sjck.kust.work → 监听 5087, 上游 5556(GeoKB), 证书 SSL\sjck.kust.work\
+#     （2026-10-15 起由 lib.kust.work 切换而来：lib 易被外部 AI 误判为
+#      "昆明理工大学图书馆"域名。环境变量名保留 TLS_LIB_* 以兼容既有部署。）
+TLS_FRONT_PORT = int(os.environ.get("TLS_FRONT_PORT", "5443"))
+TLS_FRONT_CERT = Path(os.environ.get(
+    "TLS_FRONT_CERT", str(ROOT.parent / "SSL" / "open.kust.work" / "fullchain.pem")))
+TLS_LIB_PORT = int(os.environ.get("TLS_LIB_PORT", "5087"))
+TLS_LIB_UPSTREAM = int(os.environ.get("TLS_LIB_UPSTREAM", "5556"))
+TLS_LIB_CERT = Path(os.environ.get(
+    "TLS_LIB_CERT", str(ROOT.parent / "SSL" / "sjck.kust.work" / "fullchain.pem")))
+
+
+class TlsFrontService(Service):
+    """TLS 终止层: 端口在听即视为 ready (不做 HTTP 探活 —— 探它要过 TLS 握手)。"""
+
+    def __init__(self, name="tlsfront", port=None, cert=None, upstream=5555,
+                 label="open.kust.work"):
+        self.label = label
+        self.cert = Path(cert or TLS_FRONT_CERT)
+        self.key = self.cert.parent / "privkey.pem"
+        self.upstream = upstream
+        super().__init__(name, port or TLS_FRONT_PORT, None, grace=10)
+
+    def probe(self):
+        ok, _ = tcp_probe("127.0.0.1", self.port, timeout=3.0)
+        return ("ready" if ok else "down"), None
+
+    def start(self):
+        LOG_DIR.mkdir(parents=True, exist_ok=True)
+        f = open(LOG_DIR / f"{self.name}.out.log", "a", encoding="utf-8", errors="replace")
+        env = child_env()
+        env["TLS_FRONT_PORT"] = str(self.port)
+        env["TLS_FRONT_UPSTREAM"] = str(self.upstream)
+        env["TLS_FRONT_CERT"] = str(self.cert)
+        env["TLS_FRONT_KEY"] = str(self.key)
+        try:
+            p = subprocess.Popen(
+                [python_exe(), str(ROOT / "tools" / "tls_front.py")],
+                cwd=str(ROOT), stdout=f, stderr=subprocess.STDOUT, env=env,
+                creationflags=0x00000008 | 0x00000200,   # DETACHED_PROCESS | NEW_PROCESS_GROUP
+                close_fds=True,
+            )
+        except Exception as e:
+            log(f"[{self.name}] ❌ Popen 失败: {e}")
+            return None
+        self.record_pid(p.pid)
+        log(f"[{self.name}] 已拉起 pid={p.pid} TLS 127.0.0.1:{self.port} → "
+            f"127.0.0.1:{self.upstream} ({self.label})")
+        return p.pid
+
+
+# ══════════════════════════════════════════════════════════════
+#  open.kust.work http→https 302 跳转层 (浏览器输入域名先走 80 时顶到 HTTPS)
+# ══════════════════════════════════════════════════════════════
+# ChmlFrp 的 http 隧道需要一个本地明文端点; 本服务对任意请求回 302 到
+# https://open.kust.work。与 https 链路 (tls_front:5443) 无关。
+HTTP_REDIRECT_PORT = int(os.environ.get("HTTP_REDIRECT_PORT", "5080"))
+
+
+class HttpRedirectService(Service):
+    """http→https 302 层: 端口在听即视为 ready (纯明文, 不做 HTTP 探活)。"""
+
+    def __init__(self):
+        super().__init__("httpredir", HTTP_REDIRECT_PORT, None, grace=10)
+
+    def probe(self):
+        ok, _ = tcp_probe("127.0.0.1", HTTP_REDIRECT_PORT, timeout=3.0)
+        return ("ready" if ok else "down"), None
+
+    def start(self):
+        LOG_DIR.mkdir(parents=True, exist_ok=True)
+        f = open(LOG_DIR / "httpredirect.out.log", "a", encoding="utf-8", errors="replace")
+        try:
+            p = subprocess.Popen(
+                [python_exe(), str(ROOT / "tools" / "http_redirect.py")],
+                cwd=str(ROOT), stdout=f, stderr=subprocess.STDOUT, env=child_env(),
+                creationflags=0x00000008 | 0x00000200,   # DETACHED_PROCESS | NEW_PROCESS_GROUP
+                close_fds=True,
+            )
+        except Exception as e:
+            log(f"[httpredir] ❌ Popen 失败: {e}")
+            return None
+        self.record_pid(p.pid)
+        log(f"[httpredir] 已拉起 pid={p.pid} http 127.0.0.1:{HTTP_REDIRECT_PORT} → 302 https://open.kust.work")
+        return p.pid
+
+
+# ══════════════════════════════════════════════════════════════
 #  证书同步 (云服务器 → NAS 内网 HTTPS 入口)
 # ══════════════════════════════════════════════════════════════
-# kust.work 的证书由云服务器上的 acme.sh (DNS-01) 签发并保管, 续期时它的
-# reloadcmd 只会 reload 云服务器的 nginx。但校园内网 HTTPS 走的是 NAS 上那份
-# 拷贝 (NAS:443, 见 /etc/config/apache/extra/apache-kust-ssl.conf), 不跟着换
-# 的话, 到期后内网入口会直接变成"证书已过期"报警。
-# 这里定期比对两端的 SHA256, 变了才传输 + graceful reload —— 平时零副作用。
+# 公网入口 (kust.work:443 / www.kust.work) 用云服务器上 acme.sh (DNS-01) 自动续期的
+# Let's Encrypt 证书, 那个目录不动。校园内网 HTTPS 走的是 NAS 上那份拷贝
+# (NAS:443, 见 /etc/config/apache/extra/apache-kust-ssl.conf), 用的是**腾讯云证书**
+# (2026-10-10 起, 由用户从腾讯云控制台签发, 到期前手动重签), 放在云服务器的
+# /etc/kustwork-tencent/ 作为同步源。这里定期比对两端的 SHA256, 变了才传输 +
+# graceful reload —— 平时零副作用, 且不会把 NAS 上的腾讯证书覆盖回 LE。
 # ★ 时间对齐: 只在指纹不同时动 NAS, 避免每次检查都重载 QTS 的 Web 服务。
 CERT_SYNC_INTERVAL = int(os.environ.get("KUST_CERT_SYNC_INTERVAL", 6 * 3600))
 CERT_SRC = os.environ.get("KUST_CERT_SRC", "root@<server-ip>")
-CERT_SRC_DIR = os.environ.get("KUST_CERT_SRC_DIR", "<server-panel-path>")
+CERT_SRC_DIR = os.environ.get("KUST_CERT_SRC_DIR", "/etc/kustwork-tencent")
 CERT_NAS_HOST = os.environ.get("KUST_NAS_HOST", "<lan-ip>")
 CERT_NAS_USER = os.environ.get("KUST_NAS_USER", "<redacted-secret>")
 CERT_NAS_PASS = os.environ.get("KUST_NAS_PASS", "<redacted-secret>")
@@ -677,6 +785,28 @@ def main():
         _tunnel_why = ""
         services.append(TunnelService())
 
+    # ── open.kust.work 本地 TLS 终止层 (HTTPS 入口) ──
+    # 证书不在就跳过(不影响其它服务); frpc.ini 的 local_port 指向它(5443)。
+    if TLS_FRONT_CERT.exists():
+        _tlsfront_why = ""
+        services.append(TlsFrontService())
+    else:
+        _tlsfront_why = f"未找到证书 {TLS_FRONT_CERT}"
+
+    # ── sjck.kust.work 本地 TLS 终结层 (HTTPS 入口, 上游 GeoKB 5556) ──
+    # 证书不在就跳过; frpc.ini 的 SJCK_KUST_WORK local_port 指向它(5087)。
+    # 2026-10-15 起由 lib.kust.work 切换（lib 易被误判为"昆明理工大学图书馆"域名）。
+    if TLS_LIB_CERT.exists():
+        _tlslib_why = ""
+        services.append(TlsFrontService(name="tlsfrontlib", port=TLS_LIB_PORT,
+                                        cert=TLS_LIB_CERT, upstream=TLS_LIB_UPSTREAM,
+                                        label="sjck.kust.work"))
+    else:
+        _tlslib_why = f"未找到证书 {TLS_LIB_CERT}"
+
+    # ── open.kust.work http→https 302 跳转层 (ChmlFrp http 隧道的本地端点) ──
+    services.append(HttpRedirectService())
+
     if args.status:
         out = {}
         for s in services:
@@ -704,9 +834,72 @@ def main():
     else:
         log(f"[tunnel] 纳入监护 —— 服务器 127.0.0.1:{TUNNEL_REMOTE_PORT} "
             f"→ 本机 127.0.0.1:{TUNNEL_LOCAL_PORT}")
+    if _tlsfront_why:
+        log(f"[tlsfront] ⏭️  不监护 TLS 终止层 —— 原因: {_tlsfront_why}")
+    else:
+        log(f"[tlsfront] 纳入监护 —— TLS 127.0.0.1:{TLS_FRONT_PORT} → 本机 127.0.0.1:5555")
+    if _tlslib_why:
+        log(f"[tlsfrontlib] ⏭️  不监护 sjck TLS 终止层 —— 原因: {_tlslib_why}")
+    else:
+        log(f"[tlsfrontlib] 纳入监护 —— TLS 127.0.0.1:{TLS_LIB_PORT} "
+            f"→ 本机 127.0.0.1:{TLS_LIB_UPSTREAM} (sjck.kust.work)")
     log(f"停止标记: {STOP_FILE} (存在时只监控不拉起)")
     log(f"退出标记: {QUIT_FILE} (存在时优雅退出, 用于停掉提升权限的守护)")
     log("=" * 60)
+
+    # ── 一次性 Flask 重启标记 ──
+    # 背景: 守护以 Highest 权限拉起的 Flask, 普通权限 shell 杀不掉
+    # (taskkill/Stop-Process 均 Access Denied), 改完 web_app.py 或 modules/**
+    # 的代码后没有无提权的重启通道。用法: touch 本标记 + .supervisor_quit
+    # 让旧守护退出, 再触发计划任务/手动启动新守护 → 这里借守护的手杀旧
+    # Flask 并立即拉起新代码实例。
+    if RESTART_FLAG.exists():
+        try:
+            RESTART_FLAG.unlink()
+        except Exception:
+            pass
+        old = None
+        try:
+            old = int((ROOT / ".flask_5555.pid").read_text(encoding="utf-8").strip())
+        except Exception:
+            pass
+        if old and pid_alive(old):
+            log(f"[flask] 🔄 重启标记: 杀旧实例 pid={old}")
+            kill_pid(old)
+            time.sleep(2)
+        else:
+            log("[flask] 🔄 重启标记: 旧实例已不在")
+        try:
+            (ROOT / ".flask_5555.pid").unlink(missing_ok=True)
+        except Exception:
+            pass
+        flask_svc = next((s for s in services if isinstance(s, FlaskService)), None)
+        if flask_svc:
+            flask_svc.started_at = time.time()
+            flask_svc.start()
+            log("[flask] 🔄 已按重启标记拉起新实例")
+
+    # ── 一次性 httpredir 重启标记 ──
+    # httpredir 由本守护(提权)拉起, 普通权限 shell 杀不掉 → 改代码后没有无提权的
+    # 重启通道。用法同 Flask: touch 本标记 + .supervisor_quit, 旧守护退出、计划任务
+    # 拉起新守护 → 这里借守护(提权)的手杀旧实例并立即拉起新代码。
+    if RESTART_HTTPREDIR_FLAG.exists():
+        try:
+            RESTART_HTTPREDIR_FLAG.unlink()
+        except Exception:
+            pass
+        redir_svc = next((s for s in services if isinstance(s, HttpRedirectService)), None)
+        if redir_svc:
+            if redir_svc.pid and pid_alive(redir_svc.pid):
+                log(f"[httpredir] 🔄 重启标记: 杀旧实例 pid={redir_svc.pid}")
+                kill_pid(redir_svc.pid)
+                time.sleep(2)
+            else:
+                log("[httpredir] 🔄 重启标记: 旧实例已不在")
+            redir_svc.clear_pid()
+            redir_svc.started_at = time.time()
+            redir_svc.start()
+            log("[httpredir] 🔄 已按重启标记拉起新实例")
 
     # 守护刚启动: 认领上一任守护拉起、仍在跑的进程, 并给宽限
     for s in services:

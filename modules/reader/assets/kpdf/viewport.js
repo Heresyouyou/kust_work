@@ -177,8 +177,11 @@ export class View extends Emitter {
       Object.assign(slot.root.style, {
         left: `${box.x}px`, top: `${box.y}px`, width: `${box.w}px`, height: `${box.h}px`,
       });
-      // 尺寸变了 → 已挂的文本层/画布作废
-      if (slot.renderedScale !== undefined && Math.abs(slot.renderedScale - this.scale) > 1e-3) {
+      // 缩放变了 → 已挂的文本层/画布作废
+      // 旋转变了也要作废：renderer.isReady 含 rotation，画布会按新旋转重画，
+      // 但 _mountTextLayer 见 slot.textLayer 已存在会提前返回，文本层会残留
+      // 旧旋转几何（span 位置按旧视口算）→ 划词与笔画错位。
+      if (slot.renderedScale !== undefined && (Math.abs(slot.renderedScale - this.scale) > 1e-3 || slot.textRotation !== this.rotation)) {
         this._teardownSlotLayers(i);
       }
       this.renderer?.setProtected(this._slots.keys());
@@ -508,6 +511,7 @@ export class View extends Emitter {
     slot.canvas?.remove();
     slot.canvas = null;
     slot.renderedScale = undefined;
+    slot.textRotation = undefined;
   }
 
   async _mountTextLayer(index) {
@@ -521,6 +525,7 @@ export class View extends Emitter {
       const handle = kp.createTextLayer(layerEl, { scale: this.scale, rotation: this.rotation });
       slot.textLayerEl = layerEl;
       slot.textLayer = handle;
+      slot.textRotation = this.rotation;   // 记录挂载时的旋转：relayout 据此判断文本层是否作废
       await handle.promise;
       this.emit('textlayer', { page: index + 1 });
     } catch (err) {

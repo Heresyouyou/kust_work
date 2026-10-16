@@ -58,7 +58,8 @@ ITEMS = [
     ('modules/__init__.py',             'modules/__init__.py'),
     ('modules/archive',                 'modules/archive'),
     ('modules/journals',                'modules/journals'),
-    ('modules/news',                    'modules/news'),
+    ('modules/news',                   'modules/news'),
+    ('modules/notes',                  'modules/notes'),       # 笔记整理
     ('modules/palette',                 'modules/palette'),
     ('modules/queue',                   'modules/queue'),      # 统一任务队列（展示页）
     ('modules/reader',                  'modules/reader'),     # 自研 canvas PDF 阅读器

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """图像拼合模块
 
 页面：GET /stitch
@@ -89,6 +89,38 @@ _MIME = {
     '.svg': 'image/svg+xml',
     '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png',
 }
+
+# ── 成品图的对外入口（结果链接用它）──
+# ★ 用户口径（2026-09-30）：结果链接**直接用 NAS 的入口**，不要给只在本机有效的地址
+#   —— 相对路径 / 127.0.0.1 从别人机器上看都是「本机」，分享出去就废了。
+#   `kust.work` 就是 NAS 的域名（校园网 DNS → <lan-ip> → NAS DNAT → 本机 Flask，
+#   见 portal/routes.py `_request_path()` 的通路说明）。实测：本机取 15.9MB 成品图
+#   **0.45s**、校园网同事也能直接打开 ⇒ 两条人群都兼顾。
+#   ⚠️ **不要改成 <lan-ip>**：那只在实验室 LAN（<nas-host>/<share>
+#   校园网同事打不开 —— 与 `modules/share` 是同一条坑（那边 SERVER 也必须是 kust.work）。
+#   ⚠️ 别拿 SMB 的经验否定它：`//<nas-host>/<share> 挂 94s 是 **445 端口**的事，
+#   HTTP 80/443 实测 0.016s，两者无关。
+#   换域名/换网段：设环境变量 `STITCH_PUBLIC_BASE`；**设成空串则退回相对路径**。
+#   ★ 2026-10-10 起**跟随用户实际访问协议**：https 访问生成 https 链接，http 访问生成 http
+#     链接；无请求上下文时默认 https://kust.work。
+_ENV_PUBLIC_BASE = os.environ.get('STITCH_PUBLIC_BASE')  # None = 未设 → 跟随当前请求
+
+
+def _public_base() -> str:
+    """当前请求的对外入口（scheme 跟随实际访问协议）；无请求上下文时默认 https。"""
+    if _ENV_PUBLIC_BASE is not None:
+        return _ENV_PUBLIC_BASE.strip().rstrip('/')
+    try:
+        return request.host_url.rstrip('/')
+    except Exception:
+        return 'https://kust.work'
+
+
+def _public_url(path: str) -> str:
+    """把模块内的相对路径套成对外地址（PUBLIC_BASE 为空串时原样返回）。"""
+    base = _public_base()
+    return (base + path) if base else path
+
 
 tasks = {}
 
@@ -511,19 +543,38 @@ def _stitch_runner(job_id, ctx):
         result, meta = s.stitch(paths)
         fname = _save(result)
         _f = _find_result(fname)
+        # 「成品图指引」分两个粒度下发，别混：
+        #   ① 本模块 tasks 表（/api/stitch/task/<id>）—— 带完整 meta（逐对判据明细）；
+        #   ② 统一队列的 job（/api/queue）—— 只带**精简版**。
+        # ② 必须精简的理由：91 张任务的 meta 有 4095 条逐对判据（见文件头注），
+        #   而 /api/queue 是前端 2s 一次的高频轮询，背着它等于每次轮询搬一遍大 JSON。
+        # ★ 键名叫 `result`（不是 artifacts）：web_app._queue_snapshot 的字段白名单
+        #   里放行的就是它，改名要两边同时改。
+        # 结果指引**同时给相对与绝对两套地址**，消费方不同，别互相顶替：
+        #   · `url` / `download_url` = **相对路径**，跟随访问入口（同主机、同协议）。
+        #     拼合页 `assets/app.js` 拿它当**内嵌资源**（`<img src>`、`<a download>`）——
+        #     若这里换成 `http://…` 绝对地址，页面一旦从 **https** 打开就会被浏览器的
+        #     混合内容策略拦掉（内嵌资源不允许降级到 http）。所以这对键**必须保持相对**。
+        #   · `public_url` / `public_download_url` = **NAS 对外入口**（见 PUBLIC_BASE），
+        #     给「分享出去 / 换入口打开 / 过一会儿再看」的**链接**用 —— 队列页取的就是它。
+        info = {
+            'filename': fname,
+            'url': f'/api/stitch/result/{fname}',
+            'download_url': f'/api/stitch/result/{fname}/dl',
+            'public_url': _public_url(f'/api/stitch/result/{fname}'),
+            'public_download_url': _public_url(f'/api/stitch/result/{fname}/dl'),
+            'size_kb': (round(_f.stat().st_size / 1024, 1)
+                        if _f is not None else None),
+            # int() 是必要的：shape 元素虽多为 Python int，但进了 jsonify 前
+            # 不能有任何 numpy 标量残留（否则 TypeError: not JSON serializable）
+            'width': int(result.shape[1]), 'height': int(result.shape[0]),
+        }
         _put_task(job_id, {
             'status': 'done', 'progress': s.progress, 'percent': 100,
             'queued': False, 'error': None,
-            'result': {
-                'filename': fname,
-                'url': f'/api/stitch/result/{fname}',
-                'size_kb': (round(_f.stat().st_size / 1024, 1)
-                            if _f is not None else None),
-                'width': result.shape[1], 'height': result.shape[0],
-                'meta': meta,
-            },
+            'result': dict(info, meta=meta),
         })
-        ctx.finish(message='完成')
+        ctx.finish(message='完成', result=info)
     except Exception as e:
         _put_task(job_id, {
             'status': 'error', 'error': str(e),

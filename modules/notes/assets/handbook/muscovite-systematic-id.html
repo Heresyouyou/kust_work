@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>透明矿物系统鉴定 · 白云母（按观察系统组织）</title>
+<style>
+  :root {
+    --bg: #FFFFFF; --bg2: #F5F8F9; --rule: #D8E2E4;
+    --ink: #1D2B30; --muted: #64787F; --text-secondary: #3D5158;
+    --accent: #2C6E75; --accent-hover: #235A60; --accent-soft: #EAF3F3;
+    --brand-text: #1A464B; --border: #D8E2E4; --brand: #2C6E75;
+    --brand-soft: #EAF3F3; --brand-soft-strong: #D8E9EA;
+    --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg2); color: var(--ink);
+    font-family: "Source Han Serif SC", "Noto Serif CJK SC", "SimSun", serif;
+    font-size: 15px; line-height: 1.75;
+  }
+  .page { max-width: 900px; margin: 0 auto; background: var(--bg); padding: 40px 46px 56px; box-shadow: 0 0 18px rgba(29,43,48,.07); }
+  header { border-bottom: 3px solid var(--brand); padding-bottom: var(--s4); margin-bottom: var(--s5); }
+  .kicker { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; font-size: 12.5px; letter-spacing: 3px; color: var(--accent); font-weight: 700; }
+  h1 { font-size: 26px; margin: 6px 0 8px; color: var(--brand-text); }
+  .sub { color: var(--muted); font-size: 13.5px; }
+  h2 { font-size: 19px; color: var(--brand-text); border-left: 4px solid var(--brand); padding-left: 10px; margin: 38px 0 10px; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
+  h2 .step-tag { display: inline-block; font-size: 12px; background: var(--brand); color: #fff; border-radius: 4px; padding: 1px 8px; vertical-align: 3px; margin-right: 8px; letter-spacing: 1px; }
+  h3 { font-size: 15.5px; color: var(--brand-text); margin: 18px 0 6px; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
+  p { margin: 8px 0; }
+  .req { background: var(--brand-soft); border: 1px solid var(--brand-soft-strong); border-radius: 8px; padding: 10px 14px; font-size: 13.5px; color: var(--brand-text); }
+  .req a { color: var(--accent); }
+  .tbl-title { font-size: 12.5px; color: var(--muted); margin: 0 0 4px; font-family: "Microsoft YaHei", sans-serif; }
+  .table-wrap { width: 100%; overflow-x: auto; margin: 10px 0 14px; }
+  table.rwd-card { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  table.rwd-card th, table.rwd-card td { border: 1px solid var(--border); padding: 7px 10px; vertical-align: top; text-align: left; }
+  table.rwd-card th[scope="row"] { background: var(--brand-soft); color: var(--brand-text); font-family: "Microsoft YaHei", sans-serif; font-weight: 600; white-space: nowrap; }
+  table.rwd-card thead th { background: var(--brand-soft-strong); color: var(--brand-text); font-family: "Microsoft YaHei", sans-serif; }
+  .op { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; font-size: 12px; color: #fff; background: #4E8A8F; border-radius: 3px; padding: 0 6px; margin-right: 4px; white-space: nowrap; }
+  .why { font-weight: 700; color: var(--brand-text); }
+  .thus { font-weight: 700; color: #8A5A00; }
+  .fig { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px 8px; margin: 14px 0 18px; }
+  .fig-title { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; font-size: 13.5px; font-weight: 700; color: var(--brand-text); margin-bottom: 4px; }
+  .fig svg { width: 100%; height: auto; display: block; }
+  .fig-cap { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+  .concl { background: #FBF6E9; border: 1px solid #E8D9A8; border-radius: 8px; padding: 10px 14px; font-size: 13.5px; }
+  .concl strong { color: #8A5A00; }
+  .note { font-size: 12.5px; color: var(--muted); border-top: 1px dashed var(--border); padding-top: 8px; margin-top: 12px; }
+  .note a { color: var(--accent); }
+  .sum-final { background: var(--brand-soft); border: 2px solid var(--brand); border-radius: 10px; padding: 14px 18px; text-align: center; font-size: 17px; }
+  .sum-final strong { color: var(--brand-text); }
+  footer { border-top: 1px solid var(--rule); margin-top: 40px; padding-top: 14px; font-size: 12.5px; color: var(--muted); }
+  ul { margin: 6px 0; padding-left: 22px; }
+  li { margin: 3px 0; }
+  @media (max-width: 640px) { .page { padding: 20px 16px 32px; } h1 { font-size: 21px; } }
+  @media print { body { background: #fff; } .page { box-shadow: none; padding: 10mm 12mm; max-width: none; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="kicker">透明矿物系统鉴定 · 实操记录</div>
+  <h1>白云母综合鉴定记录（按观察系统组织）</h1>
+  <p class="sub">样品：××-06（云母片岩）&nbsp;·&nbsp; 物镜 10×40&nbsp;·&nbsp;鉴定人：（考生姓名）&nbsp;·&nbsp;日期：2026-__-__</p>
+  <div class="req"><strong>记录要求</strong>（原始题板）：系统测定某矿物的光学性质；记录要求：绘图并加简单说明。本页按"单偏光→正交偏光→锥光"三大观察系统逐项记录；按定向切面组织的作答范本见<a href="hornblende-systematic-id.html">普通角闪石全记录</a>。</div>
+</header>
+
+<!-- ===================== 路线总览 ===================== -->
+<h2><span class="step-tag">路线</span>鉴定总路线与关键特征总览</h2>
+<p>白云母为单斜晶系二轴晶负光性矿物。鉴定主线：<strong>无色片状、鳞片状沿片理定向排列</strong>（部分扭折弯曲）、{001} 一组极完全解理、正低~正中突起（单偏光）→ <strong>平行消光 0°、正延性、鲜艳二级顶部~三级初干涉色（石英楔法 n=2）</strong>（正交偏光）→ <strong>二轴晶（−）、2V 中等</strong>（黑十字明显分裂）（锥光）。与黑云母的三处对照——<strong>无色/褐色、干涉色明亮鲜艳/浑浊掩盖、2V 中等（明显分裂）/2V 很小（微弱分裂）</strong>——是本记录的得分主线。</p>
+
+<div class="fig">
+  <div class="fig-title">图 A&nbsp;白云母片状定向排列、扭折弯曲与一组极完全解理（示意）</div>
+  <svg viewBox="0 0 880 350" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="白云母鳞片沿片理定向排列与扭折弯曲及解理缝示意">
+    <defs>
+      <marker id="mA1" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#2C6E75"/></marker>
+      <marker id="mA2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#64787F"/></marker>
+    </defs>
+    <!-- 左：定向排列+扭折 -->
+    <g>
+      <rect x="30" y="42" width="370" height="250" rx="8" fill="#FDFDFD" stroke="#D8E2E4"/>
+      <text x="215" y="30" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">① 鳞片沿片理定向排列（单偏光，无色）</text>
+      <g stroke="#4E8A8F" stroke-width="1.6" fill="#EAF3F3">
+        <rect x="60" y="90" width="66" height="16" rx="3" transform="rotate(-8 93 98)"/>
+        <rect x="140" y="102" width="60" height="15" rx="3" transform="rotate(-8 170 110)"/>
+        <rect x="210" y="114" width="64" height="15" rx="3" transform="rotate(-8 242 122)"/>
+        <rect x="282" y="126" width="58" height="15" rx="3" transform="rotate(-8 311 134)"/>
+        <rect x="76" y="140" width="62" height="15" rx="3" transform="rotate(-8 107 148)"/>
+        <rect x="152" y="152" width="58" height="15" rx="3" transform="rotate(-8 181 160)"/>
+        <rect x="222" y="164" width="62" height="15" rx="3" transform="rotate(-8 253 172)"/>
+        <rect x="292" y="176" width="56" height="15" rx="3" transform="rotate(-8 320 184)"/>
+        <path d="M 96,196 L 156,190 L 176,204 L 236,196" fill="none" stroke="#B3402E" stroke-width="2.4"/>
+        <rect x="156" y="184" width="22" height="15" rx="3" transform="rotate(38 167 192)" fill="#DCE9EA"/>
+      </g>
+      <text x="300" y="230" font-size="11.5" fill="#B3402E" font-family="Microsoft YaHei, sans-serif">扭折弯曲（应力变形痕迹）</text>
+      <line x1="298" y1="222" x2="212" y2="200" stroke="#B3402E" stroke-width="1" marker-end="url(#mA1)"/>
+      <text x="215" y="268" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">片理方向整体一致——变质岩中白云母典型产状</text>
+      <text x="215" y="286" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">（绢云母即细鳞片状白云母，同种不同产状）</text>
+    </g>
+    <!-- 分隔线 -->
+    <line x1="440" y1="30" x2="440" y2="320" stroke="#D8E2E4" stroke-width="1"/>
+    <!-- 右：条状切面解理 -->
+    <g>
+      <rect x="470" y="42" width="380" height="250" rx="8" fill="#FDFDFD" stroke="#D8E2E4"/>
+      <text x="660" y="30" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">② 细长条状切面：一组极完全解理缝</text>
+      <path d="M 530,80 L 780,80 L 800,252 L 550,252 Z" fill="#F4FAFA" stroke="#4E8A8F" stroke-width="1.8"/>
+      <line x1="580" y1="84" x2="590" y2="248" stroke="#7FA8A0" stroke-width="1.1"/>
+      <line x1="630" y1="83" x2="640" y2="249" stroke="#7FA8A0" stroke-width="1.1"/>
+      <line x1="680" y1="82" x2="690" y2="250" stroke="#7FA8A0" stroke-width="1.1"/>
+      <line x1="730" y1="83" x2="740" y2="249" stroke="#7FA8A0" stroke-width="1.1"/>
+      <text x="660" y="284" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">细密、平直、贯通，平行片长方向；假六边形切面不见解理缝</text>
+      <text x="660" y="302" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">底面{001}一组极完全解理——与黑云母同构造</text>
+    </g>
+  </svg>
+  <div class="fig-cap">单凭解理不能区分黑云母与白云母（同构造），须靠颜色+干涉色+2V 三对照；扭折弯曲写进晶形行，体现变质应力背景——是"从认矿物上升到读成因"的加分写法。</div>
+</div>
+
+<!-- ===================== （一）单偏光 ===================== -->
+<h2 id="s1"><span class="step-tag">（一）</span>单偏光系统 —— 晶形、颜色、突起、解理</h2>
+
+<div class="table-wrap">
+  <p class="tbl-title">表 1&nbsp;单偏光系统记录（三段式）</p>
+  <table class="rwd-card">
+    <tbody>
+      <tr><th scope="row">晶形</th><td><span class="op">操作</span>10× 扫视全片观察片理方向与切面形态。<br><span class="op">现象</span><span class="why">∵</span>目标矿物呈片状、鳞片状，沿片理定向排列；部分鳞片扭折弯曲；细长条状切面与假六边形切面并存。<br><span class="op">结论</span><span class="thus">∴</span><strong>片状、鳞片状习性，定向排列（变质片理）</strong>，扭折为应力变形痕迹——变质岩中白云母典型产状。</td></tr>
+      <tr><th scope="row">颜色与多色性</th><td><span class="op">操作</span>单偏光选条状切面转物台 360° 连续观察。<br><span class="op">现象</span><span class="why">∵</span>任意方位均无色透明，无任何颜色变化。<br><span class="op">结论</span><span class="thus">∴</span><strong>无色、无多色性</strong>——与黑云母（褐色强多色性）的第一区别。</td></tr>
+      <tr><th scope="row">突起与贝克线</th><td><span class="op">操作</span>缩小光圈，微升镜筒观察贝克线；结合糙面与边缘宽窄。<br><span class="op">现象</span><span class="why">∵</span>提升镜筒贝克线移向矿物，清楚但不强烈；糙面微显、边缘细窄清楚。<br><span class="op">结论</span><span class="thus">∴</span>n＞树胶 → 正突起；程度低~中（Np=1.552 略高于树胶、Ng=1.616 正中）→ <strong>正低~正中突起</strong>。</td></tr>
+      <tr><th scope="row">解理</th><td><span class="op">操作</span>条状切面观察解理缝方向与密度；假六边形切面对照。<br><span class="op">现象</span><span class="why">∵</span>条状切面见<strong>一组细密、平直、贯通的极完全解理缝</strong>（平行片长方向）；假六边形切面不见解理缝。<br><span class="op">结论</span><span class="thus">∴</span>底面{001}<strong>一组极完全解理</strong>（与黑云母同构造，单凭解理不能区分两者，须靠颜色+干涉色）。</td></tr>
+      <tr><th scope="row">糙面 · 蚀变 · 包裹体</th><td><span class="op">操作</span>单偏光+正交偏光逐颗粒检查。<br><span class="op">现象</span><span class="why">∵</span>颗粒洁净，未见蚀变交代与特征包裹体。<br><span class="op">结论</span><span class="thus">∴</span>无蚀变、无特征包裹体，记录"未见"。</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===================== （二）正交偏光 ===================== -->
+<h2 id="s2"><span class="step-tag">（二）</span>正交偏光系统 —— 消光、干涉色、延性、双晶</h2>
+
+<div class="table-wrap">
+  <p class="tbl-title">表 2&nbsp;正交偏光系统记录（三段式）</p>
+  <table class="rwd-card">
+    <tbody>
+      <tr><th scope="row">消光类型</th><td><span class="op">操作</span>正交偏光下转物台，观察消光位与解理缝的关系。<br><span class="op">现象</span><span class="why">∵</span>解理缝平行十字丝任一方向时整体消光；斜交 45° 时最亮。<br><span class="op">结论</span><span class="thus">∴</span><strong>平行消光</strong>（云母族共性）。</td></tr>
+      <tr><th scope="row">消光角</th><td><span class="op">操作</span>消光位读数 a₁，解理缝平行纵十字丝读数 a₂。<br><span class="op">现象</span><span class="why">∵</span>|a₁−a₂|=0°，多颗粒一致。<br><span class="op">结论</span><span class="thus">∴</span><strong>消光角 0°</strong>。</td></tr>
+      <tr><th scope="row">最高干涉色与级序</th><td><span class="op">操作</span>正交偏光逐视域对比取最高干涉色（条状切面）；转 45° 最亮位；插 λ/4 云母试板判断升降；缓慢插入石英楔至灰黑（全补偿点）再缓慢抽出，统计紫红色带出现次数。<br><span class="op">现象</span><span class="why">∵</span>全片最高干涉色为<strong>鲜艳的红、绿色</strong>（明亮清晰，与黑云母的浑浊暗褐对照鲜明）；插 λ/4 试板后降低（异名半径平行，可直接补偿）；插入石英楔干涉色逐级降低至灰黑；缓慢抽出过程观察到 <strong>2 次</strong>紫红色带，随后恢复鲜艳红绿色。<br><span class="op">结论</span><span class="thus">∴</span>紫红带 n=2 → 级序 = n+1 = 三级内 → <strong>最高干涉色二级顶部~三级初</strong>；R≈1100~1290 nm，Δ=R/0.03 mm≈0.036~0.043，与白云母 Δ 一致——"无色+鲜艳二三级干涉色"组合是白云母的身份证。</td></tr>
+      <tr><th scope="row">延性符号</th><td><span class="op">操作</span>条状切面延长方向（=解理缝方向）转至一、三象限对角线；插石膏试板。<br><span class="op">现象</span><span class="why">∵</span>干涉色升高、带蓝色调。<br><span class="op">结论</span><span class="thus">∴</span>同名升高 → 延长方向为慢光 → <strong>正延性</strong>。</td></tr>
+      <tr><th scope="row">双晶</th><td><span class="op">操作</span>正交偏光转物台 360° 寻找双晶缝。<br><span class="op">现象</span><span class="why">∵</span>未见双晶缝，消光均匀。<br><span class="op">结论</span><span class="thus">∴</span><strong>无双晶</strong>（偶见解理扭折带，非双晶）。</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="fig">
+  <div class="fig-title">图 B&nbsp;最高干涉色级序测定：石英楔法（紫红带 n=2 → 三级序内）</div>
+  <svg viewBox="0 0 880 330" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="白云母石英楔法级序测定：鲜艳红绿、补偿灰黑、抽出紫红带两次">
+    <defs>
+      <marker id="mB1" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#2C6E75"/></marker>
+    </defs>
+    <!-- ① 45°位鲜艳红绿 -->
+    <g>
+      <text x="155" y="40" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">① 45° 位：鲜艳红、绿色</text>
+      <circle cx="155" cy="130" r="78" fill="#C85A6E" stroke="#64787F" stroke-width="1.8"/>
+      <path d="M 155,52 A 78 78 0 0 1 233,130 L 155,130 Z" fill="#5FA88C"/>
+      <path d="M 155,208 A 78 78 0 0 1 77,130 L 155,130 Z" fill="#5FA88C"/>
+      <circle cx="155" cy="130" r="6" fill="#FDFDFD" stroke="#1A464B" stroke-width="1.5"/>
+      <text x="155" y="240" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">明亮清晰（对照黑云母浑浊暗褐）</text>
+      <text x="155" y="258" font-size="11.5" fill="#2C6E75" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">插 λ/4 板：降低（异名可补偿）</text>
+    </g>
+    <!-- ② 石英楔补偿 -->
+    <g>
+      <text x="425" y="40" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">② 石英楔补偿至灰黑</text>
+      <circle cx="425" cy="130" r="78" fill="#454B52" stroke="#64787F" stroke-width="1.8"/>
+      <circle cx="425" cy="130" r="6" fill="#FDFDFD" stroke="#1A464B" stroke-width="1.5"/>
+      <polygon points="470,196 560,222 554,236 466,212" fill="#EAF3F3" stroke="#4E8A8F" stroke-width="1.5"/>
+      <text x="512" y="254" font-size="11.5" fill="#2C6E75" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">缓插入至全补偿点（R=0）</text>
+    </g>
+    <!-- ③ 抽出数紫红带 -->
+    <g>
+      <text x="715" y="40" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">③ 抽出：紫红带 2 次</text>
+      <rect x="580" y="118" width="40" height="40" fill="#4A4F55"/>
+      <rect x="620" y="118" width="34" height="40" fill="#CDD3D6"/>
+      <rect x="654" y="118" width="34" height="40" fill="#B03A5B"/>
+      <rect x="688" y="118" width="34" height="40" fill="#E6C84E"/>
+      <rect x="722" y="118" width="34" height="40" fill="#B03A5B"/>
+      <rect x="756" y="118" width="34" height="40" fill="#5FA88C"/>
+      <rect x="790" y="118" width="30" height="40" fill="#C85A6E"/>
+      <text x="671" y="176" font-size="11.5" fill="#B03A5B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">第1次</text>
+      <text x="739" y="176" font-size="11.5" fill="#B03A5B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">第2次</text>
+      <path d="M 700,96 L 745,96" fill="none" stroke="#2C6E75" stroke-width="2" marker-end="url(#mB1)"/>
+      <path d="M 745,88 L 700,88" fill="none" stroke="#2C6E75" stroke-width="2" marker-end="url(#mB1)"/>
+      <text x="722" y="80" font-size="11.5" fill="#2C6E75" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">R≈1100~1290 nm</text>
+      <text x="715" y="204" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">随后恢复鲜艳红绿色</text>
+    </g>
+    <!-- 底部结论条 -->
+    <rect x="20" y="248" width="840" height="56" rx="8" fill="#EAF3F3" stroke="#2C6E75" stroke-width="1.2"/>
+    <text x="440" y="271" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">级序 = 紫红带次数 n + 1 = 2 + 1 = 三级序内 → 最高干涉色二级顶部~三级初</text>
+    <text x="440" y="293" font-size="13.5" font-weight="bold" fill="#2C6E75" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">Δ≈0.036~0.043 与白云母一致——"无色+鲜艳二三级干涉色"是白云母身份证</text>
+  </svg>
+  <div class="fig-cap">白云母的级序测定是六大矿物中数据链最完整的一条：λ/4 板判升降（异名可补偿）→ 石英楔补偿至灰黑 → 抽出数紫红带 2 次 → n+1 定级序 → R 反推 Δ 与标准值核对，五步环环相扣。</div>
+</div>
+
+<!-- ===================== （三）锥光 ===================== -->
+<h2 id="s3"><span class="step-tag">（三）</span>锥光系统 —— 轴性、光性符号、2V</h2>
+
+<div class="table-wrap">
+  <p class="tbl-title">表 3&nbsp;锥光系统记录（三段式）</p>
+  <table class="rwd-card">
+    <tbody>
+      <tr><th scope="row">干涉图</th><td><span class="op">操作</span>换 40× 物镜、推入勃氏镜；选干涉色最低（一级灰白）的大片状颗粒（≈平行{001}切面，即垂直 Bxa 切面）；转物台 45° 观察黑十字变化。<br><span class="op">现象</span><span class="why">∵</span>0° 位黑十字；转 45° 黑十字<strong>明显分裂</strong>为两条双曲黑臂，光轴出露点分居两臂凹侧顶点、相距中等（约视域半径之半）；转回 90° 复合为黑十字。<br><span class="op">结论</span><span class="thus">∴</span>黑十字明显分裂 → <strong>二轴晶</strong>，垂直 Bxa 图；与黑云母（微弱分裂）形成对照。</td></tr>
+      <tr><th scope="row">轴性与光性符号</th><td><span class="op">操作</span>保持 45° 位（光轴点连线与试板孔方向 NE-SW 一致）；插入石膏试板；观察凹侧与凸侧内圈颜色变化；拔出复核。<br><span class="op">现象</span><span class="why">∵</span>凹侧（双曲臂之间，Bxa 锐角区）升高变蓝；凸侧（外侧，钝角区）降低变橙黄。<br><span class="op">结论</span><span class="thus">∴</span>凹侧沿连线方向振动的是慢光 → Bxo=Ng → Bxa=Np → <strong>二轴晶负光性（−）</strong>。</td></tr>
+      <tr><th scope="row">2V（估计）</th><td><span class="op">操作</span>45° 位估计两光轴点间距与双曲臂弯曲程度。<br><span class="op">现象</span><span class="why">∵</span>两光轴点相距中等（约视域半径之半）；双曲臂明显弯曲但未近直。<br><span class="op">结论</span><span class="thus">∴</span>2V <strong>中等</strong>（≈29°~47°）。</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="fig">
+  <div class="fig-title">图 C&nbsp;垂直 Bxa 干涉图三步判读：明显分裂 · 二轴晶（−）· 2V 中等</div>
+  <svg viewBox="0 0 880 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="白云母垂直Bxa干涉图判读：0度黑十字、45度明显分裂、插石膏试板凹侧变蓝凸侧变黄">
+    <defs>
+      <marker id="mC1" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#64787F"/></marker>
+      <marker id="mC2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#2C6E75"/></marker>
+    </defs>
+    <!-- 左：0°位黑十字 -->
+    <g>
+      <circle cx="145" cy="140" r="112" fill="#FDFDFD" stroke="#64787F" stroke-width="2"/>
+      <rect x="130" y="30" width="30" height="220" fill="#1D2B30"/>
+      <rect x="35" y="125" width="220" height="30" fill="#1D2B30"/>
+      <circle cx="145" cy="140" r="6" fill="#FDFDFD" stroke="#1A464B" stroke-width="2"/>
+      <text x="145" y="282" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">① 0°位：黑十字</text>
+      <text x="145" y="300" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">选一级灰白大片状颗粒（⊥Bxa 切面）</text>
+    </g>
+    <!-- 中：45°位明显分裂 -->
+    <g>
+      <circle cx="440" cy="140" r="112" fill="#FDFDFD" stroke="#64787F" stroke-width="2"/>
+      <path d="M 470,36 C 540,80 540,200 470,244" fill="none" stroke="#1D2B30" stroke-width="13"/>
+      <path d="M 340,36 C 270,80 270,200 340,244" fill="none" stroke="#1D2B30" stroke-width="13"/>
+      <circle cx="506" cy="140" r="5" fill="#B3402E"/>
+      <circle cx="374" cy="140" r="5" fill="#B3402E"/>
+      <text x="506" y="120" font-size="11" fill="#B3402E" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">光轴点</text>
+      <text x="374" y="120" font-size="11" fill="#B3402E" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">光轴点</text>
+      <line x1="374" y1="140" x2="506" y2="140" stroke="#64787F" stroke-width="1.2" stroke-dasharray="4 3"/>
+      <text x="440" y="164" font-size="11" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">相距≈视域半径之半</text>
+      <path d="M 540,80 A 105 105 0 0 1 552,140" fill="none" stroke="#64787F" stroke-width="1.8" marker-end="url(#mC1)"/>
+      <text x="560" y="112" font-size="11.5" fill="#64787F" font-family="Microsoft YaHei, sans-serif">随物台旋转</text>
+      <text x="440" y="282" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">② 45°位：明显分裂（2V 中等）</text>
+      <text x="440" y="300" font-size="11.5" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">双曲臂明显弯曲——对照黑云母微弱分裂</text>
+    </g>
+    <!-- 右：插石膏试板 -->
+    <g>
+      <circle cx="735" cy="140" r="112" fill="#FDFDFD" stroke="#64787F" stroke-width="2"/>
+      <path d="M 765,36 C 835,80 835,200 765,244" fill="none" stroke="#1D2B30" stroke-width="13"/>
+      <path d="M 635,36 C 565,80 565,200 635,244" fill="none" stroke="#1D2B30" stroke-width="13"/>
+      <path d="M 735,140 L 790,80 L 830,140 L 790,200 Z" fill="#2F6FBA" fill-opacity="0.28"/>
+      <path d="M 735,140 L 680,80 L 640,140 L 680,200 Z" fill="#E8B93E" fill-opacity="0.40"/>
+      <circle cx="801" cy="140" r="5" fill="#B3402E"/>
+      <circle cx="669" cy="140" r="5" fill="#B3402E"/>
+      <text x="822" y="70" font-size="12.5" font-weight="bold" fill="#2B5F8E" font-family="Microsoft YaHei, sans-serif">凹侧变蓝(升)</text>
+      <text x="600" y="222" font-size="12.5" font-weight="bold" fill="#8A6508" font-family="Microsoft YaHei, sans-serif">凸侧变黄(降)</text>
+      <line x1="669" y1="140" x2="801" y2="140" stroke="#64787F" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#mC2)"/>
+      <text x="735" y="282" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">③ 插石膏试板：看凹、凸侧</text>
+      <text x="735" y="300" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">两黑臂之间（Bxa 锐角区）变蓝</text>
+    </g>
+    <!-- 推理链 -->
+    <rect x="20" y="324" width="840" height="58" rx="8" fill="#EAF3F3" stroke="#2C6E75" stroke-width="1.2"/>
+    <text x="440" y="347" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">推理链：黑十字明显分裂 → 二轴晶；凹侧（Bxa 区）沿连线变蓝 = 慢光 → Bxo=Ng、Bxa=Np</text>
+    <text x="440" y="370" font-size="13.5" font-weight="bold" fill="#2C6E75" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">结论：二轴晶，负光性（−），2V 中等（≈29°~47°）</text>
+  </svg>
+  <div class="fig-cap">二轴晶光性判读口诀：凹侧看锐角区（Bxa 出露区）。凹侧变蓝=连线方向慢光=Bxo 为 Ng → Bxa=Np → 负光性；凹侧变黄则为正光性（如普通辉石）。黑云母与白云母一个"微弱分裂"、一个"明显分裂"，2V 差异是云母二分的定量依据。</div>
+</div>
+
+<!-- ===================== （四）汇总 ===================== -->
+<h2 id="s4"><span class="step-tag">（四）</span>综合以上各点写出鉴定结果（11 项）</h2>
+
+<div class="table-wrap">
+  <p class="tbl-title">表 4&nbsp;白云母系统鉴定结果汇总</p>
+  <table class="rwd-card">
+    <thead>
+      <tr><th style="width:44px">序号</th><th style="width:180px">项目</th><th>测定结果</th><th style="width:110px">测定系统</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>晶形</td><td>片状、鳞片状，沿片理定向排列，部分扭折弯曲</td><td>单偏光</td></tr>
+      <tr><td>2</td><td>解理（组数、等级）</td><td><strong>{001} 一组极完全解理</strong></td><td>单偏光</td></tr>
+      <tr><td>3</td><td>解理夹角</td><td>—（一组解理，无夹角）</td><td>单偏光</td></tr>
+      <tr><td>4</td><td>多色性和吸收性公式</td><td>无色、无多色性</td><td>单偏光</td></tr>
+      <tr><td>5</td><td>突起等级</td><td>正低~正中突起（Np=1.552~Ng=1.616）</td><td>单偏光</td></tr>
+      <tr><td>6</td><td>最高干涉色</td><td><strong>二级顶部~三级初</strong>（鲜艳红绿；石英楔法 n=2）</td><td>正交偏光</td></tr>
+      <tr><td>7</td><td>消光类型</td><td><strong>平行消光</strong></td><td>正交偏光</td></tr>
+      <tr><td>8</td><td>消光角</td><td>0°（解理缝平行十字丝时消光）</td><td>正交偏光</td></tr>
+      <tr><td>9</td><td>延性符号</td><td>正延性</td><td>正交偏光</td></tr>
+      <tr><td>10</td><td>轴性</td><td><strong>二轴晶</strong>（黑十字明显分裂）</td><td>锥光</td></tr>
+      <tr><td>11</td><td>光性符号</td><td><strong>负光性（−）</strong>；2V 中等（≈29°~47°）</td><td>锥光</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="sum-final">定名：<strong>白云母（Muscovite）</strong><br><span style="font-size:13px; font-weight:400; color:#3D5158;">依据链：无色片状定向排列 · {001} 一组极完全解理 · 正低~正中突起 · 平行消光 0°+正延性 · 鲜艳二级顶部~三级初干涉色（石英楔法 n=2，Δ≈0.036~0.043）· 二轴晶（−）2V 中等（黑十字明显分裂）</span></div>
+
+<p class="note"><strong>与手册的对应</strong>：本记录与《晶体光学与岩矿镜下鉴定知识手册》7.5 记录五内容同源；白云母系统背景与黑云母对照见手册 5.6，光性参数见手册 8.1 速查总表。按定向切面组织的作答范本见<a href="hornblende-systematic-id.html">普通角闪石全记录</a>；返回<a href="mineral-microscopy-handbook.html">知识手册</a>。</p>
+
+<footer>晶体光学与岩矿镜下鉴定 · 实操记录系列 · 2026-10-12 制作 &nbsp;|&nbsp; 光学常数与《晶体光学》通行教材及手册核定值逐项核对一致</footer>
+
+</div>
+</body>
+</html>

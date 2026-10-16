@@ -110,13 +110,13 @@ MODULES = [
         'status': 'online',
     },
     {
-        'id': 'terms',
+        'id': 'geokb',
         'group': '科研工具',
-        'name': '地学术语库',
-        'desc': '术语对照表检索，查看命中率与扩充记录',
-        'url': None,
-        'tag': '规划中',
-        'status': 'coming',
+        'name': '团队知识库',
+        'desc': 'GeoKB 地矿学科知识库：总览仪表盘，可公开检索与浏览',
+        'url': '/geokb/',
+        'tag': '总览',
+        'status': 'online',
     },
     {
         'id': 'triangle',
@@ -145,6 +145,15 @@ MODULES = [
         'tag': '新增',
         'status': 'online',
     },
+    {
+        'id': 'software',
+        'group': '科研工具',
+        'name': '常用软件',
+        'desc': 'NAS 共享目录的常用软件清单，按类型分组，点卡片即可下载',
+        'url': '/software',
+        'tag': '下载',
+        'status': 'online',
+    },
 
     # ═══════════ 个人效率 ═══════════
     {
@@ -156,6 +165,15 @@ MODULES = [
         'tag': '新增',
         'status': 'online',
         'accent': True,
+    },
+    {
+        'id': 'notes',
+        'group': '个人效率',
+        'name': '笔记整理',
+        'desc': '归档笔记卡片陈列，点开即读，含岩矿镜下鉴定速用手册',
+        'url': '/notes',
+        'tag': '新增',
+        'status': 'online',
     },
 
     # ═══════════ 系统 ═══════════

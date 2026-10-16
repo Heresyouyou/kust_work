@@ -30,9 +30,11 @@
   校验不通过的保留在本地并在报告里标出来，宁可占空间也不能丢数据。
 
 ★ 路径优先级
-  盘符 S: 优先（与用户心智一致，且实测可读写）；UNC 兜底
-  （驱动器映射是「每登录会话」的，若服务被计划任务/系统会话拉起则看不到 S:）。
+  UNC 直连 `//<nas-host>/<share> 优先（同网段直连，唯一实测可用）；
+  盘符 `S:` 次之（与用户心智一致，但映射是「每登录会话」的，服务被计划任务/系统会话
+  拉起时看不到 S:）。
   可用环境变量 NAS_PDF_ROOT 强制指定。
+  ⚠️ 不要用 `kust.work` 那套 UNC：它多一层校园网 DNS + NAS DNAT，本机不通（见下）。
 
 配置：环境变量 NAS_PDF_ROOT（可选）、NAS_TTL_HOURS（默认 48）
 """
@@ -42,6 +44,8 @@ import json
 import os
 import re
 import shutil
+import socket
+import threading
 import time
 from datetime import datetime
 from pathlib import Path
@@ -57,11 +61,32 @@ INDEX_PATH = DATA_DIR / 'nas_index.json'
 LOCK_PATH = DATA_DIR / 'nas_index.lock'
 
 # ── NAS 根目录候选（按顺序探测，第一个 is_dir() 的胜出）──
+# ★ 2026-09-29 统一改用内网直连地址 <lan-ip>。
+#   旧写法 //<nas-host>/<share> 依赖「校园网 DNS → <lan-ip> → NAS eth0 PREROUTING DNAT」
+#   两级跳。本机实测 kust.work 解析到 <lan-ip> 且 100% 超时（DNAT 丢失 / 默认路由
+#   走 WLAN 热点），于是 lookup() 命中索引后的 restore() 全部返回 'NAS 不可达'，
+#   日志里就是反复刷的「NAS 索引命中但取回失败」。
+#   <lan-ip> 是同网段直连（本机 <lan-ip>），实测三个子目录都在。
+#   代价：本机换网段后要显式设 NAS_PDF_ROOT 覆盖。
 _ENV_ROOT = os.environ.get('NAS_PDF_ROOT', '').strip()
 ROOT_CANDIDATES = ([Path(_ENV_ROOT)] if _ENV_ROOT else []) + [
-    Path('S:/Translator_PDFs'),
     Path('//<nas-host>/<share>'),
+    Path('S:/Translator_PDFs'),
 ]
+
+# ── 探测硬超时（秒）──────────────────────────────────────────
+# ★ 为什么必须给 is_dir() 上超时（2026-09-29 实测）：
+#   `Path.is_dir()` 打一个**不可达**的 UNC 会一直挂到 SMB 超时 —— 实测
+#   //<nas-host>/<share>>90s 不返回，//<nas-host>/<share> 同样 >30s。
+#   而 `root()` 就在 HTTP 请求路径上（/api/check → _find_cache → lookup/restore），
+#   所以 NAS 一宕机，前端 POST /api/check 会**卡满 90 秒**（浏览器早超时了）——
+#   对校园网同事更是如此（他们那条链路还要多跳一层 NAS DNAT）。
+#   探到的结果本来就只缓存 60s，因此这里用「工作线程 + join(timeout)」把单次
+#   探测钉死在 NAS_PROBE_TIMEOUT 秒内；超时不算"不可用"，只跳过并退避。
+_PROBE_TIMEOUT = float(os.environ.get('NAS_PROBE_TIMEOUT', '5') or 5)
+_PROBE_BACKOFF_MAX = float(os.environ.get('NAS_PROBE_BACKOFF_MAX', '1800') or 1800)
+# str(候选路径) -> (连续超时次数, 早于此刻不再探测)
+_probe_slow = {}
 
 # 三个版本 → NAS 子目录名（与手工建好的目录一致，不要改）
 SUBDIRS = {'original': 'uploads', 'mono': 'translated', 'dual': 'duo'}
@@ -128,26 +153,63 @@ _root_cache = {'path': None, 'at': 0.0}
 _ROOT_TTL = 60.0     # 探测结果缓存 60 秒；负结果也缓存，避免反复卡在不可达 UNC 上
 
 
+def _probe_dir(cand: Path) -> bool:
+    """`cand.is_dir()` 的**带硬超时**版本（超时按 False 处理，并退避）。
+
+    直接用 `cand.is_dir()` 的问题见 `_PROBE_TIMEOUT` 的注释：不可达 UNC 会挂满
+    SMB 超时。这里把调用丢进工作线程、只等 `_PROBE_TIMEOUT` 秒：
+      · 正常路径（局域网 NAS 实测 ~0.06s）行为与原来完全一致；
+      · 卡住的候选只留下一根 daemon 线程，且进入退避，不会每个请求都再挂一次。
+    退避按「连续超时次数」指数增长（60s → 120s → … → 上限 1800s），探测成功即清零
+    —— 既防线程堆积，也保证 NAS 恢复后能自动重新启用（最长 30 分钟一次重试）。
+    """
+    key = str(cand)
+    now = time.time()
+    n, until = _probe_slow.get(key, (0, 0.0))
+    if now < until:
+        return False
+
+    box = {}
+
+    def _work():
+        try:
+            box['v'] = cand.is_dir()
+        except Exception as e:            # 权限/网络名等：算"不可用"
+            box['v'] = False
+            logger.debug('NAS 候选不可用 %s: %s', cand, e)
+
+    t = threading.Thread(target=_work, name='nas-probe', daemon=True)
+    t.start()
+    t.join(_PROBE_TIMEOUT)
+    if t.is_alive():
+        n += 1
+        cd = min(60.0 * (2 ** (n - 1)), _PROBE_BACKOFF_MAX)
+        _probe_slow[key] = (n, now + cd)
+        logger.warning('NAS 候选探测超时（>%.0fs，第 %d 次）→ 本次运行退避 %.0fs: %s',
+                       _PROBE_TIMEOUT, n, cd, cand)
+        return False
+
+    _probe_slow.pop(key, None)            # 探测成功：清掉退避计数
+    return bool(box.get('v'))
+
+
 def root(refresh: bool = False):
-    """返回可用的 NAS 根目录 Path，全部不可达返回 None。"""
+    """返回可用的 NAS 根目录 Path，全部不可达返回 None。
+
+    ⚠️ 每个候选都走 `_probe_dir()`（带超时）—— 绝不在请求路径上裸调 is_dir()。
+    """
     now = time.time()
     if not refresh and _root_cache['path'] is not None:
-        try:
-            if _root_cache['path'].is_dir():
-                return _root_cache['path']
-        except Exception:
-            pass
+        if _probe_dir(_root_cache['path']):
+            return _root_cache['path']
         if now - _root_cache['at'] < _ROOT_TTL:
             return None                    # 负结果缓存期内不再重复探测
 
     for cand in ROOT_CANDIDATES:
-        try:
-            if cand.is_dir():
-                _root_cache['path'] = cand
-                _root_cache['at'] = now
-                return cand
-        except Exception as e:
-            logger.debug('NAS 候选不可用 %s: %s', cand, e)
+        if _probe_dir(cand):
+            _root_cache['path'] = cand
+            _root_cache['at'] = now
+            return cand
     _root_cache['path'] = None
     _root_cache['at'] = now
     return None

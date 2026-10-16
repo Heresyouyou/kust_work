@@ -186,6 +186,12 @@
     var m = Math.floor(s / 60), r = Math.round(s % 60);
     return m + 'm' + (r ? r + 's' : '');
   }
+  /** 文件体积：<1MB 用 KB，否则 MB（显微拼图常达几十 MB）。 */
+  function fmtSize(kb) {
+    kb = Number(kb) || 0;
+    if (!kb) return '';
+    return kb < 1024 ? kb.toFixed(0) + 'KB' : (kb / 1024).toFixed(1) + 'MB';
+  }
   function metric(k, v, sub) {
     return '<div class="m"><div class="k">' + esc(k) + '</div><div class="v">'
       + esc(v) + (sub ? ' <small>' + esc(sub) + '</small>' : '') + '</div></div>';
@@ -208,8 +214,13 @@
     var s = j.status || '';
     var kind = j.kind || 'translate';
     var kname = j.display || KIND_LBL[kind] || kind;
-    // 翻译的进度字段是 progress(0~100)，拼合是 percent；两者择一，缺省 0
-    var pct = Number(j.percent != null ? j.percent : j.progress) || 0;
+    // 翻译用 progress、拼合用 percent，两边都不会同时有值 —— 取较大者。
+    // ★ 2026-09-29 修：原写法 `percent != null ? percent : progress` 优先取 percent，
+    //   而翻译任务的 percent 恒为 0（实测：跑完的任务是 progress=100 / percent=0），
+    //   于是翻译类任务的进度条永远停在 0%，看起来像「没在推进」。
+    //   也不能简单反过来优先 progress：stitch 的 progress 会被快照归一成 0.0，
+    //   反过来又会把拼合压成 0%。两者都是各自单调的进度值，取 max 才两边都对。
+    var pct = Math.max(Number(j.progress) || 0, Number(j.percent) || 0);
     var cls = ['queued', 'translating', 'done', 'failed', 'cancelled'].indexOf(s) >= 0 ? s : 'cancelled';
     var lbl = (s === 'translating') ? runningLabel(kind) : (DOC_LBL[s] || s);
 
@@ -218,15 +229,36 @@
     if (s === 'translating') meta.push(pct + '%');
     if (j.elapsed) meta.push('已用 ' + fmtDur(j.elapsed));
     if (j.created_at) meta.push(fmtClock(j.created_at) + ' 提交');
+    // 拼合成品图的体量提示：全景 PNG 通常是原尺寸加载（后端不缩图），
+    // 先给尺寸+体积，免得点开时以为页面卡死。
+    if (j.result && j.result.width && j.result.height) {
+      meta.push(Number(j.result.width) + '×' + Number(j.result.height)
+        + (j.result.size_kb ? ' · ' + fmtSize(j.result.size_kb) : ''));
+    }
     if (s === 'queued' && j.message) meta.push(j.message);
     var errHtml = j.error ? '<div class="jmeta"><span class="jerr">错误：' + esc(j.error) + '</span></div>' : '';
 
     var links = [];
-    // 全部走自研阅读器（/PDFreader），不再交给浏览器原生 PDF。
-    // 点「中文」「双语」时若原文也在，直接进 原文+该版本 的双栏对照。
-    if (j.original_url) links.push('<a href="' + esc(readerUrl(j.original_url, '')) + '" target="_blank">原文</a>');
-    if (j.mono_url) links.push('<a href="' + esc(readerUrl(j.original_url || j.mono_url, j.original_url ? j.mono_url : '')) + '" target="_blank">中文</a>');
-    if (j.dual_url) links.push('<a href="' + esc(readerUrl(j.original_url || j.dual_url, j.original_url ? j.dual_url : '')) + '" target="_blank">双语</a>');
+    // 与归档页 /archive 同步的点击逻辑：原文/中文/双语 三个按钮 = 直接下载
+    // （后端给的绝对 NAS 直链 *_dl_url，带 ?dl=1 由服务端强制附件下载，跨域分享也成立）；
+    // 只有「在线阅读」才进自研阅读器（原文 + 中文双栏对照，缺中文退双语）。
+    // 原文缺失时无「在线阅读」。
+    if (j.original_dl_url) links.push('<a href="' + esc(j.original_dl_url) + '">原文</a>');
+    if (j.mono_dl_url) links.push('<a href="' + esc(j.mono_dl_url) + '">中文</a>');
+    if (j.dual_dl_url) links.push('<a href="' + esc(j.dual_dl_url) + '">双语</a>');
+    if (j.original_url) links.push('<a href="' + esc(readerUrl(j.original_url, j.mono_url || j.dual_url || '')) + '" target="_blank">在线阅读</a>');
+    // 拼合成品图：**链接直接用 NAS 的入口**（用户口径 2026-09-30）——
+    // 后端给的 `public_url` 形如 http://<nas-host>/<share>
+    // 校园网同事也能直接打开；相对路径 url 从别人机器上看就是「本机」，分享出去就废了。
+    // （后端另给了相对版 `url`，那是拼合页自己当**内嵌资源**用的：https 页面下
+    //   内嵌 <img> 不允许降级到 http，故不能顶替。这里只当老快照的兜底。）
+    // 预览保持内联（send_file 不带 as_attachment），下载走 /dl（as_attachment）。
+    if (j.result) {
+      var imgUrl = j.result.public_url || j.result.url;
+      var dlUrl = j.result.public_download_url || j.result.download_url;
+      if (imgUrl) links.push('<a href="' + esc(imgUrl) + '" target="_blank">查看成图</a>');
+      if (dlUrl) links.push('<a href="' + esc(dlUrl) + '">下载</a>');
+    }
 
     var showBar = (s === 'translating' || s === 'queued' || s === 'done');
 

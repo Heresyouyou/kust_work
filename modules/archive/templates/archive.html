@@ -171,27 +171,17 @@
     });
   }
 
-  /** 生成自研阅读器地址：file=主文档，peer=对照文档（可空）。
-   *  file/peer 来自后端，本身已是编码好的 URL 路径 —— 绝不能再整体
-   *  encodeURIComponent，否则 %20 会被二次编码成 %2520（实测踩过）。
-   *  只补编码裸字符，并把可能被误编码的 %25 还原回 %。 */
-  function readerUrl(file, peer) {
-    function enc(s) { return encodeURI(s || '').replace(/%25/g, '%'); }
-    var u = '/PDFreader?file=' + enc(file);
-    if (peer) u += '&peer=' + enc(peer);
-    return u + '&layout=continuous&sync=1';
-  }
-
-  // 可用版本 → 用自研阅读器单栏打开（不再交给浏览器原生 PDF）
+  // 可用版本 → 用后端给的绝对 NAS 直链（f.dl_url，带 ?dl=1）直接下载，不进阅读器
   // 缺失版本 → 置灰不可点的 span
+  // 阅读器只保留「在线阅读」一个入口（原文 + 中文对照）。
   function vbHtml(f) {
     if (!f.available) {
       return '<span class="vb off" title="该论文没有' + esc(f.label) + '版本">' +
         esc(f.label) + '<em>无</em></span>';
     }
-    return '<a class="vb" href="' + esc(readerUrl(f.url, '')) + '" target="_blank" rel="noopener"' +
-      ' title="' + esc(f.label) + ' · ' + esc(f.name) + ' · 在阅读器中打开">' +
-      esc(f.label) + '<em>' + fmtSize(f.size) + '</em><span class="arw">&#8599;</span></a>';
+    return '<a class="vb" href="' + esc(f.dl_url || f.url) + '"' +
+      ' title="' + esc(f.label) + ' · ' + esc(f.name) + ' · 点击下载（NAS 直链）">' +
+      esc(f.label) + '<em>' + fmtSize(f.size) + '</em><span class="arw">&#8595;</span></a>';
   }
 
   // 「在线阅读」按钮：原文 + 中文/双语 一键进入阅读器双栏同步；
@@ -217,10 +207,10 @@
     var titleHtml = '<div class="p-ttl" title="' + esc(raw) + '">' + esc(p.title) + '</div>' +
       '<div class="p-ttl-meta">' + fmtTime(p.mtime) + ' · ' + p.file_count + ' 个版本 · ' +
         fmtSize(p.total_size) + '</div>';
-    // 标题整体作为入口：可点击直接进入阅读器；没有 reader_url 时退化为静态文本。
+    // 标题与「在线阅读」等效：点击即进阅读器（原文 + 中文对照）。
     var titleBlock = p.reader_url
       ? '<a class="p-ttl-link" href="' + esc(p.reader_url) + '" target="_blank" rel="noopener"'
-          + ' title="点击标题直接进入阅读器">' + titleHtml + '</a>'
+          + ' title="点击标题直接进入阅读器（同「在线阅读」）">' + titleHtml + '</a>'
       : titleHtml;
     return '<div class="paper">' +
       '<div class="p-main">' + titleBlock + '</div>' +
@@ -261,7 +251,7 @@
       .then(function (d) {
         windowHours = d.window_hours || 48;
         winEl.textContent = '仅显示最近 ' + windowHours + ' 小时的论文 · ' +
-          '点击版本按钮用浏览器打开 PDF';
+          '点版本按钮直接下载 · 「在线阅读」进原文+中文对照';
         papers = d.papers || [];
         render();
       })
