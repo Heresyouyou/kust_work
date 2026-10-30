@@ -1,0 +1,865 @@
+openapi: 3.0.3
+info:
+  title: GeoKB AI Service API
+  description: |
+    GeoKB 5556 端口面向公网 AI Agent 的只读检索服务。
+    **无需访问凭据**；仅保留按 IP 的滑动窗口限流。
+    推荐 AI 使用 JSON 参数进行结构化过滤与字段裁剪。
+  version: 2.0.0
+  contact:
+    name: GeoKB Admin
+servers:
+  - url: http://127.0.0.1:5556
+    description: 本地 5556 服务
+
+security: []
+
+paths:
+  /:
+    get:
+      summary: Agent 用法手册（Markdown）
+      description: >-
+        直接返回 Markdown 格式的用法说明（llms.txt 内容），告诉 Agent 如何检索并取到条目全文。
+        要点：/api/search 默认 format=summary 不含正文，取正文需 format=full 或改调 /api/entry/{id}。
+        机器可读的 JSON 路由表见 /index.json。
+      responses:
+        '200':
+          description: 成功
+          content:
+            text/markdown:
+              schema: { type: string }
+
+  /llms.txt:
+    get:
+      summary: Agent 精简用法手册（Markdown，llms.txt 约定）
+      description: 与根目录内容一致；同时提供 /.well-known/llms.txt 别名。
+      responses:
+        '200':
+          description: 成功
+          content:
+            text/markdown:
+              schema: { type: string }
+
+  /llms-full.txt:
+    get:
+      summary: Agent 完整使用手册（Markdown）
+      description: 含端到端示例、检索参数全表、模块与标签清单、可信度/来源分级、端点全表、排错表。
+      responses:
+        '200':
+          description: 成功
+          content:
+            text/markdown:
+              schema: { type: string }
+
+  /prompt.md:
+    get:
+      summary: 用户端一行开头（配合根目录 / 使用）
+      description: >-
+        用户只需发一行「先读 https://sjck.kust.work/ ，再按里面的规则回答：<问题>」。
+        完整规则（角色、执行顺序、五条契约、语料边界、引用格式、排错）已落在根目录 /，
+        由 AI 自己读取，不再需要粘贴长提示词。同时提供 /prompt.txt 别名。
+      responses:
+        '200':
+          description: 成功
+          content:
+            text/markdown:
+              schema: { type: string }
+
+  /prompt-full.md:
+    get:
+      summary: 详版提示词模板（对方 AI 不能访问网页时整段粘贴）
+      description: >-
+        极简版 /prompt.md 的展开形态，含用法前提、建联自证、六条回答纪律与输出结构。
+        仅当调用方无法读取网页时使用。同时提供 /prompt-full.txt 别名。
+      responses:
+        '200':
+          description: 成功
+          content:
+            text/markdown:
+              schema: { type: string }
+
+  /index.json:
+    get:
+      summary: 服务根目录的 JSON 版本
+      description: 返回服务描述与全部可用端点的 JSON 索引（程序使用）。
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  data:
+                    type: object
+                    properties:
+                      service: { type: string }
+                      version: { type: string }
+                      description: { type: string }
+                      links: { type: object }
+                      tips: { type: array, items: { type: string } }
+                      rate_limit: { type: string }
+
+  /health:
+    get:
+      summary: 健康检查
+      responses:
+        '200':
+          description: 服务健康
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Envelope'
+
+  /manifest:
+    get:
+      summary: 知识库元数据
+      description: 列出模块、条目数、模型、最近更新与可用端点。
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Envelope'
+
+  /openapi.json:
+    get:
+      summary: OpenAPI 规范
+      responses:
+        '200':
+          description: 返回本 JSON 文档
+
+  /api/search:
+    get:
+      summary: 混合检索（GET）
+      parameters:
+        - $ref: '#/components/parameters/QueryQ'
+        - $ref: '#/components/parameters/Modules'
+        - $ref: '#/components/parameters/Tags'
+        - $ref: '#/components/parameters/ExcludeModules'
+        - $ref: '#/components/parameters/ExcludeTags'
+        - $ref: '#/components/parameters/ConfidenceMin'
+        - $ref: '#/components/parameters/Status'
+        - $ref: '#/components/parameters/DateFrom'
+        - $ref: '#/components/parameters/DateTo'
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/Order'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+        - $ref: '#/components/parameters/MinScore'
+        - $ref: '#/components/parameters/ScoreRatio'
+        - $ref: '#/components/parameters/GlobalCap'
+        - $ref: '#/components/parameters/MinResults'
+        - $ref: '#/components/parameters/TokenBudget'
+        - $ref: '#/components/parameters/Fields'
+        - $ref: '#/components/parameters/Format'
+        - $ref: '#/components/parameters/Expand'
+        - $ref: '#/components/parameters/Fuzzy'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResult'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+    post:
+      summary: 混合检索（POST JSON）
+      description: 推荐 AI 使用 POST JSON 进行复杂过滤。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRequest'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResult'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+  # ---------------------------------------------------------------------------
+  # AI 友好兼容层（2026-10-14 增）：接住"猜路径"的 Agent，全部 308 跳转
+  # ---------------------------------------------------------------------------
+  /api/v1/{rest}:
+    get:
+      summary: 兼容别名：/api/v1/* → /api/*
+      description: >
+        本服务没有版本前缀。AI 若按习惯猜 /api/v1/search 等路径，会收到
+        308 永久重定向到对应 /api/* 端点（保留查询串与请求方法）。
+        同样兼容 /v1/* 前缀。
+      parameters:
+        - name: rest
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '308':
+          description: 重定向到 /api/<rest>
+  /search:
+    get:
+      summary: 兼容别名：/search → /api/search
+      responses:
+        '308':
+          description: 重定向到 /api/search（保留查询串）
+  /api:
+    get:
+      summary: API 端点索引
+      description: >
+        给"走到门口"的 Agent 一张地图：常用端点、离线索引、鉴权说明
+        （本服务全程无需鉴权）。
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Envelope'
+  /api/docs:
+    get:
+      summary: 兼容别名：/api/docs → /openapi.json
+      description: >
+        同样兼容 /docs、/api-docs、/documentation、/swagger.json、
+        /openapi、/api/spec、/api/openapi.json、/.well-known/openapi.json。
+      responses:
+        '308':
+          description: 重定向到 /openapi.json
+
+  /api/entries:
+    get:
+      summary: 纯元数据过滤列表（GET）
+      parameters:
+        - $ref: '#/components/parameters/Modules'
+        - $ref: '#/components/parameters/Tags'
+        - $ref: '#/components/parameters/ExcludeModules'
+        - $ref: '#/components/parameters/ExcludeTags'
+        - $ref: '#/components/parameters/ConfidenceMin'
+        - $ref: '#/components/parameters/Status'
+        - $ref: '#/components/parameters/DateFrom'
+        - $ref: '#/components/parameters/DateTo'
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/Order'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+        - $ref: '#/components/parameters/Fields'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResult'
+
+    post:
+      summary: 纯元数据过滤列表（POST JSON）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRequest'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResult'
+
+  /api/module/{name}:
+    get:
+      summary: 模块下全部条目
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Envelope'
+
+  /api/modules:
+    get:
+      summary: 模块列表与统计
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Envelope'
+
+  /api/entry/{id}:
+    get:
+      summary: 条目详情
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Envelope'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/entry/{id}/fulltext:
+    get:
+      summary: 论文全文文本
+      description: |
+        返回该论文条目对应的**已抽取纯文本**（不是 PDF 二进制）。
+        比下载 PDF 再解析省得多，Agent 优先用这个端点读原文内容。
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+        - name: limit
+          in: query
+          description: 截断字符数，0 表示不截断
+          schema: { type: integer, default: 0 }
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Envelope'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/entry/{id}/pdf/meta:
+    get:
+      summary: PDF 原文元信息
+      description: 查询该条目是否挂了 PDF 原文、文件大小与下载/预览地址，下载前先查这个。
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Envelope'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/entry/{id}/pdf:
+    get:
+      summary: 下载 PDF 原文
+      description: |
+        返回 application/pdf 二进制流，默认以附件形式下载（带 Content-Disposition）。
+        加 `?inline=1` 改为内联，供浏览器/阅读器直接打开。支持 Range 请求。
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+        - name: inline
+          in: query
+          schema: { type: string, enum: ['1', 'true'] }
+      responses:
+        '200':
+          description: PDF 文件流
+          content:
+            application/pdf:
+              schema: { type: string, format: binary }
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/entry/{id}/pdf/preview:
+    get:
+      summary: PDF 在线预览页
+      description: 返回 HTML 页面，用浏览器内置 PDF 查看器内嵌显示原文（不依赖外部 CDN）。
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: HTML 预览页
+          content:
+            text/html:
+              schema: { type: string }
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/pdf:
+    get:
+      summary: 按相对路径取 PDF
+      description: 已知 sources[].path 时直接取文件，如 /api/pdf?path=papers_repo/by_journal/...
+      parameters:
+        - name: path
+          in: query
+          required: true
+          schema: { type: string }
+        - name: inline
+          in: query
+          schema: { type: string, enum: ['1', 'true'] }
+      responses:
+        '200':
+          description: PDF 文件流
+          content:
+            application/pdf:
+              schema: { type: string, format: binary }
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/pdf/status:
+    get:
+      summary: PDF 存储状态
+      description: 返回当前 PDF 根路径、是否可达、文件数与占用（按 inode 去重，硬链接不重复计）。
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Envelope'
+
+  /api/entry/{id}/related:
+    get:
+      summary: 相关条目推荐
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 10 }
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Envelope'
+
+  /api/entry/{id}.md:
+    get:
+      summary: 单条目 Markdown 版（Agent 友好）
+      description: >
+        与 /api/entry/{id} 内容一致，但直接返回 text/markdown，无 JSON 嵌套，
+        Agent 解析成本最低。也可在 /api/entry/{id} 上加 ?format=md 或
+        Accept: text/markdown 获得同样结果。
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: 成功
+          content:
+            text/markdown:
+              schema: { type: string }
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /topics.md:
+    get:
+      summary: 主题导航（Markdown）
+      description: 按模块/标签给出可直接点击的检索 URL 模板，并列出离线通路。
+      responses:
+        '200':
+          description: 成功
+          content:
+            text/markdown:
+              schema: { type: string }
+
+  /corpus.md:
+    get:
+      summary: 全量条目索引（Markdown，可离线检索）
+      description: >
+        实时从索引生成的全量条目清单（标题 + id + 标签），整页下载后即可用
+        任意文本检索工具离线查找，无需调用任何 API。?module= 可按模块筛选。
+      parameters:
+        - name: module
+          in: query
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: 成功
+          content:
+            text/markdown:
+              schema: { type: string }
+
+  /corpus.json:
+    get:
+      summary: 全量条目结构化导出
+      description: >
+        全部生效条目的 id/title/module/tags/summary/source_tier 及 pdf_url，
+        供 Agent 下载后在本地做程序化检索。?module= 筛选模块，
+        ?body=1 附带正文（体积大，慎用）。
+      parameters:
+        - name: module
+          in: query
+          required: false
+          schema: { type: string }
+        - name: body
+          in: query
+          required: false
+          schema: { type: boolean, default: false }
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Envelope'
+
+  /corpus.json.gz:
+    get:
+      summary: 全量导出的 gzip 版
+      description: 与 /corpus.json 内容相同，gzip 压缩（体积约降 85%），弱网友好。
+      parameters:
+        - name: module
+          in: query
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/gzip:
+              schema:
+                type: string
+                format: binary
+
+  /api/synonyms/{term}:
+    get:
+      summary: 查询同义词
+      parameters:
+        - name: term
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Envelope'
+
+  /api/expand:
+    get:
+      summary: 概念延伸建议
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Envelope'
+
+  /api/graph/{id}:
+    get:
+      summary: 知识链局部图
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+        - name: depth
+          in: query
+          schema: { type: integer, default: 1, maximum: 3 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Envelope'
+
+  /api/tags:
+    get:
+      summary: 热门标签
+      parameters:
+        - name: module
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Envelope'
+
+components:
+  parameters:
+    QueryQ:
+      name: q
+      in: query
+      schema: { type: string }
+      description: >
+        查询词；留空则退化为纯元数据过滤。为兼容不同 AI 的调用习惯，
+        以下别名等价：query / keyword / keywords / search / kw。
+
+    Modules:
+      name: modules
+      in: query
+      schema: { type: string }
+      description: 逗号分隔的模块白名单；也支持旧参数 `module`。
+
+    Tags:
+      name: tags
+      in: query
+      schema: { type: string }
+      description: 逗号分隔标签；命中任意一个即返回。
+
+    ExcludeModules:
+      name: exclude_modules
+      in: query
+      schema: { type: string }
+      description: 逗号分隔排除模块。
+
+    ExcludeTags:
+      name: exclude_tags
+      in: query
+      schema: { type: string }
+      description: 逗号分隔排除标签。
+
+    ConfidenceMin:
+      name: confidence_min
+      in: query
+      schema: { type: string, enum: [A, B, C, D] }
+      description: 最低可信度。
+
+    Status:
+      name: status
+      in: query
+      schema: { type: string }
+      description: 逗号分隔状态，默认 active,deprecated。
+
+    DateFrom:
+      name: date_from
+      in: query
+      schema: { type: string, format: date }
+      description: 更新日期下限（YYYY-MM-DD）。
+
+    DateTo:
+      name: date_to
+      in: query
+      schema: { type: string, format: date }
+      description: 更新日期上限（YYYY-MM-DD）。
+
+    Sort:
+      name: sort
+      in: query
+      schema: { type: string, enum: [relevance, updated, confidence, score, id], default: relevance }
+
+    Order:
+      name: order
+      in: query
+      schema: { type: string, enum: [desc, asc], default: desc }
+
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 0, maximum: 100, default: 0 }
+      description: 0 表示按 score_ratio 自适应截断。
+
+    Offset:
+      name: offset
+      in: query
+      schema: { type: integer, minimum: 0, default: 0 }
+      description: 分页偏移。
+
+    MinScore:
+      name: min_score
+      in: query
+      schema: { type: number, minimum: 0, maximum: 1 }
+      description: 绝对分数阈值。
+
+    ScoreRatio:
+      name: score_ratio
+      in: query
+      schema: { type: number, minimum: 0, maximum: 1, default: 0.55 }
+      description: 相对截断阈值。
+
+    GlobalCap:
+      name: global_cap
+      in: query
+      schema: { type: integer, minimum: 1, default: 50 }
+      description: 自适应模式下全局上限。
+
+    MinResults:
+      name: min_results
+      in: query
+      schema: { type: integer, minimum: 1, default: 3 }
+      description: 自适应模式下最少返回条数。
+
+    TokenBudget:
+      name: token_budget
+      in: query
+      schema: { type: integer }
+      description: 上下文 Token 预算。
+
+    Fields:
+      name: fields
+      in: query
+      schema: { type: string }
+      description: 逗号分隔返回字段白名单，如 id,title,score。
+
+    Format:
+      name: format
+      in: query
+      schema: { type: string, enum: [summary, full, md], default: summary }
+      description: >
+        summary 只返回 id/title/summary；full 追加 body_markdown；
+        md 返回 text/markdown（Agent 友好，无 JSON 嵌套）。
+
+    Expand:
+      name: expand
+      in: query
+      schema: { type: boolean, default: true }
+      description: 是否启用同义词/概念扩展。
+
+    Fuzzy:
+      name: fuzzy
+      in: query
+      schema: { type: boolean, default: true }
+      description: 主结果不足时是否启用模糊兜底。
+
+  schemas:
+    SearchRequest:
+      type: object
+      properties:
+        q: { type: string }
+        modules: { type: array, items: { type: string } }
+        tags: { type: array, items: { type: string } }
+        exclude_modules: { type: array, items: { type: string } }
+        exclude_tags: { type: array, items: { type: string } }
+        confidence_min: { type: string, enum: [A, B, C, D] }
+        status: { type: array, items: { type: string } }
+        date_from: { type: string, format: date }
+        date_to: { type: string, format: date }
+        sort: { type: string, default: relevance }
+        order: { type: string, default: desc }
+        limit: { type: integer, default: 0 }
+        offset: { type: integer, default: 0 }
+        min_score: { type: number }
+        score_ratio: { type: number, default: 0.55 }
+        global_cap: { type: integer, default: 50 }
+        min_results: { type: integer, default: 3 }
+        token_budget: { type: integer }
+        fields: { type: array, items: { type: string } }
+        format: { type: string, default: summary }
+        expand: { type: boolean, default: true }
+        fuzzy: { type: boolean, default: true }
+
+    Entry:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        module: { type: string }
+        tags: { type: array, items: { type: string } }
+        summary: { type: string }
+        confidence: { type: string, enum: [A, B, C, D] }
+        status: { type: string, enum: [active, deprecated, deleted] }
+        updated: { type: string }
+        sources: { type: array, items: { type: object } }
+        path: { type: string }
+        body_markdown: { type: string }
+
+    EntrySummary:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        module: { type: string }
+        tags: { type: array, items: { type: string } }
+        summary: { type: string }
+        confidence: { type: string }
+        status: { type: string }
+        updated: { type: string }
+        score: { type: number }
+        matched_by: { type: array, items: { type: string } }
+        score_detail: { type: object }
+        body_chars: { type: integer }
+
+    SearchResult:
+      type: object
+      properties:
+        ok: { type: boolean }
+        data:
+          type: object
+          properties:
+            query: { type: string }
+            expanded_terms: { type: array, items: { type: string } }
+            term_expansion: { type: array, items: { type: string } }
+            module_filter: { type: string, nullable: true }
+            status_filter: { type: array, items: { type: string } }
+            strategy: { type: string }
+            total_hits: { type: integer }
+            hits_count: { type: integer }
+            limit: { type: integer }
+            offset: { type: integer }
+            hits: { type: array, items: { $ref: '#/components/schemas/EntrySummary' } }
+            index_built_at: { type: string, nullable: true }
+
+    Envelope:
+      type: object
+      properties:
+        ok: { type: boolean }
+        data: { type: object }
+
+    Error:
+      type: object
+      properties:
+        ok: { type: boolean, example: false }
+        error: { type: string }
+        message: { type: string }
+
+  responses:
+    BadRequest:
+      description: 参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RateLimited:
+      description: 请求过于频繁
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

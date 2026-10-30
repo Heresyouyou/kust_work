@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN" x-data="{ dark: localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) }" x-bind:data-theme="dark ? 'dark' : 'light'">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}GeoKB{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+  <script src="{{ url_for('static', filename='vendor/htmx.min.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='vendor/alpine.min.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='vendor/marked.min.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='vendor/chart.min.js') }}" defer></script>
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <div class="brand">🌍 GeoKB</div>
+      <nav>
+        <a href="{{ url_for('page_index') }}" class="{% if active == 'home' %}active{% endif %}">🏠 仪表盘</a>
+        <a href="{{ url_for('page_modules') }}" class="{% if active == 'modules' %}active{% endif %}">📂 模块树</a>
+        <a href="{{ url_for('page_papers') }}" class="{% if active == 'papers' %}active{% endif %}">📄 论文仓库</a>
+        <a href="{{ url_for('page_search') }}" class="{% if active == 'search' %}active{% endif %}">🔍 检索</a>
+        <a href="{{ url_for('admin_login') }}">🔐 管理</a>
+      </nav>
+      <div style="margin-top:auto;padding-top:2rem;font-size:.85rem;color:var(--text-muted)">
+        <span>v0.5 · 本地 5556</span>
+      </div>
+    </aside>
+    <main class="main">
+      <div class="toolbar">
+        <h1 style="margin:0;font-size:1.5rem">{% block heading %}GeoKB{% endblock %}</h1>
+        <button class="theme-toggle" @click="dark = !dark; localStorage.theme = dark ? 'dark' : 'light'" x-html="dark ? '☀️' : '🌙'" title="切换主题"></button>
+      </div>
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // marked 安全默认
+      if (typeof marked !== 'undefined' && marked.set) {
+        marked.setOptions({headerIds:false,mangle:false});
+      }
+    });
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

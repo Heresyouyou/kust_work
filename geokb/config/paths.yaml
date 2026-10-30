@@ -1,0 +1,14 @@
+# GeoKB 外部数据路径（PDF 原文仓库）
+# 论文 PDF 已于 2026-10-14 整体迁移至 NAS：
+#   S: 盘 = \\192.168.10.1\KUST_SJCK_PUBLIC（公共共享，非个人目录 Youyou）
+#   实际目录 = S:/GeoKB/papers_repo
+# 注意：kust.work 域名解析到 10.109.0.222（校园网/公网地址），本机局域网请走 192.168.10.1。
+# 条目 frontmatter 中 sources[].path 存的是相对路径（papers_repo/...），
+# 服务端按这里的 pdf_root 拼接，因此搬家只需改这一处。
+pdf_root: S:/GeoKB/papers_repo
+
+# 迁移前的本地位置，仅作回退/对照，一般不再使用
+pdf_root_legacy: D:/PostNews/papers_repo
+
+# 全文文本缓存（论文 PDF 抽取出的纯文本，供 /api/entry/<id>/fulltext 使用）
+text_cache: D:/ZSK/geokb/state/text

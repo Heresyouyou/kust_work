@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}管理登录 · GeoKB{% endblock %}
+{% block heading %}管理登录{% endblock %}
+{% block content %}
+<div class="card" style="max-width:420px;margin:auto">
+  {% if error %}<div style="color:var(--danger);margin-bottom:1rem">{{ error }}</div>{% endif %}
+  <form method="post" action="{{ url_for('admin_do_login') }}">
+    <label>管理 Token</label>
+    <input type="password" name="token" required autofocus style="width:100%">
+    <button type="submit" class="btn btn-primary" style="margin-top:1rem;width:100%">登录</button>
+  </form>
+</div>
+{% endblock %}

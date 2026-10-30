@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}条目管理 · GeoKB{% endblock %}
+{% block heading %}条目管理{% endblock %}
+{% block content %}
+<div style="margin-bottom:1rem">
+  <a href="{{ url_for('admin_entry_new') }}" class="btn btn-primary">+ 新建条目</a>
+  <a href="{{ url_for('admin_dashboard') }}" class="btn">返回</a>
+</div>
+<div class="card">
+  <table style="width:100%;border-collapse:collapse">
+    <thead>
+      <tr>
+        <th style="text-align:left;padding:.5rem;border-bottom:1px solid var(--border)">标题</th>
+        <th style="text-align:left;padding:.5rem;border-bottom:1px solid var(--border)">模块</th>
+        <th style="text-align:left;padding:.5rem;border-bottom:1px solid var(--border)">状态</th>
+        <th style="text-align:left;padding:.5rem;border-bottom:1px solid var(--border)">更新</th>
+        <th style="text-align:left;padding:.5rem;border-bottom:1px solid var(--border)">操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td style="padding:.5rem;border-bottom:1px solid var(--border)"><a href="{{ url_for('page_entry', eid=row.id) }}">{{ row.title }}</a></td>
+        <td style="padding:.5rem;border-bottom:1px solid var(--border)">{{ row.module }}</td>
+        <td style="padding:.5rem;border-bottom:1px solid var(--border)"><span class="tag conf-{{ row.status }}">{{ row.status }}</span></td>
+        <td style="padding:.5rem;border-bottom:1px solid var(--border)">{{ row.updated }}</td>
+        <td style="padding:.5rem;border-bottom:1px solid var(--border)">
+          <a href="{{ url_for('admin_entry_edit', eid=row.id) }}" class="btn" style="padding:.25rem .5rem;font-size:.8rem">编辑</a>
+          {% if row.status == 'deleted' %}
+          <form method="post" action="{{ url_for('admin_entry_restore', eid=row.id) }}" style="display:inline" onsubmit="return confirm('恢复？')">
+            <button type="submit" class="btn" style="padding:.25rem .5rem;font-size:.8rem">恢复</button>
+          </form>
+          {% else %}
+          <form method="post" action="{{ url_for('admin_entry_delete', eid=row.id) }}" style="display:inline" onsubmit="return confirm('确认软删除？')">
+            <button type="submit" class="btn btn-danger" style="padding:.25rem .5rem;font-size:.8rem">删除</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

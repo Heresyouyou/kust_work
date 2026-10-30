@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}管理后台 · GeoKB{% endblock %}
+{% block heading %}管理后台{% endblock %}
+{% block content %}
+<div class="grid">
+  <div class="stat"><div class="num">{{ stats.total }}</div><div class="label">总条目</div></div>
+  <div class="stat"><div class="num">{{ stats.active }}</div><div class="label">活跃</div></div>
+  <div class="stat"><div class="num">{{ stats.deleted }}</div><div class="label">已软删除</div></div>
+</div>
+
+<div style="margin-bottom:1rem">
+  <a href="{{ url_for('admin_entry_new') }}" class="btn btn-primary">+ 新建条目</a>
+  <a href="{{ url_for('admin_entries') }}" class="btn">条目列表</a>
+  <form method="post" action="{{ url_for('admin_rebuild') }}" style="display:inline" onsubmit="return confirm('确认立即重建索引？')">
+    <button type="submit" class="btn">重建索引</button>
+  </form>
+</div>
+
+<div class="card">
+  <h2>最近变更</h2>
+  <ul class="entry-list">
+    {% for e in recent %}
+    <li>
+      <div>
+        <a href="{{ url_for('page_entry', eid=e.id) }}">{{ e.title }}</a>
+        <span class="tag" style="margin-left:.5rem">{{ e.module }}</span>
+      </div>
+      <div class="meta">
+        <span class="tag conf-{{ e.status }}">{{ e.status }}</span>
+        <span>{{ e.updated }}</span>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+
+<div class="card">
+  <h2>CHANGELOG</h2>
+  <ul class="entry-list">
+    {% for c in changelog %}
+    <li>
+      <div><strong>{{ c.action }}</strong> · {{ c.eid }}</div>
+      <div class="meta">{{ c.ts }}</div>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

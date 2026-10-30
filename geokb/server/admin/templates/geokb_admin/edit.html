@@ -1,0 +1,53 @@
+{% extends "geokb_admin/base.html" %}
+{% block title %}{% if entry %}编辑 · {{ entry.title }}{% else %}新建条目{% endif %}{% endblock %}
+{% block content %}
+<h1>{% if entry %}编辑条目{% else %}新建条目{% endif %}</h1>
+<div class="card">
+  <form method="post" action="{{ url_for('admin.admin_entry_save') }}">
+    <div class="row">
+      <div>
+        <label for="id">条目 ID（英文/数字/下划线/短横线）</label>
+        <input type="text" id="id" name="id" value="{{ entry.id if entry else '' }}" required {% if entry %}readonly{% endif %}>
+      </div>
+      <div>
+        <label for="module">模块 slug（小写/数字/下划线/短横线）</label>
+        <input type="text" id="module" name="module" value="{{ entry.module if entry else '' }}" required>
+      </div>
+    </div>
+    <label for="title">标题</label>
+    <input type="text" id="title" name="title" value="{{ entry.title if entry else '' }}" required>
+    <div class="row">
+      <div>
+        <label for="confidence">置信度</label>
+        <select id="confidence" name="confidence">
+          <option value="A" {% if entry and entry.confidence=='A' %}selected{% endif %}>A 权威机构/经典教材</option>
+          <option value="B" {% if entry and entry.confidence=='B' %}selected{% endif %}>B 同行评议/用户验证</option>
+          <option value="C" {% if entry and entry.confidence=='C' %}selected{% endif %}>C 可信二手汇编</option>
+          <option value="D" {% if entry and entry.confidence=='D' %}selected{% endif %}>D 未核实草稿</option>
+        </select>
+      </div>
+      <div>
+        <label for="status">状态</label>
+        <select id="status" name="status">
+          <option value="active" {% if entry and entry.status=='active' %}selected{% endif %}>active</option>
+          <option value="deprecated" {% if entry and entry.status=='deprecated' %}selected{% endif %}>deprecated</option>
+          <option value="deleted" {% if entry and entry.status=='deleted' %}selected{% endif %}>deleted</option>
+        </select>
+      </div>
+    </div>
+    <label for="tags">标签（逗号分隔）</label>
+    <input type="text" id="tags" name="tags" value="{{ entry.tags|join(',') if entry and entry.tags else '' }}">
+    <label for="summary">摘要</label>
+    <input type="text" id="summary" name="summary" value="{{ entry.summary if entry else '' }}">
+    <label for="sources">来源（每行一个 name；或 JSON 数组）</label>
+    <textarea id="sources" name="sources" rows="3">{% if entry and entry.sources %}{{ entry.sources | tojson(indent=2) }}{% endif %}</textarea>
+    <label for="body">正文（Markdown）</label>
+    <textarea id="body" name="body" rows="18" required>{{ entry.body_markdown if entry else '' }}</textarea>
+    <div class="actions" style="margin-top:18px">
+      <button type="submit" class="btn btn-primary">保存</button>
+      <a class="btn" href="/admin/entries">取消</a>
+      {% if entry %}<a class="btn" href="http://127.0.0.1:5556/api/entry/{{ entry.id }}" target="_blank">API JSON ↗</a>{% endif %}
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}模块树 · GeoKB{% endblock %}
+{% block heading %}模块树{% endblock %}
+{% block content %}
+<div class="card">
+  <ul class="module-list">
+    {% for row in rows %}
+    <li>
+      <a href="{{ url_for('page_module', name=row[0]) }}">
+        <span>{{ row[0] }}</span>
+        <span class="count">{{ row[1] }} 条目</span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

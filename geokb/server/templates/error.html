@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}错误 · GeoKB{% endblock %}
+{% block heading %}出错了{% endblock %}
+{% block content %}
+<div class="card" style="border-color:var(--danger);background:var(--danger-soft)">
+  <p>{{ message }}</p>
+  <a href="{{ url_for('page_index') }}" class="btn" style="margin-top:1rem">返回仪表盘</a>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{{ module }} · GeoKB{% endblock %}
+{% block heading %}模块：{{ module }}{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>条目列表 · {{ rows|length }} 条</h2>
+  <ul class="entry-list">
+    {% for row in rows %}
+    <li>
+      <div>
+        <a href="{{ url_for('page_entry', eid=row[0]) }}">{{ row[1] }}</a>
+        {% set s = row[2] or '' %}
+        <p style="margin:.25rem 0 0;color:var(--text-muted);font-size:.9rem">{{ s[:100] }}{% if s|length > 100 %}...{% endif %}</p>
+      </div>
+      <div class="meta">
+        <span class="tag conf-{{ row[3] }}">{{ row[3] }}</span>
+        <div>{{ row[5] }}</div>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

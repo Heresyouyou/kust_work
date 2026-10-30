@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}论文仓库 · GeoKB{% endblock %}
+{% block heading %}论文仓库{% endblock %}
+{% block content %}
+<div class="grid">
+  <div class="stat"><div class="num">{{ total }}</div><div class="label">PDF/元数据总数</div></div>
+  <div class="stat"><div class="num">{{ rows|length }}</div><div class="label">本页展示</div></div>
+</div>
+
+<div class="card">
+  <h2>统一论文仓库（D:/PostNews/papers_repo）</h2>
+  <p style="color:var(--text-muted)">来源：PostNews 期刊推送、arXiv/CrossRef 下载、既有 PDF 集中。点击标题可打开原始链接，本地 PDF 可直接下载。</p>
+  <ul class="entry-list">
+    {% for row in rows %}
+    <li>
+      <div>
+        <a href="{{ row.url }}" target="_blank" rel="noopener">{{ row.title }}</a>
+        <span class="tag" style="margin-left:.5rem">{{ row.journal }}</span>
+        <p style="margin:.35rem 0 0;color:var(--text-muted);font-size:.9rem">
+          {% if row.date %}日期: {{ row.date }} {% endif %}
+          {% if row.size %}大小: {{ (row.size/1024/1024)|round(2) }} MB {% endif %}
+          {% if row.source %}来源: {{ row.source }}{% endif %}
+        </p>
+      </div>
+      <div class="meta">
+        {% if row.repo_path %}
+        <a href="file://{{ row.repo_path }}" class="btn" style="padding:.25rem .5rem;font-size:.8rem">本地PDF</a>
+        {% else %}
+        <span class="tag">metadata only</span>
+        {% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

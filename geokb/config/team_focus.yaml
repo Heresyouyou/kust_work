@@ -1,0 +1,85 @@
+# 团队研究画像（知识点「可复用性」判据的输入）
+#
+# 用途：scripts/kp_select.py 用本文件给候选知识点打「团队相关性」分。
+#   命中任一板块 → 该维度得分；命中得越多、越具体，分数越高（饱和 3 个）。
+#
+# 维护：研究方向变化时直接改本文件，**改完立即生效**（无缓存、无需重启）。
+#       每项写「规范词 + 同义词/英文/缩写」，用小写英文与中文混合匹配。
+#
+# 排序即优先级：越靠前越接近团队主线。
+
+commodities:            # 矿种（同一种矿的研究最可直接参考）
+  - [W, [钨, 白钨矿, 黑钨矿, 钨矿, scheelite, wolframite, tungsten]]
+  - [Sn, [锡, 锡石, cassiterite, tin]]
+  - [Mo, [钼, 辉钼矿, molybdenite, molybdenum]]
+  - [Cu, [铜, 黄铜矿, chalcopyrite, copper]]
+  - [Au, [金, 金矿, gold]]
+  - [Bi, [铋, 辉铋矿, bismuth]]
+  - [Be, [铍, 绿柱石, beryl, beryllium]]
+  - [Li, [锂, 锂辉石, spodumene, lithium]]
+  - [NbTa, [铌钽, 铌, 钽, columbite, tantalite, niobium, tantalum]]
+  - [REE, [稀土, 独居石, 氟碳铈矿, monazite, bastnasite, rare earth]]
+
+deposit_types:          # 矿床类型（成因模型可直接类比）
+  - [矽卡岩, [矽卡岩型, 夕卡岩, skarn, 钙矽卡岩, 镁矽卡岩]]
+  - [斑岩, [斑岩型, porphyry]]
+  - [云英岩, [greisen, 云英岩型]]
+  - [石英脉型, [石英脉, 脉型, vein-type, quartz vein]]
+  - [伟晶岩, [pegmatite, 花岗伟晶岩]]
+  - [岩浆热液, [岩浆-热液, magmatic-hydrothermal, 岩浆热液系统]]
+  - [SEDEX, [sedex, 喷流沉积]]
+  - [VMS, [vms, 块状硫化物]]
+  - [IOCG, [iocg, 铁氧化物铜金]]
+  - [造山型金矿, [orogenic gold, 造山型金]]
+
+minerals:               # 关键矿物（团队做矿物微区与矿床矿物学，矿物名=可对标）
+  - [石榴石, [garnet, 钙铝榴石, 钙铁榴石, 锰铝榴石, grossular, andradite, spessartine]]
+  - [白钨矿, [scheelite, 钨华]]
+  - [辉钼矿, [molybdenite]]
+  - [黄铁矿, [pyrite, 含金黄铁矿, 载金矿物]]
+  - [磁铁矿, [magnetite]]
+  - [磷灰石, [apatite]]
+  - [锆石, [zircon]]
+  - [独居石, [monazite]]
+  - [萤石, [fluorite, 荧石]]
+  - [电气石, [tourmaline]]
+  - [绿柱石, [beryl]]
+  - [方解石, [calcite]]
+  - [角闪石, [amphibole, 阳起石, actinolite]]
+  - [辉石, [pyroxene, 透辉石, diopside, 单斜辉石]]
+  - [长石, [feldspar, 钾长石, 斜长石, plagioclase]]
+  - [云母, [mica, 白云母, 黑云母, muscovite, biotite, 金云母, phlogopite]]
+
+tectonic:               # 构造背景 / 地球动力环境（换区可类比的部分）
+  - [华南, [南岭, 江南造山带, 华夏地块, 扬子地块, south china, cathaysia, nanling]]
+  - [特提斯, [tethys, 三江, 滇西, 怒江, 澜沧江, 金沙江, sanjiang]]
+  - [青藏高原, [tibetan plateau, 冈底斯, 喜马拉雅, 羌塘, 拉萨地体, gangdese, himalaya]]
+  - [华北克拉通, [north china craton, 胶东, 太行, 燕辽]]
+  - [中亚造山带, [caob, 天山, 阿尔泰, 兴蒙, central asian orogenic belt, tianshan, altay]]
+  - [古太平洋俯冲, [paleo-pacific, 太平洋板块俯冲, 板片回卷, slab rollback, 板片断离, slab break-off]]
+  - [陆内伸展, [伸展背景, 岩石圈减薄, 拉张, intracontinental extension, lithospheric thinning]]
+  - [碰撞造山, [同碰撞, 后碰撞, collisional, post-collisional, 陆陆碰撞]]
+  - [变形与应变, [应变速率, 变形, 韧性剪切, 构造应力, strain rate, deformation, shear]]
+
+methods:                # 方法/技术（创新方法可直接迁移）
+  - [LA-ICP-MS, [激光剥蚀, laser ablation, la-icp-ms, icp-ms]]
+  - [矿物微区分析, [电子探针, epma, 原位分析, in-situ analysis, 面扫描, mapping]]
+  - [同位素定年, [u-pb, 锆石定年, 独居石定年, re-os, ar-ar, rb-sr, sm-nd, 年代学]]
+  - [同位素示踪, [hf同位素, nd同位素, s同位素, c-o同位素, 同位素组成, isotopic]]
+  - [流体包裹体, [fluid inclusion, 包裹体测温, 均一温度, 盐度]]
+  - [矿物微量元素, [微量元素, trace element, 稀土配分, ree pattern, 阴极发光, cl imaging]]
+  - [热力学模拟, [相平衡, pseudosection, thermocalc, 热力学, thermodynamic modelling]]
+  - [数值模拟, [numerical simulation, 反演, inversion, 数值模型]]
+  - [机器学习, [machine learning, 深度学习, deep learning, 随机森林, 神经网络, shap]]
+  - [大数据/知识图谱, [knowledge graph, 知识图谱, 数据驱动, data-driven, 数据库]]
+
+themes:                 # 可借鉴的解释范式（现象怎么解释）
+  - [成矿物质来源, [物质来源, 金属来源, metal source, 源区]]
+  - [流体演化, [流体混合, 沸腾, 相分离, fluid mixing, boiling, phase separation]]
+  - [氧化还原, [氧逸度, fo2, redox, 氧化还原条件, 还原性流体]]
+  - [岩浆演化, [分离结晶, 结晶分异, fractional crystallization, 岩浆混合, magma mixing, 同化混染, assimilation]]
+  - [部分熔融, [partial melting, 源区熔融, 地壳重熔, 深熔]]
+  - [蚀变分带, [蚀变, alteration, 钾化, 绢英岩化, 青磐岩化, 矽卡岩化]]
+  - [矿化富集机制, [富集机制, 沉淀机制, 卸载机制, precipitation mechanism, 矿化就位]]
+  - [剥蚀保存, [保存条件, 抬升剥蚀, exhumation, preservation, 隆升]]
+  - [成矿预测, [找矿预测, 靶区优选, 远景评价, mineral potential, prospectivity]]

@@ -1,0 +1,24 @@
+# 本目录是 GeoKB 服务端代码/文档快照。
+# 知识本体（content/）、台账（state/）、检索库（index/*.db）、
+# 模型（models/）与虚拟环境体积大或含内部数据，不入本公开仓库。
+
+# ---- 运行时与派生产物 ----
+venv/
+__pycache__/
+*.py[cod]
+models/
+index/
+logs/
+backup/
+raw_sources/
+inbox/
+state/
+content/
+nul
+
+# ---- 凭据：绝不提交 ----
+.deepseek_key.ingest
+config/admin_token.txt
+*.token
+*.pem
+*.key

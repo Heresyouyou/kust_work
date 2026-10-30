@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}GeoKB 管理{% endblock %}</title>
+  <style>
+    :root {
+      --bg: #2b2b2b;
+      --surface: #262626;
+      --surface-2: #303030;
+      --border: #3a3a3a;
+      --text: #e8e4df;
+      --muted: #8a867f;
+      --accent: #4a9e6a;
+      --accent-dim: #2d6e46;
+      --err: #b0433c;
+      --warn: #a86d12;
+    }
+    :root[data-theme="light"] {
+      --bg: #f7f6f3;
+      --surface: #ffffff;
+      --surface-2: #f2f0ec;
+      --border: #e2dfd8;
+      --text: #2a2926;
+      --muted: #6e6a63;
+      --accent: #2e7d4f;
+      --accent-dim: #4a9a6d;
+      --err: #b0433c;
+      --warn: #a86d12;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .brand svg { width: 22px; height: 22px; fill: currentColor; }
+    nav { display: flex; gap: 18px; align-items: center; }
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+    }
+    nav a:hover { color: var(--accent); }
+    main { max-width: 1100px; margin: 24px auto; padding: 0 24px 64px; }
+    h1 { font-size: 22px; margin: 0 0 18px; }
+    h2 { font-size: 16px; margin: 28px 0 12px; color: var(--muted); }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; }
+    .stat { text-align: center; }
+    .stat .n { font-size: 32px; font-weight: 700; color: var(--accent); }
+    .stat .l { font-size: 13px; color: var(--muted); margin-top: 4px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { color: var(--muted); font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+    tr:hover td { background: var(--surface-2); }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .tag.active { color: var(--accent); border-color: var(--accent-dim); }
+    .tag.deleted { color: var(--err); border-color: var(--err); }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      font-size: 13px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-dim); border-color: var(--accent-dim); color: #fff; }
+    .btn-danger { color: var(--err); border-color: var(--err); }
+    .btn-danger:hover { background: var(--err); color: #fff; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    form.inline { display: inline; }
+    label { display: block; font-size: 13px; color: var(--muted); margin: 14px 0 4px; }
+    input[type="text"], input[type="password"], textarea, select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+    }
+    input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent-dim); }
+    textarea { min-height: 120px; resize: vertical; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .error { color: var(--err); padding: 12px; border: 1px solid var(--err); border-radius: 6px; background: rgba(176,67,60,0.08); }
+    .row { display: flex; gap: 12px; }
+    .row > * { flex: 1; }
+    .recent-list { list-style: none; padding: 0; margin: 0; }
+    .recent-list li { padding: 8px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+    .recent-list li:last-child { border-bottom: none; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+    .meta { color: var(--muted); font-size: 12px; }
+    a { color: var(--accent); }
+    a:hover { text-decoration: underline; }
+    .empty { color: var(--muted); padding: 24px; text-align: center; }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="brand" href="/admin">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      GeoKB 管理端
+    </a>
+    <nav>
+      <a href="/admin/dashboard">总览</a>
+      <a href="/admin/entries">条目</a>
+      <a href="/admin/entry/new">新建</a>
+      <a href="http://127.0.0.1:5556/openapi.json" target="_blank">API 文档 ↗</a>
+      <a href="http://127.0.0.1:5555/geokb" target="_blank">公共门户 ↗</a>
+      <a href="/admin/logout">退出</a>
+    </nav>
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

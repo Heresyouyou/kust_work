@@ -1,0 +1,12 @@
+# 统一投放箱（手动下载的论文 PDF）
+#
+# 用途：当天自动链路没拿到 PDF 的论文（ScienceDirect 的 CF 内容防护、OUP/GSW
+# 风控、付费墙、需机构登录等），由人工下载后丢到这里，每天 12:01 与 18:01
+# 各批量入库一次。
+#
+# 改这里即刻生效，无需重启任何服务（脚本每次运行都重新读配置）。
+# 环境变量 GEOKB_INBOX 优先级更高；命令行 --folder 最高。
+inbox: D:/ZSK/geokb/inbox/papers
+
+# 旧的收件箱（manual_inbox.py 时代），仍在时一并扫描，处理完可手动删除目录。
+legacy_inbox: D:/ZSK/geokb/state/inbox

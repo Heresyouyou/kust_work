@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}检索 · GeoKB{% endblock %}
+{% block heading %}全站检索{% endblock %}
+{% block content %}
+<form class="search-box" action="{{ url_for('page_search') }}" method="get">
+  <input type="text" name="q" value="{{ q }}" placeholder="输入关键词或问题，例如：石英镜下鉴定、斑岩铜矿...">
+  <button type="submit" class="btn btn-primary">检索</button>
+</form>
+
+{% if expanded %}
+<div class="card" style="padding:.75rem 1rem">
+  <span style="color:var(--text-muted)">扩展词：</span>
+  {% for t in expanded %}<span class="tag" style="margin-right:.35rem">{{ t }}</span>{% endfor %}
+</div>
+{% endif %}
+
+{% if q %}
+<div class="card">
+  <h2>检索结果 · {{ hits|length }} 条</h2>
+  {% if hits %}
+  <ul class="entry-list">
+    {% for h in hits %}
+    <li>
+      <div>
+        <a href="{{ url_for('page_entry', eid=h.id) }}">{{ h.title }}</a>
+        <span class="tag" style="margin-left:.5rem">{{ h.module }}</span>
+        <p style="margin:.35rem 0 0;color:var(--text-muted);font-size:.9rem">
+          {{ h.summary[:120] if h.summary else '' }}{% if h.summary and h.summary|length > 120 %}...{% endif %}
+          <span style="margin-left:.5rem" title="匹配方式">{{ h.matched_by|join(',') }}</span>
+        </p>
+      </div>
+      <div class="meta" title="RRF 融合得分">
+        <span class="tag">{{ '%.4f'|format(h.score) }}</span>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p style="color:var(--text-muted)">未命中任何条目，可尝试更通用的关键词或英文术语。</p>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

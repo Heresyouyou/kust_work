@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{{ entry.title }} · GeoKB{% endblock %}
+{% block heading %}{{ entry.title }}{% endblock %}
+{% block content %}
+<div class="card" style="padding-bottom:.5rem">
+  <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center">
+    <span class="tag">{{ entry.module }}</span>
+    <span class="tag conf-{{ entry.confidence }}">{{ entry.confidence }}</span>
+    {% if entry.status == 'deleted' %}<span class="tag conf-deleted">已删除</span>{% endif %}
+    <span style="color:var(--text-muted);font-size:.85rem;margin-left:auto">更新于 {{ entry.updated }}</span>
+  </div>
+  <p style="color:var(--text-muted);font-size:1rem">{{ entry.summary }}</p>
+  {% if entry.tags %}
+  <div style="margin-top:.5rem">
+    {% for t in entry.tags %}<span class="tag" style="margin-right:.35rem">{{ t }}</span>{% endfor %}
+  </div>
+  {% endif %}
+</div>
+
+<div class="card markdown-body" id="body-md">
+  {{ entry.body_markdown }}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const el = document.getElementById('body-md');
+  if (el && typeof marked !== 'undefined') {
+    el.innerHTML = marked.parse(el.textContent);
+  }
+});
+</script>
+
+{% if entry.sources %}
+<div class="card">
+  <h2>来源</h2>
+  <ul>
+    {% for s in entry.sources %}
+    <li>
+      {% if s.url %}<a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.name or s.url }}</a>
+      {% else %}{{ s.name or s }}{% endif %}
+      {% if s.accessed %}<span class="meta">（{{ s.accessed }}）</span>{% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+{% endblock %}

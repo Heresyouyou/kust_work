@@ -1,0 +1,126 @@
+# -*- coding: utf-8 -*-
+"""论文全文的统一预处理入口（摘要任务与知识点任务共用）。
+
+为什么必须共用（2026-10-19）：
+    DeepSeek 的自动前缀缓存只认「完全相同的 messages 前缀」，命中价是未命中的
+    1/50。此前两个任务各截各的（摘要 smart_truncate 5000 / 知识点 [:12000] 字符），
+    指令又都在全文前面，导致实测缓存命中率仅 **1.5%**，输入侧几乎全按最贵档付费。
+
+    现在统一为：同一段清洗后文本 + 同一 system + 全文前置、指令后置。
+    这样第二个任务能命中第一个任务留下的 KV 前缀，输入计费降到约 1/10。
+
+对外只暴露三个函数：
+    clean(raw)              去参考文献/致谢/页眉页脚/重复行
+    truncate(text, budget)  头部 60% + 结论段 40%（token 预算）
+    prepare(raw, budget)    clean + truncate，返回可直接拼进 prompt 的文本
+"""
+import re
+from collections import Counter
+
+# ─── 两个任务共用的 system（必须逐字节相同才能命中前缀缓存）────
+SYSTEM_PROMPT = (
+    "你是地矿学科文献处理助手。严格按用户要求输出一个 JSON 对象，"
+    "不要输出任何其他文字、解释或 markdown 代码块。"
+)
+
+# 两个任务共用的文本预算（token）。**必须两处引用同一个常量**，否则文本不同、
+# 前缀不匹配、缓存失效。
+# 定 10000 的依据（scripts/_budget_locator.py，2026-10-19）：
+#   bg=5000/8000/10000 的知识点质量指标与旧版 12000 字符硬截断持平
+#   （含数值率 0.50/0.42/0.42 vs 旧版 0.42，单篇方差极大故视为等价），
+#   而 bg=10000 送入约 6,600–7,300 token，与旧版实测 6,766 token 等价，
+#   但覆盖到了结论段（旧版只能看到全文前 17%）。
+INGEST_BUDGET = 10000
+
+# ─── 章节/区块识别 ────────────────────────────────────────────
+RE_REFS = re.compile(
+    r"(?im)^\s*(references|reference list|bibliography|acknowledg\w*|"
+    r"data availability|conflicts? of interest|author contributions|"
+    r"funding|supplementary materials|参考文献|致\s*谢)\s*[:.]?\s*$", re.I)
+RE_CONCL = re.compile(
+    r"(?im)^\s*(?:\d+\.?\s*)?(conclusions?|summary and conclusions?|"
+    r"concluding remarks|discussion and conclusions?|结\s*论|结论与讨论)\s*[:.]?\s*$", re.I)
+RE_BOILER = re.compile(
+    r"(?i)(doi\.org/|https?://creativecommons|©\s*\d{4}|open access|"
+    r"licensee|basel, switzerland|mdpi|elsevier|springer|frontiers\s+in|"
+    r"received:|accepted:|published:|academic editor:|citation:|copyright:|"
+    r"creative commons|terms and conditions|all rights reserved|"
+    r"第\s*\d+\s*卷\s*第\s*\d+\s*期|收稿日期|修回日期|责任编辑|中图分类号)")
+RE_CJK = re.compile(r"[\u4e00-\u9fff]")
+
+
+def est_tokens(text):
+    """CJK≈1 token/字；ASCII 实测 3.0 chars/token（不是 4）。"""
+    cjk = len(RE_CJK.findall(text))
+    return int(cjk + (len(text) - cjk) / 3.0)
+
+
+def clean(raw):
+    """L1 切尾部参考文献/致谢 → L2 去页眉页脚 → L3 去高频重复行。"""
+    cut = len(raw)
+    for m in RE_REFS.finditer(raw):
+        if m.start() > len(raw) * 0.45:      # 只认后半段出现的，避免误伤正文引用讨论
+            cut = min(cut, m.start())
+    t = raw[:cut]
+
+    keep = []
+    for ln in t.split("\n"):
+        s = ln.strip()
+        if len(s) < 3:
+            continue
+        if RE_BOILER.search(s):
+            continue
+        keep.append(s)
+
+    cnt = Counter(keep)
+    keep = [ln for ln in keep if cnt[ln] < 3 or len(ln) > 60]
+    return "\n".join(keep)
+
+
+def truncate(text, budget=5000):
+    """头部 60% + 结论段 40%。预算内原样返回，超出则两头取。
+
+    ⚠ head 不能写死字符上限：早期版本用 text[:14000]，导致 budget 调到 12000
+    token 时 head 仍只吃进 14,000 字符（英文约 4,700 token），预算形同虚设。
+    现按比例取头部 65% 字符，再由 cut 按 token 精确收敛。
+    """
+    if est_tokens(text) <= budget:
+        return text
+    head_budget = int(budget * 0.6)
+    tail_budget = budget - head_budget
+
+    def cut(s, b):
+        while s and est_tokens(s) > b:
+            s = s[: int(len(s) * 0.85)]
+        return s
+
+    head = cut(text[: int(len(text) * 0.65)], head_budget)
+    hits = list(RE_CONCL.finditer(text))
+    if hits:
+        # 结论段可能在 90% 之后；给 12,000 字符窗口，由 cut 收敛到 tail_budget
+        seg = text[hits[-1].start(): hits[-1].start() + 12000]
+        tail = "\n\n[结论段节选]\n" + cut(seg, tail_budget)
+    else:
+        tail = "\n\n[文末节选]\n" + cut(text[-12000:], tail_budget)
+    return head + tail
+
+
+def numbered(text):
+    """加行号版（知识点任务用它做证据引用）。
+
+    ⚠ 必须由**两个任务共用**：行号会让文本内容变化（每行多 "L123:"），
+    若只给知识点任务加行号，它的前缀就与摘要任务不同，缓存立刻失效。
+    故 prepare() 统一输出行号版，摘要任务也吃同一份文本（多付约 8% 字符，
+    但换来输入计费降一个量级，净赚）。
+    """
+    lines = [l for l in text.split("\n") if l.strip()]
+    return "\n".join("L%d:%s" % (i + 1, l) for i, l in enumerate(lines))
+
+
+def prepare(raw, budget=5000):
+    """论文原文 → 可直接拼进 prompt 的统一文本（行号版，两任务共用）。
+
+    两个 LLM 任务必须用**同一次调用的同一个返回值**，否则前缀不同、缓存失效。
+    预算先按纯文本 92% 截断，给行号前缀留余量。
+    """
+    return numbered(truncate(clean(raw), int(budget * 0.92)))

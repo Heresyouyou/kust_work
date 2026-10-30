@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}{% if entry %}编辑条目{% else %}新建条目{% endif %} · GeoKB{% endblock %}
+{% block heading %}{% if entry %}编辑：{{ entry.title }}{% else %}新建条目{% endif %}{% endblock %}
+{% block content %}
+<form class="admin-form" method="post" action="{{ url_for('admin_entry_save') }}" x-data="{ body: {{ (entry.body_markdown or '')|tojson }} }" @submit="document.getElementById('body-hidden').value = body">
+  <input type="hidden" name="id" value="{{ entry.id if entry else '' }}" required>
+  <label>标题</label>
+  <input type="text" name="title" value="{{ entry.title if entry else '' }}" required>
+
+  <label>模块 slug</label>
+  <input type="text" name="module" value="{{ entry.module if entry else '' }}" placeholder="例如 mineralogy" required>
+
+  <label>标签（逗号分隔）</label>
+  <input type="text" name="tags" value="{{ (entry.tags or [])|join(',') }}">
+
+  <label>摘要</label>
+  <input type="text" name="summary" value="{{ entry.summary if entry else '' }}">
+
+  <label>可信度</label>
+  <select name="confidence">
+    {% for c in ['A','B','C','D'] %}
+    <option value="{{ c }}" {% if entry and entry.confidence == c %}selected{% endif %}>{{ c }}</option>
+    {% endfor %}
+  </select>
+
+  <label>状态</label>
+  <select name="status">
+    {% for s in ['active','deprecated','deleted'] %}
+    <option value="{{ s }}" {% if entry and entry.status == s %}selected{% endif %}>{{ s }}</option>
+    {% endfor %}
+  </select>
+
+  <label>来源（JSON 或每行一个）</label>
+  <textarea name="sources" rows="3">{% if entry and entry.sources %}{{ entry.sources|tojson(indent=2) }}{% endif %}</textarea>
+
+  <div class="split" style="margin-top:1rem">
+    <div>
+      <label>正文 Markdown</label>
+      <textarea id="body-input" x-model="body" rows="22" placeholder="# 标题&#10;&#10;正文内容..."></textarea>
+      <input type="hidden" id="body-hidden" name="body" :value="body">
+    </div>
+    <div>
+      <label>实时预览</label>
+      <div class="card markdown-body" id="preview" style="min-height:400px">
+        预览区
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:1rem">
+    <button type="submit" class="btn btn-primary">保存</button>
+    <a href="{{ url_for('admin_entries') }}" class="btn">取消</a>
+  </div>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('body-input');
+  const preview = document.getElementById('preview');
+  const hidden = document.getElementById('body-hidden');
+  function render() {
+    if (typeof marked !== 'undefined') preview.innerHTML = marked.parse(input.value || '');
+    if (hidden) hidden.value = input.value;
+  }
+  input.addEventListener('input', render);
+  render();
+});
+</script>
+{% endblock %}

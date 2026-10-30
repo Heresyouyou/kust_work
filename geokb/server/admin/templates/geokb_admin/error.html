@@ -1,0 +1,10 @@
+{% extends "geokb_admin/base.html" %}
+{% block title %}出错{% endblock %}
+{% block content %}
+<h1>操作失败</h1>
+<div class="error">{{ message }}</div>
+<div style="margin-top:18px">
+  <a class="btn" href="/admin/dashboard">返回总览</a>
+  <a class="btn" href="/admin/entries">返回条目列表</a>
+</div>
+{% endblock %}

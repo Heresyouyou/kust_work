@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}仪表盘 · GeoKB{% endblock %}
+{% block heading %}仪表盘{% endblock %}
+{% block content %}
+<div class="grid">
+  <div class="stat"><div class="num">{{ total }}</div><div class="label">知识条目</div></div>
+  <div class="stat"><div class="num">{{ modules|length }}</div><div class="label">模块</div></div>
+  <div class="stat"><div class="num">{{ papers }}</div><div class="label">论文题录</div></div>
+  <div class="stat"><div class="num">512</div><div class="label">向量维度</div></div>
+</div>
+
+<div class="card" style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+  <div>
+    <h2>模块分布</h2>
+    <canvas id="moduleChart" height="220"></canvas>
+  </div>
+  <div>
+    <h2>可信度分布</h2>
+    <canvas id="confChart" height="220"></canvas>
+  </div>
+</div>
+
+<div class="card">
+  <h2>最近更新</h2>
+  <ul class="entry-list">
+    {% for e in recent %}
+    <li>
+      <div>
+        <a href="{{ url_for('page_entry', eid=e.id) }}">{{ e.title }}</a>
+        <span class="tag" style="margin-left:.5rem">{{ e.module }}</span>
+      </div>
+      <div class="meta">{{ e.updated }}</div>
+    </li>
+    {% else %}
+    <li style="color:var(--text-muted)">暂无更新记录</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const modCtx = document.getElementById('moduleChart').getContext('2d');
+  const confCtx = document.getElementById('confChart').getContext('2d');
+  const root = document.documentElement;
+  const accent = getComputedStyle(root).getPropertyValue('--accent').trim();
+  const color = getComputedStyle(root).getPropertyValue('--text-main').trim() || '#333';
+  const modData = {{ modules|tojson }};
+  const confData = {{ conf|tojson }};
+  new Chart(modCtx, {
+    type: 'bar',
+    data: {
+      labels: modData.map(r => r[0]),
+      datasets: [{ label: '条目数', data: modData.map(r => r[1]), backgroundColor: accent }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { color } }, y: { ticks: { color } } } }
+  });
+  new Chart(confCtx, {
+    type: 'doughnut',
+    data: {
+      labels: confData.map(r => r[0]),
+      datasets: [{ data: confData.map(r => r[1]) }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'right', labels: { color } } } }
+  });
+});
+</script>
+{% endblock %}

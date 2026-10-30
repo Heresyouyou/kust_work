@@ -1,0 +1,22 @@
+{
+  "team": "Tianbaxin Tungsten / South China Metallogeny",
+  "focus_areas": [
+    "斑岩铜钼矿床成因、勘查与成矿流体",
+    "矽卡岩型钨/锡/铜/钼矿床",
+    "关键矿产成矿作用（W、Sn、Cu、Mo、Li、REE）",
+    "华南、三江等成矿区带",
+    "矿床模型与找矿预测",
+    "显微矿物鉴定与岩相学"
+  ],
+  "core_keywords": [
+    "porphyry copper", "porphyry Cu", "porphyry molybdenum", "斑岩铜矿", "斑岩钼矿",
+    "skarn", "矽卡岩", "钨矿", "tungsten", "锡矿", "tin",
+    "铜矿", "copper deposit", "钼矿", "molybdenum", "锂矿", "lithium", "稀土", "REE",
+    "成矿流体", "流体包裹体", "fluid inclusion", "成矿作用", "mineralization",
+    "矿床模型", "deposit model", "找矿预测", "mineral exploration",
+    "华南", "三江", "Yunnan", "Tibet", "青藏高原"
+  ],
+  "inclusion_threshold": 1,
+  "model_path": "D:/PostNews/Translate/models-gguf/Qwen3.5-4B-Q4_K_M.gguf",
+  "llama_cli": "D:/PostNews/Translate/llama-cpp/llama-cli.exe"
+}

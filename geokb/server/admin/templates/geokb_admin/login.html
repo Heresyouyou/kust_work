@@ -1,0 +1,14 @@
+{% extends "geokb_admin/base.html" %}
+{% block title %}GeoKB 登录{% endblock %}
+{% block content %}
+<div class="card" style="max-width:420px;margin:80px auto 0">
+  <h1>GeoKB 管理登录</h1>
+  {% if error %}<div class="error">{{ error }}</div>{% endif %}
+  <form method="post" action="{{ url_for('admin.admin_do_login') }}">
+    <label for="token">管理 Token</label>
+    <input type="password" id="token" name="token" placeholder="输入 admin_token.txt 中的 TOKEN" required autofocus>
+    <button type="submit" class="btn btn-primary" style="margin-top:18px;width:100%">登录</button>
+  </form>
+  <p class="hint">本端点位于 5555 门户，仅用于知识库管理；检索服务仍在 5556 端口。</p>
+</div>
+{% endblock %}

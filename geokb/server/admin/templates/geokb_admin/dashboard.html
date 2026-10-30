@@ -1,0 +1,65 @@
+{% extends "geokb_admin/base.html" %}
+{% block title %}GeoKB 总览{% endblock %}
+{% block content %}
+<h1>知识库总览</h1>
+<div class="card">
+  <div class="grid-3">
+    <div class="stat"><div class="n">{{ stats.total }}</div><div class="l">条目总数</div></div>
+    <div class="stat"><div class="n">{{ stats.active }}</div><div class="l">有效</div></div>
+    <div class="stat"><div class="n">{{ stats.deprecated }}</div><div class="l">已弃用</div></div>
+    <div class="stat"><div class="n">{{ stats.deleted }}</div><div class="l">已删除</div></div>
+  </div>
+</div>
+<div class="actions">
+  <a class="btn btn-primary" href="/admin/entry/new">+ 新建条目</a>
+  <form class="inline" method="post" action="{{ url_for('admin.admin_rebuild') }}" onsubmit="return confirm('重建索引会刷新 FTS5 与向量表，确认？')">
+    <button type="submit" class="btn">🔄 重建索引</button>
+  </form>
+  <form class="inline" method="post" action="{{ url_for('admin.admin_self_update_run') }}" onsubmit="return confirm('触发外部 feed 自更新会耗时数分钟，确认？')">
+    <button type="submit" class="btn">⬆️ 外部 feed 自更新</button>
+  </form>
+  <a class="btn" href="{{ api_url }}/openapi.json" target="_blank">AI API 文档 ↗</a>
+</div>
+<h2>模块分布</h2>
+<div class="card">
+  {% if mod_dist %}
+  <table>
+    <thead><tr><th>模块</th><th>条目数</th></tr></thead>
+    <tbody>
+      {% for m, n in mod_dist %}
+      <tr><td>{{ m }}</td><td>{{ n }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<div class="empty">暂无模块数据</div>{% endif %}
+</div>
+<h2>最近更新</h2>
+<div class="card">
+  {% if recent %}
+  <ul class="recent-list">
+    {% for r in recent %}
+    <li>
+      <span>
+        <a href="/admin/entry/{{ r.id }}/edit">{{ r.title }}</a>
+        <span class="meta">· {{ r.module }} · {{ r.updated }}</span>
+      </span>
+      <span class="tag {{ r.status }}">{{ r.status }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}<div class="empty">暂无条目</div>{% endif %}
+</div>
+<h2>变更日志</h2>
+<div class="card">
+  {% if changelog %}
+  <table>
+    <thead><tr><th>时间</th><th>条目</th><th>动作</th><th>来源</th></tr></thead>
+    <tbody>
+      {% for c in changelog %}
+      <tr><td class="mono">{{ c.ts }}</td><td>{{ c.eid }}</td><td>{{ c.action }}</td><td>{{ c.agent }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<div class="empty">暂无变更记录</div>{% endif %}
+</div>
+{% endblock %}

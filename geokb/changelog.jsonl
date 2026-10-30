@@ -1,0 +1,18 @@
+{"ts": "2026-10-13T23:38:09", "eid": "test-1791905884", "action": "save", "agent": "web-admin"}
+{"ts": "2026-10-13T23:39:08", "eid": "test-1791905884", "action": "delete", "agent": "web-admin"}
+{"ts": "2026-10-13T23:39:09", "eid": "test-1791905884", "action": "restore", "agent": "web-admin"}
+{"ts": "2026-10-13T23:40:32", "eid": "test-1791905884", "action": "delete", "agent": "web-admin"}
+{"ts": "2026-10-13T23:40:36", "eid": "test-1791905884", "action": "restore", "agent": "web-admin"}
+{"ts": "2026-10-13T23:40:54", "eid": "test-1791906053", "action": "save", "agent": "web-admin"}
+{"ts": "2026-10-13T23:40:58", "eid": "test-1791906053", "action": "delete", "agent": "web-admin"}
+{"ts": "2026-10-13T23:41:02", "eid": "test-1791906053", "action": "restore", "agent": "web-admin"}
+{"ts": "2026-10-14T03:02:05", "eid": "*", "action": "self-update-finished:D:\\ZSK\\geokb\\logs\\self_update_20261014_030158.log", "agent": "geokb-admin-5554"}
+{"ts": "2026-10-14T03:03:14", "eid": "*", "action": "self-update-finished:D:\\ZSK\\geokb\\logs\\self_update_20261014_030308.log", "agent": "geokb-admin-5554"}
+{"ts": "2026-10-14T03:03:23", "eid": "*", "action": "self-update-finished:D:\\ZSK\\geokb\\logs\\self_update_20261014_030316.log", "agent": "geokb-admin-5554"}
+{"ts": "2026-10-15T08:50:00", "eid": "*", "action": "domain-migration: lib.kust.work -> sjck.kust.work (frpc SJCK_KUST_WORK tunnel, tls_front cert, 5166 URL renames, root page simplified, pdf_url field added)", "agent": "geokb-admin-5554"}
+{"ts": "2026-10-16T15:15:00", "eid": "*", "action": "wechat-batch-ingest: 31 papers archived to NAS by_journal + manual analysis entries (extraction=manual, confidence=B), index 5325 entries; [14] Sun&Chen2017 dup skipped; NAS index.jsonl locked (deferred, pending file state/index_wechat_31.jsonl)", "agent": "geokb-admin-5554"}
+{"ts": "2026-10-16T15:35:00", "eid": "*", "action": "star feature: state/starred.json + POST/DELETE /api/entry/<id>/star + GET /api/stars (public, no auth), x1.5 boost in retriever, starred field in hits/entry; 31 wechat-batch papers starred; NAS index.jsonl merged (898 lines, lock released)", "agent": "geokb-admin-5554"}
+{"ts": "2026-10-18T20:10:00", "eid": "*", "action": "kpoints backfill: 237 papers had entries but ZERO knowledge points (trigger_pdf_ingest never called kp_extract). Generated 31 text files for wechat batch + 1386 kps (237 papers), retried 5 json_fail (4 ok). Fixed index schema: added parent/evidence columns (were written to md but never indexed -> API returned null), added parent_title/parent_url/parent_pdf_url in entry API + markdown. Hooked kp_extract into trigger_pdf_ingest. Archived 2 non-paper entries (journal submission guidelines). kpoints 4528->5944, index 7422", "agent": "geokb-admin-5554"}
+{"ts": "2026-10-18T22:07:02", "eid": "*", "action": "lab page rolled back: added /lab (server/lab_site.py, installed-userscript entry page on 5556) then removed at user request (attack-surface concern). app.py register + module file deleted, 5556 restarted, GET /lab -> 404; /journal and /health unaffected.", "agent": "geokb-admin-5554"}
+{"ts": "2026-10-24T01:49:33", "eid": "*", "action": "ingest-api-key: GeoKB 入库链路统一切到专用 key (.deepseek_key.ingest) + HTTP-Tracking-Id 5e62b29d-7074-4062-8485-97599610bf3d；覆盖 deepseek_client/pdf_corpus_ingest/kp_extract/inbox/user_upload/migrate；model/URL/thinking 不变。注意：提供的 key 实测 401（长度 34，疑似少一位），待更正后生效。", "agent": "workbuddy"}
+{"ts": "2026-10-24T01:57:54", "eid": "*", "action": "ingest-api-key: 更正后的 35 位 key 已通过实测（普通调用与 JSON 模式均 200，usage 正常）；入库链路配置完成，tracking 头已在假响应中核验。model/URL/thinking/timeout 未变。", "agent": "workbuddy"}
