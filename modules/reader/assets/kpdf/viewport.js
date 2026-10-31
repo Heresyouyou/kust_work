@@ -22,6 +22,16 @@ import { clamp, rafThrottle, el } from './util.js';
 /** 预取窗口系数：视野外再预画这么多，滚动时不至于看到空白闪烁。 */
 const PREFETCH_RATIO = 0.9;
 
+/**
+ * 归一化一段引文，便于在文本层里做包含匹配：
+ * 去空白（PDF 换行、两端对齐的额外空格）、去软连字符、转小写。
+ */
+function normQuote(s) {
+  return String(s || '')
+    .replace(/[\s\u00a0\u00ad\u200b]+/g, '')
+    .toLowerCase();
+}
+
 export class View extends Emitter {
   /**
    * @param {object} o
@@ -252,6 +262,9 @@ export class View extends Emitter {
 
   /** 适配比例（1 = 恰好适配）。UI 显示「适合宽度 100%」用这个。 */
   get fitRatio() {
+    // 处于适配模式时恒为 1：此时 scale 就是按当前容器算出来的适配值。
+    // 不能拿 scale/commonSize 基准去比 —— 页尺寸不一致的文档会算出 1200% 这种怪数。
+    if (this.fitMode && this.fitMode !== 'none') return 1;
     const base = this.baseScale();
     return base ? this.scale / base : 1;
   }
@@ -510,6 +523,8 @@ export class View extends Emitter {
     slot.linksBuilt = false;
     slot.canvas?.remove();
     slot.canvas = null;
+    slot.hoverLayerEl?.remove();   // 缩放/旋转后字框作废，色带必须跟着清
+    slot.hoverLayerEl = null;
     slot.renderedScale = undefined;
     slot.textRotation = undefined;
   }
@@ -586,6 +601,376 @@ export class View extends Emitter {
       });
     }
     return count;
+  }
+
+  /**
+   * 跳到第 page 页，并高亮 quote 所在的段落（导读的「P.x」用它）。
+   *
+   * 文本层是虚拟化的：目标页可能还没挂载，所以这里轮询等待（最多 tries×100ms）。
+   * 匹配失败不抛错——只保留页码跳转，导读那边的点击体验不受影响。
+   * 匹配用「去空白 + 转小写」后的整页拼接串，因此跨行的句子也能对上；
+   * 原文有软连字符、断词时逐级缩短前缀重试。
+   */
+  focusQuote(page, quote, { tries = 30 } = {}) {
+    const q = normQuote(quote);
+    if (!q) return Promise.resolve(0);
+    const index = Math.max(0, Math.min(this.doc.numPages - 1, (page | 0) - 1));
+    return new Promise((resolve) => {
+      let n = 0;
+      const tick = () => {
+        if (this._destroyed) { resolve(0); return; }
+        const hit = this._markQuote(index, q);
+        if (hit) { resolve(hit); return; }
+        if (++n >= tries) { resolve(0); return; }
+        setTimeout(tick, 100);
+      };
+      tick();
+    });
+  }
+
+  /** 在某一页的文本层里标记与 q（已归一化）匹配的 span，返回标记数。 */
+  _markQuote(index, q) {
+    const slot = this._slots.get(index);
+    const layer = slot?.textLayerEl;
+    if (!layer) return 0;
+    const spans = Array.from(layer.querySelectorAll('span'));
+    if (!spans.length) return 0;
+    const norm = spans.map((sp) => normQuote(sp.textContent));
+    const joined = norm.join('');
+    if (!joined) return 0;
+    const starts = [];
+    let acc = 0;
+    for (const t of norm) { starts.push(acc); acc += t.length; }
+
+    // 先试完整片段，逐级缩短（PDF 断词、连字符、错字都会让长片段对不上）
+    const probes = [];
+    for (const L of [q.length, 90, 70, 50, 35, 24, 16, 12]) {
+      if (L <= q.length && L >= 12) probes.push(q.slice(0, L));
+    }
+    let at = -1;
+    let len = 0;
+    for (const p of probes) {
+      at = joined.indexOf(p);
+      if (at >= 0) { len = p.length; break; }
+    }
+    if (at < 0) return 0;
+
+    const end = at + len;
+    let first = -1;
+    let count = 0;
+    for (let i = 0; i < spans.length; i++) {
+      const s = starts[i];
+      const e = s + norm[i].length;
+      if (!norm[i] || e <= at || s >= end) continue;
+      spans[i].classList.add('kp-hit', 'kp-hit-current');
+      if (first < 0) first = i;
+      count++;
+    }
+    if (first >= 0) {
+      try {
+        spans[first].scrollIntoView({ block: 'center', behavior: 'smooth' });
+      } catch { /* 老浏览器不支持 options，忽略 */ }
+    }
+    return count;
+  }
+
+
+  /** 清掉划词镜像的高亮。 */
+  clearMirror() {
+    try {
+      if (window.CSS && CSS.highlights) CSS.highlights.delete('kpdf-mirror');
+    } catch (e) { /* 忽略 */ }
+    for (const [, slot] of this._slots) {
+      const layer = slot.textLayerEl;
+      if (!layer) continue;
+      layer.querySelectorAll('span.kp-mirror').forEach((sp) => sp.classList.remove('kp-mirror'));
+    }
+  }
+
+  // ── 悬停整句高亮：一行一个矩形 ───────────────────────────────
+  /**
+   * 客户端坐标 → 某页的页面本地坐标（可越界），slack 是外扩容差（像素）。
+   *
+   * 悬停吸附靠它：指针不必压在字上，落在行旁、行距里 10px 以内，
+   * 也能算出「离哪一页多远、页面内哪个点最近」。
+   */
+  pagePointAt(cx, cy, slack = 0) {
+    let best = null;
+    for (const [i, slot] of this._slots) {
+      const r = slot.root.getBoundingClientRect();
+      if (!r.width || !r.height) continue;
+      const dx = Math.max(r.left - cx, 0, cx - r.right);
+      const dy = Math.max(r.top - cy, 0, cy - r.bottom);
+      const d = Math.hypot(dx, dy);
+      if (d > slack) continue;
+      if (!best || d < best.d) {
+        best = { page: i + 1, d, x: cx - r.left, y: cy - r.top, w: r.width, h: r.height };
+      }
+    }
+    return best;
+  }
+
+  /**
+   * 一段 Range → 「一行一个矩形」，坐标是本页本地 CSS 像素。
+   *
+   * 高亮和选区不是一回事：选区跟着字形走，逐字/逐 span 拼出来，边缘坑坑洼洼；
+   * 高亮要的是一条条齐整的色带，所以这里按行聚类，每行只出一个矩形：
+   *   · 左、右 = 该行最左/最右的字框边（句子跨几行就出几个矩形）；
+   *   · 上、下 = 该行**最高的那个字框**（行高），不是每个字自己的框。
+   * 这样一行看过去就是一个完整矩形，不会出现高低不齐的碎块。
+   */
+  lineRectsOf(page, range) {
+    const index = Math.max(0, Math.min(this.doc.numPages - 1, (page | 0) - 1));
+    const slot = this._slots.get(index);
+    if (!slot || !range) return [];
+    const pr = slot.root.getBoundingClientRect();
+    if (!pr.width || !pr.height) return [];
+
+    const raw = [];
+    for (const r of range.getClientRects()) {
+      if (r.width < 0.5 || r.height < 0.5) continue;
+      raw.push({ x: r.left - pr.left, y: r.top - pr.top, w: r.width, h: r.height });
+    }
+    if (!raw.length) return [];
+    raw.sort((a, b) => (a.y + a.h / 2) - (b.y + b.h / 2));
+
+    // 同行的判据：垂直中心足够近（阈值跟行内较高的那个框走，容许上下标）
+    const rows = [];
+    for (const r of raw) {
+      const cy = r.y + r.h / 2;
+      let row = null;
+      for (const q of rows) {
+        if (Math.abs(q.cy - cy) <= Math.max(2, 0.5 * Math.max(q.h, r.h))) { row = q; break; }
+      }
+      if (!row) {
+        rows.push({ cy, top: r.y, h: r.h, x0: r.x, x1: r.x + r.w });
+        continue;
+      }
+      if (r.h > row.h + 0.5) { row.h = r.h; row.top = r.y; row.cy = cy; }
+      row.x0 = Math.min(row.x0, r.x);
+      row.x1 = Math.max(row.x1, r.x + r.w);
+    }
+    rows.sort((a, b) => a.top - b.top);
+    return rows.map((q) => ({ x: q.x0, y: q.top, w: q.x1 - q.x0, h: q.h }));
+  }
+
+  /** 某一页的悬停色带层（按需创建，永远不吃鼠标事件）。 */
+  _hoverLayer(slot) {
+    if (slot.hoverLayerEl && slot.hoverLayerEl.isConnected) return slot.hoverLayerEl;
+    const layer = el('div.kp-hoverLayer', { 'data-page': String(slot.index + 1) });
+    slot.root.append(layer);
+    slot.hoverLayerEl = layer;
+    return layer;
+  }
+
+  /**
+   * 画悬停色带。rects 是 lineRectsOf 的结果（本页本地坐标）。
+   * 返回承载色带的图层元素，调用方用它判断「还挂在页上吗」。
+   */
+  paintHover(page, rects, { sent = '' } = {}) {
+    const index = Math.max(0, Math.min(this.doc.numPages - 1, (page | 0) - 1));
+    const slot = this._slots.get(index);
+    if (!slot || !rects || !rects.length) return null;
+    const layer = this._hoverLayer(slot);
+    layer.textContent = '';
+    if (sent === '' || sent === null) layer.removeAttribute('data-sent');
+    else layer.dataset.sent = String(sent);
+    const frag = document.createDocumentFragment();
+    for (const r of rects) {
+      const d = el('div.kp-hoverRect');
+      d.style.left = `${r.x.toFixed(2)}px`;
+      d.style.top = `${r.y.toFixed(2)}px`;
+      d.style.width = `${r.w.toFixed(2)}px`;
+      d.style.height = `${r.h.toFixed(2)}px`;
+      frag.append(d);
+    }
+    layer.append(frag);
+    return layer;
+  }
+
+  /** 清掉所有悬停色带（两栏都清）。 */
+  clearHoverPaint() {
+    for (const [, slot] of this._slots) {
+      slot.hoverLayerEl?.remove();
+      slot.hoverLayerEl = null;
+    }
+  }
+
+  /** 取某一页已挂载的文本层元素（虚拟化，没挂载就返回 null）。 */
+  textLayer(page) {
+    const idx = Math.max(0, Math.min(this.doc.numPages - 1, (page | 0) - 1));
+    return this._slots.get(idx)?.textLayerEl || null;
+  }
+
+  /**
+   * 字符级高亮（划词镜像首选）：在指定页里把 text 这段文字精确标出来。
+   *
+   * 之前按 span 标会导致「一句话把整行都染上」（PDF 文本层一行常是一个 span）。
+   * 这里改用 CSS Custom Highlight API：把 span 拼成一条带索引的字符串，
+   * 定位到起止字符后再还原成 DOM Range，只有这句话的字符会变色。
+   * boxes（句子版面框，0–1）用来在同页出现多次时挑对那一处。
+   */
+  highlightTextRange(page, text, boxes) {
+    const index = Math.max(0, Math.min(this.doc.numPages - 1, (page | 0) - 1));
+    const slot = this._slots.get(index);
+    const layer = slot?.textLayerEl;
+    if (!layer) return 0;
+    this.clearMirror();
+
+    const spans = Array.from(layer.querySelectorAll('span'));
+    let joined = '';
+    const map = [];
+    for (const sp of spans) {
+      const node = sp.firstChild;
+      if (!node || node.nodeType !== 3) continue;
+      const t = node.nodeValue || '';
+      for (let i = 0; i < t.length; i++) {
+        const ch = t[i];
+        if (/[\s\u00a0\u00ad\u200b]/.test(ch)) continue;
+        joined += ch.toLowerCase();
+        map.push([node, i]);
+      }
+    }
+    const q0 = normQuote(text);
+    if (!joined || q0.length < 4) return 0;
+
+    // 逐级缩短：译文与原文偶尔差一个标点，长片段对不上时退一步
+    let at = -1;
+    let len = 0;
+    for (const L of [q0.length, 120, 90, 60, 40, 24, 16]) {
+      if (L > q0.length || L < 8) continue;
+      const q = q0.slice(0, L);
+      let pos = joined.indexOf(q);
+      if (pos >= 0) {
+        // 有句子框时，挑起点落在框内的那一处（同页重复文本的最优解）
+        if (boxes && boxes.length) {
+          const pr = slot.root.getBoundingClientRect();
+          const hit = [];
+          while (pos >= 0) {
+            hit.push(pos);
+            pos = joined.indexOf(q, pos + 1);
+          }
+          const inside = hit.find((p) => {
+            const r = map[p][0].parentElement.getBoundingClientRect();
+            const cx = (r.left + r.width / 2 - pr.left) / (pr.width || 1);
+            const cy = (r.top + r.height / 2 - pr.top) / (pr.height || 1);
+            return boxes.some((b) => cx >= b[0] - 0.02 && cx <= b[2] + 0.02
+              && cy >= b[1] - 0.02 && cy <= b[3] + 0.02);
+          });
+          pos = inside === undefined ? hit[0] : inside;
+        }
+        at = pos;
+        len = q.length;
+        break;
+      }
+    }
+    if (at < 0) return 0;
+
+    const start = map[at];
+    const end = map[Math.min(at + len - 1, map.length - 1)];
+    try {
+      const range = document.createRange();
+      range.setStart(start[0], start[1]);
+      range.setEnd(end[0], end[1] + 1);
+      if (window.CSS && CSS.highlights && window.Highlight) {
+        CSS.highlights.set('kpdf-mirror', new Highlight(range));
+        return len;
+      }
+      return this._markSpans(range) ? len : 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  /** 不支持 Custom Highlight 时退化成 span 标记（会把整行染上，但不会漏）。 */
+  _markSpans(range) {
+    const layer = range.startContainer.parentElement?.closest('.kp-textLayer');
+    if (!layer) return false;
+    for (const sp of layer.querySelectorAll('span')) {
+      if (range.intersectsNode(sp)) sp.classList.add('kp-mirror');
+    }
+    return true;
+  }
+
+  /**
+   * 按**版面框**高亮（划词镜像首选路径）。
+   *
+   * boxes 是 `align.py` 给的归一化矩形 [fx0,fy0,fx1,fy1]（相对页宽高）。
+   * 相比「整页文字搜索」，它不会因为同一句话在页面上出现两次而标错位置，
+   * 也不会把相邻段落的字带进来 —— 句子的框是算出来的，不是猜的。
+   */
+  highlightBoxes(page, boxes) {
+    const index = Math.max(0, Math.min(this.doc.numPages - 1, (page | 0) - 1));
+    const slot = this._slots.get(index);
+    const layer = slot?.textLayerEl;
+    if (!layer || !boxes || !boxes.length) return 0;
+    const pr = slot.root.getBoundingClientRect();
+    if (!pr.width || !pr.height) return 0;
+    this.clearMirror();
+    const rects = [];
+    for (const b of boxes) {
+      if (!b || b.length < 4) continue;
+      rects.push({
+        left: pr.left + b[0] * pr.width,
+        top: pr.top + b[1] * pr.height,
+        right: pr.left + b[2] * pr.width,
+        bottom: pr.top + b[3] * pr.height,
+      });
+    }
+    if (!rects.length) return 0;
+    let n = 0;
+    for (const sp of layer.querySelectorAll('span')) {
+      const r = sp.getBoundingClientRect();
+      if (r.width < 1 || r.height < 1) continue;
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const inside = rects.some((b) => cx >= b.left - 2 && cx <= b.right + 2
+        && cy >= b.top - 2 && cy <= b.bottom + 2);
+      if (inside) { sp.classList.add('kp-mirror'); n++; }
+    }
+    return n;
+  }
+
+  /**
+   * 高亮某一页里的一段文字（划词镜像用）。
+   *
+   * 和 focusQuote 一样用「整页归一化拼接串 + 跨 span 覆盖」定位，区别是：
+   *   · 只标这一页，不滚动（滚动会跟同步组打架）；
+   *   · 找不到就返回 0，由调用方决定是否降级。
+   */
+  highlightText(page, text, { cls = 'kp-mirror' } = {}) {
+    const index = Math.max(0, Math.min(this.doc.numPages - 1, (page | 0) - 1));
+    const slot = this._slots.get(index);
+    const layer = slot?.textLayerEl;
+    if (!layer) return 0;
+    layer.querySelectorAll('span.' + cls).forEach((sp) => sp.classList.remove(cls));
+    const spans = Array.from(layer.querySelectorAll('span'));
+    if (!spans.length) return 0;
+    const norm = spans.map((sp) => normQuote(sp.textContent));
+    const joined = norm.join('');
+    const q = normQuote(text);
+    if (!joined || q.length < 4) return 0;
+    let at = -1;
+    let len = 0;
+    for (const L of [q.length, 140, 100, 70, 50, 32, 20, 14]) {
+      if (L > q.length || L < 10) continue;
+      at = joined.indexOf(q.slice(0, L));
+      if (at >= 0) { len = L; break; }
+    }
+    if (at < 0) return 0;
+    const end = at + len;
+    const starts = [];
+    let acc = 0;
+    for (const t of norm) { starts.push(acc); acc += t.length; }
+    let n = 0;
+    for (let i = 0; i < spans.length; i++) {
+      const a = starts[i];
+      const b = a + norm[i].length;
+      if (!norm[i] || b <= at || a >= end) continue;
+      spans[i].classList.add(cls);
+      n++;
+    }
+    return n;
   }
 
   destroy() {

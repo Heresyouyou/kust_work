@@ -604,9 +604,28 @@ def _open_kust_https_silent_probe():
 def index():
     return render_template_string(INDEX_HTML)
 
-# ── 缓存查找: 按文件名 stem 匹配 translated 目录 ──
-def _find_cache(name):
-    """返回 {exists, mono_url, dual_url, stem} 或 None"""
+# ── 缓存查找: 先按内容 sha 查仓库，再退回按文件名匹配历史产物 ──
+def _find_cache(name, sha=None):
+    """返回 {exists, mono_url, dual_url, stem} 或 None。
+
+    ★ 2026-10-29：sha 优先。
+      2026-10 之前的实现是「遍历整个 translated/ 目录做 `stem in f.stem` 子串匹配」，
+      既是 O(n)，又会误命中（A 的标题是 B 的子串时拿错文件）。现在先按 sha 精确查
+      内容寻址仓库；只有老档案（无 sha）才退回文件名匹配。
+    """
+    if sha:
+        try:
+            from modules.tr import store as _tr
+            p, how = _tr.resolve(sha, 'zh.mono')
+            if p:
+                dp, _ = _tr.resolve(sha, 'zh.dual')
+                return {'exists': True,
+                        'mono_url': f'/translated/{p.name}',
+                        'dual_url': (f'/translated/{dp.name}' if dp else None),
+                        'stem': sha[:12], 'from_store': True, 'how': how}
+        except Exception as e:
+            logger.warning('按 sha 查译文失败（退回文件名匹配）: %s', e)
+
     if not name: return None
     name = Path(name).name
     stem = Path(name).stem
@@ -635,10 +654,59 @@ def _find_cache(name):
                     'stem': stem,
                 }
 
-    # 3. NAS 文献仓库兜底
-    #    本地没有 → 查本地 JSON 索引（不扫网络）→ 命中则把三版本拷回本地。
-    #    ⚠️ 必须拷回本地：队列与归档只读本地，前端 URL 也是 /translated/xxx.pdf，
-    #       拷回后 URL 完全一致，前端与归档逻辑都不用改。
+    # 3a. 文件名 → papers.works 的 sha
+    #     为什么需要这一跳：译文记录里的 src_path 是「当初传进翻译页的那个文件名」，
+    #     而 GeoKB 里同一篇的 pdf_path 是另一个名字（同一内容、不同文件）。只按
+    #     src_path 查会漏。works 表里两个 id 都在，借它把名字换成 sha 再查仓库。
+    try:
+        from modules.papers import store as _pstore
+        _w = _pstore.one("SELECT primary_sha256 FROM works WHERE pdf_path LIKE ? "
+                         "AND primary_sha256 IS NOT NULL AND primary_sha256<>'' LIMIT 1",
+                         ('%' + name,))
+        _s = (_w or {}).get('primary_sha256') or ''
+        if _s:
+            from modules.tr import store as _trstore
+            _p, _how = _trstore.resolve(_s, 'zh.mono')
+            if _p:
+                _dp, _ = _trstore.resolve(_s, 'zh.dual')
+                return {
+                    'exists': True,
+                    'mono_url': f'/translated/{_p.name}',
+                    'dual_url': (f'/translated/{_dp.name}' if _dp
+                                 else (f'/api/tr/file/{_s}/zh.dual'
+                                       if _trstore.has(_s, 'zh.dual') else None)),
+                    'stem': _s[:12], 'from_store': True, 'via': 'works',
+                }
+    except Exception as e:
+        logger.warning('文件名→works 桥接失败（继续兜底）: %s', e)
+
+    # 3b. 内容寻址仓库兜底：按原文件名查 src_path（同一篇原文上传过就有记录）
+    try:
+        from modules.tr import db as _trdb, store as _trstore
+        _rows = _trdb.conn().execute(
+            "SELECT DISTINCT sha FROM blobs WHERE kind='zh.mono' AND state='ok' "
+            "AND (src_path LIKE ? OR name LIKE ?) LIMIT 3",
+            ('%' + name, '%' + name)).fetchall()
+        for _r in _rows:
+            _sha = _r['sha']
+            _p, _how = _trstore.resolve(_sha, 'zh.mono')
+            if not _p:
+                continue
+            _dp, _ = _trstore.resolve(_sha, 'zh.dual')
+            return {
+                'exists': True,
+                'mono_url': f'/translated/{_p.name}',
+                # 双语版是派生件：没有实体就给派生地址（下载时现拼）
+                'dual_url': (f'/translated/{_dp.name}' if _dp
+                             else (f'/api/tr/file/{_sha}/zh.dual'
+                                   if _trstore.has(_sha, 'zh.dual') else None)),
+                'stem': _sha[:12],
+                'from_store': True,
+            }
+    except Exception as e:
+        logger.warning('按文件名查内容寻址仓库失败（继续走旧索引）: %s', e)
+
+    # 4. 旧 NAS 索引兜底 —— 2026-10 之前的历史档案（没有 sha 的那批）
     if nas_archive is not None:
         try:
             item = nas_archive.lookup(name)
@@ -728,25 +796,29 @@ def api_upload():
     f.save(str(save_path))
     original_url = f'/uploads/{safe}'
 
+    # ★ 2026-10-29：上传即算 sha256。以前只有文件名 hash，导致「同一篇重传」认不出、
+    #   「换个标题」就再翻一遍。sha 是内容寻址仓库的唯一键（~250 ms/100MB，可接受）。
+    sha = None
+    try:
+        from modules.papers.extract import sha256_of
+        sha = sha256_of(str(save_path))
+    except Exception as e:
+        logger.warning('上传文件算 sha 失败（退回按文件名查缓存）: %s', e)
+
     # ══ 缓存优先 ══
-    cache = _find_cache(fname)
+    cache = _find_cache(fname, sha=sha)
     if cache:
         logger.info('✅ Cache hit: %s → %s', fname, cache['mono_url'])
-        # 历史译文可能没有双语版（本功能上线前产出的）→ 拿本次上传的原文现场补拼
-        # 实测 24 页约 0.4s，同步做不会拖慢响应
+        # 双语版不再现场补拼（2026-10-29）：有原文 + 中文版就能取，
+        # 给派生地址，下载时现拼（~1 s）、本地留 24 h。
         dual_url = cache.get('dual_url')
-        if not dual_url and ensure_dual is not None:
+        if not dual_url and sha:
             try:
-                _mono = TRANSLATED_DIR / Path(cache['mono_url']).name
-                if _mono.exists():
-                    _dp = ensure_dual(save_path, _mono, mode=BILINGUAL_MODE)
-                    if _dp:
-                        dual_url = f'/translated/{_dp.name}'
-                        # 补出的双语版也回写 NAS，保持仓库三版本完整
-                        _nas_archive_versions(save_path, _mono, _dp,
-                                              display_name=fname, source='cache-hit')
+                from modules.tr import store as _tr
+                if _tr.has(sha, 'zh.dual'):
+                    dual_url = '/api/tr/file/%s/zh.dual' % sha
             except Exception as e:
-                logger.warning('缓存命中补双语版失败（非致命）: %s', e)
+                logger.warning('查双语版可派生性失败（非致命）: %s', e)
         return jsonify({
             'status': 'done',
             'original_url': original_url,
@@ -757,14 +829,34 @@ def api_upload():
         })
 
     # 缓存未命中 → 正常入队
+    job_id = _new_translate_job(save_path, fname, original_url, sha=sha)
+
+    QUEUE.put(job_id)
+    _ensure_worker()
+
+    return jsonify({
+        'job_id': job_id,
+        'status': 'queued',
+        'original_url': original_url,
+        'name': fname,
+    })
+
+# ── 建任务（上传入口与 /api/tr/submit 共用同一份字段）──
+def _new_translate_job(save_path, fname, original_url, sha=None):
+    """登记一个翻译任务，返回 job_id。
+
+    字段与 2026-10-16 的修复保持一致（kind/hard_timeout/stall_timeout/cancelable）：
+    缺 hard_timeout 会让大文件被 30 min 的兜底误杀；缺 cancelable 会让 /api/cancel
+    恒返回 409。
+    """
     job_id = uuid.uuid4().hex
     now = time.time()
-
     with jobs_lock:
-        # 清理旧 job
-        to_del = [k for k, v in jobs.items() if v.get('status') in ('done','failed') and now - v.get('ended_at',0) > 3600]
-        for k in to_del: del jobs[k]
-
+        to_del = [k for k, v in jobs.items()
+                  if v.get('status') in ('done', 'failed')
+                  and now - v.get('ended_at', 0) > 3600]
+        for k in to_del:
+            del jobs[k]
         jobs[job_id] = {
             'job_id': job_id,
             'name': fname,
@@ -783,30 +875,76 @@ def api_upload():
             'original_url': original_url,
             'mono_url': None,
             'dual_url': None,
-            # ⚠️ 2026-10-16 修复：本入口此前**绕过 submit_task 手写 jobs 字典**，
-            # 缺 kind/hard_timeout/stall_timeout/cancelable，导致：
-            #   ① 硬超时 fallback 固定 30min，38.8MB/5页超大文件必被误杀；
-            #   ② stall 阈值 None → 看门狗直接跳过（大页 PDF 下反倒是蒙对了）；
-            #   ③ cancelable 缺失 → /api/cancel 恒返回 409，用户无法中断。
-            # 这里补齐；阈值随后由 _on_progress 按 BabelDOC 的页数自适应放大。
             'kind': KIND_TRANSLATE,
             'display': '翻译',
             'hard_timeout': TRANSLATE_HARD_TIMEOUT,
             'stall_timeout': TRANSLATE_STALL_TIMEOUT,
             'cancelable': True,
-            'cancel_event': threading.Event(),  # ⚠️ 用户取消信号
+            'cancel_event': threading.Event(),
+            'sha': sha,
             '_payload': {'path': str(save_path), 'name': fname},
         }
+    if sha:
+        try:
+            from modules.tr import store as _tr
+            _tr.put_job(sha, 'queued', pct=0, stage='排队')
+        except Exception:
+            pass
+    return job_id
 
+
+def _put_into_tr_store(job_id, src_path, mono_path, dual_url, display_name):
+    """把本次译文的三个版本写进内容寻址仓库，返回 (sha, mono_url, dual_url)。
+
+    URL 用 `/api/tr/file/<sha>/<kind>` —— 纯 ASCII、与内容绑定、本地被清也能从
+    NAS 取回。旧实现返回 `/translated/<带中文标题的文件名>`，GeoKB 回搬时
+    urllib 只收 ASCII，得靠百分号编码兜着（它自己的注释里记着这个坑）。
+    """
+    sha = None
+    with jobs_lock:
+        j = jobs.get(job_id)
+        sha = (j or {}).get('sha')
+    if not sha:
+        try:
+            from modules.papers.extract import sha256_of
+            sha = sha256_of(str(src_path))
+        except Exception as e:
+            logger.warning('计算 sha 失败，本次不入新仓库: %s', e)
+            return None, None, None
+        with jobs_lock:
+            if jobs.get(job_id):
+                jobs[job_id]['sha'] = sha
+    try:
+        from modules.tr import store as _tr
+        if mono_path and Path(mono_path).exists():
+            _tr.put(mono_path, sha, 'zh.mono', title=display_name, src_path=src_path)
+        # 原文快照要先落，dual 的「可派生」判断依赖 orig + mono 都在
+        if not _tr.has(sha, 'orig', deep=True):
+            _tr.put(src_path, sha, 'orig', title=display_name)
+        # 双语版是派生件：有 orig + mono 就能取，不在这里生成
+        dual_url = ('/api/tr/file/%s/zh.dual' % sha) if _tr.has(sha, 'zh.dual') else None
+        return (sha, '/api/tr/file/%s/zh.mono' % sha, dual_url)
+    except Exception as e:
+        logger.warning('写入内容寻址仓库失败（旧归档仍可用）: %s', e)
+        return sha, None, None
+
+
+def _tr_submit(sha, pdf_path, opts):
+    """给 /api/tr/submit 用的执行入口：复用同一条串行队列。"""
+    p = Path(pdf_path)
+    job_id = _new_translate_job(p, p.name,
+                                '/uploads/%s' % p.name,
+                                sha=sha)
+    with jobs_lock:
+        j = jobs.get(job_id)
+        if j:
+            j['_want_dual'] = bool((opts or {}).get('dual'))
+            j['_force'] = bool((opts or {}).get('force'))
+            j['_tr_work_id'] = (opts or {}).get('work_id')
     QUEUE.put(job_id)
     _ensure_worker()
+    return {'job_id': job_id}
 
-    return jsonify({
-        'job_id': job_id,
-        'status': 'queued',
-        'original_url': original_url,
-        'name': fname,
-    })
 
 # ── 队列 worker (单线程, 串行翻译) ──
 def _ensure_worker():
@@ -1195,25 +1333,10 @@ def _run_translate(job_id):
 
         # 双语拼接版：翻译完成即自动生成（左原文 / 右译文），供前端下载
         # ⚠️ 必须在 mono 定位成功之后做 —— 否则 dual 恒为 None
+        # 双语版**不再提前拼**（2026-10-29 用户定）：只要原文 + 中文版在，
+        # 随时可以拼一份出来。所以前端拿到的是派生地址，点下载时现拼（~1 s），
+        # 本地保留 24 h，不占 NAS。
         dual_url = None
-        if mono_path.exists():
-            try:
-                # 拼接期间刷新心跳，避免看门狗误判「长时间无进度」
-                with jobs_lock:
-                    _jj = jobs.get(job_id)
-                    if _jj:
-                        _jj['message'] = '生成双语对照版…'
-                        _jj['last_progress_at'] = time.time()
-            except Exception:
-                pass
-            if ensure_dual is not None:
-                _dp = ensure_dual(Path(src_path), mono_path, mode=BILINGUAL_MODE)
-                if _dp:
-                    dual_url = f'/translated/{_dp.name}'
-            else:
-                dual_path = _dual_path(stem)
-                if _make_dual_pdf(Path(src_path), mono_path, dual_path):
-                    dual_url = f'/translated/{dual_path.name}'
 
         # 兜底: 找任何译版
         if not mono_url:
@@ -1224,12 +1347,21 @@ def _run_translate(job_id):
                     mono_url = f'/translated/{mono_path.name}'
                     break
 
-        # ── 归档到 NAS 文献仓库（原文 / 中文 / 双语 三版本）──
-        _nas_archive_versions(
-            src_path, mono_path,
-            (TRANSLATED_DIR / Path(dual_url).name) if dual_url else None,
-            display_name=name, source='translate',
-        )
+        # ── 入库：新内容寻址仓库为主（2026-10-29）──
+        # 成功时把 URL 换成 /api/tr/file/<sha>/<kind>：纯 ASCII、与内容绑定、
+        # 本地被清也能从 NAS 取回。GeoKB 靠这个 URL 回搬译文，换了才不会再出现
+        # 「文件名带中文 → urllib 只收 ASCII → 回搬失败」。
+        _sha2, _m, _d = _put_into_tr_store(job_id, src_path, mono_path, dual_url, name)
+        if _m:
+            mono_url, dual_url = _m, _d
+        else:
+            # 新仓库写失败才退回旧三目录归档（保证有兜底，不丢产物）
+            logger.warning('新仓库入库失败，退回旧归档路径')
+            _nas_archive_versions(
+                src_path, mono_path,
+                (TRANSLATED_DIR / Path(dual_url).name) if dual_url else None,
+                display_name=name, source='translate',
+            )
 
         with jobs_lock:
             j = jobs.get(job_id)
@@ -1482,6 +1614,18 @@ try:
                          register_runner=register_task_runner)
 except Exception:
     logger.exception('❌ 功能模块注册失败（门户本身仍可用）')
+
+
+# ── 统一译文仓库接口（/api/tr/*）──
+# ★ 2026-10-29：所有模块的翻译读写都收敛到这一层。
+#   同进程（papers、本页）直接 import modules.tr.store，跨进程（GeoKB 5556）走 HTTP。
+#   既有的 /api/upload|status|check 保持路径与响应不变，GeoKB 不用改。
+try:
+    from modules.tr import api as _tr_api
+    _tr_api.init_tr(app, submit_fn=_tr_submit)
+    logging.getLogger('geo').info('[tr] 译文仓库接口已注册 /api/tr/*')
+except Exception:
+    logger.exception('❌ 译文仓库接口注册失败（翻译主流程不受影响）')
 
 
 # ── 清理 (后台) ──

@@ -89,6 +89,15 @@
   /* ── 双栏主体 ── */
   .app { position: absolute; inset: var(--topbar-h) 0 0 0; display: flex; }
   .pane { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
+  /* 中文对照关掉 → 只留原文，左栏自动占满（flex:1） */
+  body.zh-off #rightPane, body.zh-off #divider { display: none !important; }
+  /* 工具栏里的开关：不许被 flex 压缩（压到 18px 文字就没了，也点不着），
+     并抬一层避免被相邻的 status 盖住 */
+  #zhToggle, #scaleLock { flex: 0 0 auto; white-space: nowrap; position: relative; }
+  /* 底部工具栏原先是 z-index:auto，被 kpdf 文本层（.kp-textLayer, z-index:2）压着。
+     真实点击能穿透（文本层 pointer-events:none），但自动化判定为「不可点」，
+     而且缩放/翻页按钮在极端情况下也会被遮。整体抬一层。 */
+  #leftBottomBar, #rightBottomBar { z-index: 6; }
   .pane.en { border-right: 1px solid var(--border); }
   /* 顶部头部已移除：缩放 + 状态整合进底部 .bottom-bar，让 PDF 占满整栏 */
 
@@ -276,6 +285,9 @@
         <button id="zoomLeftIn" title="放大 (+)" data-page-node-id="iynF7VF2tXozCnLfMTy4OK">+</button>
         <button id="zoomLeftReset" title="重置 (0)" data-page-node-id="qB7hQoL5oCOPFywjxFFDJo">↺</button>
       </div>
+      <div class="sep"></div>
+      <button id="zhToggle" title="中英对照：当前已开启。点击只看原文" aria-pressed="true">中文</button>
+      <button id="scaleLock" title="缩放联动：已锁定（两侧一起缩放）。点击解锁，可单独放大一侧" aria-pressed="true">🔒</button>
       <div class="sep" data-page-node-id="Xn9wTeIleQ5heiWlf6G2R7"></div>
       <span class="status" id="leftStatus" data-page-node-id="EvnfZqwD5GTf2BjGWzSHjA"></span>
     </div>
@@ -399,7 +411,53 @@ const KP = {
   right: null,     // 右 reader 实例
   group: null,     // 跨实例 SyncGroup
   master: 'left',  // 用户最后操作的一侧
+  leftSrc: '',     // 左栏 PDF 地址（句对对齐表要靠它俩算）
+  rightSrc: '',    // 右栏 PDF 地址
 };
+
+/* ── 中英对照开关 + 缩放锁（2026-10-30）──
+ * 中文对照关掉：右栏与分隔线收走，左栏占满 —— 就是「只看原文」。
+ * 缩放锁：锁定=两侧一起缩放（默认）；解锁=滚动仍同步、缩放各调各的。
+ * 两者都记在 localStorage，换个文件打开还按上次的选择。 */
+const zhToggle = document.getElementById('zhToggle');
+const scaleLockBtn = document.getElementById('scaleLock');
+let ZH_ON = true, SCALE_LOCK_ON = true;
+try {
+  ZH_ON = localStorage.getItem('tr:zhOn') !== '0';
+  SCALE_LOCK_ON = localStorage.getItem('tr:scaleLock') !== '0';
+} catch (e) { /* 隐私模式忽略 */ }
+
+function applyZh(on) {
+  ZH_ON = !!on;
+  try { localStorage.setItem('tr:zhOn', ZH_ON ? '1' : '0'); } catch (e) {}
+  document.body.classList.toggle('zh-off', !ZH_ON);
+  if (zhToggle) {
+    zhToggle.setAttribute('aria-pressed', String(ZH_ON));
+    zhToggle.textContent = ZH_ON ? '中文对照' : '仅原文';
+    zhToggle.title = ZH_ON ? '中英对照：当前已开启。点击只看原文'
+                           : '中英对照：当前已关闭。点击恢复左右对照';
+  }
+  // 只看原文时没有「两侧」，锁自然失效（但记住用户原来的选择）
+  if (scaleLockBtn) scaleLockBtn.disabled = !ZH_ON;
+}
+
+function applyScaleLock(on) {
+  SCALE_LOCK_ON = !!on;
+  try { localStorage.setItem('tr:scaleLock', SCALE_LOCK_ON ? '1' : '0'); } catch (e) {}
+  if (scaleLockBtn) {
+    scaleLockBtn.setAttribute('aria-pressed', String(SCALE_LOCK_ON));
+    scaleLockBtn.textContent = SCALE_LOCK_ON ? '🔒' : '🔓';
+    scaleLockBtn.title = SCALE_LOCK_ON
+      ? '缩放联动：已锁定（两侧一起缩放）。点击解锁，可单独放大一侧'
+      : '缩放联动：已解锁（各调各的）。点击锁定，恢复两侧同步缩放';
+  }
+  // 两侧联动靠页内的 SyncGroup（两个 Reader 的 view 都挂在它下面）
+  try { KP.group && KP.group.setScaleSync && KP.group.setScaleSync(SCALE_LOCK_ON); } catch (e) {}
+}
+
+zhToggle?.addEventListener('click', () => applyZh(!ZH_ON));
+scaleLockBtn?.addEventListener('click', () => applyScaleLock(!SCALE_LOCK_ON));
+applyZh(ZH_ON);
 
 /** 懒加载 kpdf 模块图。 */
 async function kpdfMod() {
@@ -424,6 +482,7 @@ const paneHost = (which) => (which === 'left' ? leftView : rightView);
 /** 挂载（或换掉）一侧的 PDF。 */
 async function mountPane(which, url) {
   if (!url) return null;
+  KP[which === 'left' ? 'leftSrc' : 'rightSrc'] = url;
   const host = paneHost(which);
   // 自己负责收起空态占位：否则 .empty 会以 flex 项身份把渲染宿主挤成一条
   // （setPdfFrame 也会收，但 mountPane 可能被直接调用，不能依赖调用方）
@@ -441,11 +500,17 @@ async function mountPane(which, url) {
     panes: [{ src: url, label: which === 'left' ? '原文' : '译文' }],
     mode: 'continuous',
     fit: 'width',
+    // ★ 句对联动：本页是「两个独立 Reader」，各一栏。
+    //   side 决定在对齐表里取原文侧(0)还是译文侧(1)；
+    //   align 由 ensureSync() 在两侧都就绪后统一设置（详见那里）。
+    side: which === 'left' ? 0 : 1,
     // 翻译页自己有缩放/翻页控件，宿主里不留阅读器的工具栏与侧栏
     toolbar: false, statusbar: false, findbar: false, sidebar: null,
     sync: { enabled: false },   // 单栏；两侧同步交给下面的 SyncGroup
   });
   KP[which] = reader;
+  // 调试出口：控制台/自动化自检用（看 _side / _align / 悬停状态）
+  try { window['__kpdf_' + which] = reader; } catch (e) { /* ignore */ }
 
   const view = paneView(which);
   if (view) {
@@ -463,9 +528,12 @@ async function mountPane(which, url) {
     // 内核自己处理 Ctrl+Wheel 缩放，这里只把结果回写到百分比显示
     view.on('scale', (e) => {
       if (e?.programmatic) return;
-      S.iframeZoom = Math.round((e.scale ?? 1) * 100);
-      leftZoom.textContent = S.iframeZoom + '%';
-      rightZoom.textContent = S.iframeZoom + '%';
+      // 各自显示自己的 scale：SyncGroup 用 fit 模式联动时，宽页与窄页的 scale
+      // 本来就不相等（视觉高度对齐、数值不同）。把两侧都写成源侧的数字会出现
+      // 「看着一样大、百分比却对不上」。工具栏按钮两侧都调 setScale，各自都会更新。
+      const pct = Math.round((e.scale ?? 1) * 100);
+      (which === 'left' ? leftZoom : rightZoom).textContent = pct + '%';
+      S.iframeZoom = pct;
     });
   }
 
@@ -477,6 +545,24 @@ async function mountPane(which, url) {
 /** 两侧都就绪后建立跨实例同步（归一化锚点 + 等比缩放）。 */
 function ensureSync() {
   const l = paneView('left'), r = paneView('right');
+
+  // ★ 句对对齐表（2026-10-30）：两侧都就绪才算得出地址。
+  //   后端按文件名认哪边是译文，所以 left/right 谁在左谁在右都无所谓。
+  //   两个 Reader 各自加载同一份表（_id 是「页号:句序」，可复现），再用
+  //   setPeer 互相点亮 —— 效果与导读分屏的双栏一致。
+  //   ⚠️ 必须放在下面 paneView 的空值判断之前：那个判断要的是「两栏都渲染出
+  //      view」，而设 align 只要 Reader 实例在就行。放后面会被 return 挡掉，
+  //      表现为「两侧都能单独高亮，但从不联动」。
+  if (KP.leftSrc && KP.rightSrc && KP.left && KP.right) {
+    const a = '/api/tr/align?orig=' + encodeURIComponent(KP.leftSrc)
+            + '&mono=' + encodeURIComponent(KP.rightSrc);
+    try {
+      KP.left.setAlign(a);
+      KP.right.setAlign(a);
+      KP.left.setPeer(KP.right);
+    } catch (e) { console.warn('[translate] 句对联动初始化失败', e); }
+  }
+
   if (!l || !r || !KP.mod) return;
   if (KP.group) {
     try { KP.group.remove(l); KP.group.remove(r); } catch (e) { /* ignore */ }
@@ -490,6 +576,8 @@ function ensureSync() {
   });
   KP.group.add(l, { master: true });
   KP.group.add(r);
+  // 同步组重建了 → 把当前的缩放锁状态重新应用一遍（否则换文件后又变回联动）
+  try { applyScaleLock(SCALE_LOCK_ON); } catch (e) { /* ignore */ }
 }
 
 // ── 对外接口（与原 iframe 实现同名，调用点无需改动） ──

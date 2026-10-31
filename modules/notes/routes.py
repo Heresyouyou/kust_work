@@ -2,9 +2,12 @@
 """笔记整理模块
 
 卡片陈列页：静态归档的笔记卡片 + 逐篇打开阅读。
-笔记正文是自带样式的静态 HTML，放在 assets/notes/ 下直接发；
-卡片清单写死在下面的 NOTES 里，新增笔记 = 加一条 + 丢一个 html 进 assets/notes/。
+笔记正文是自带样式的静态 HTML，放在 assets/ 下直接发；
+卡片清单写死在下面的 NOTES 里，新增笔记 = 加一条 + 丢一个 html 进 assets/。
 后端不出数据、不存库、不接表单。
+
+论文导读已于 2026-10-24 迁出：正文在 modules/papers（入口 /papers），
+这里不再保留 /notes/papers 列表页与静态文章。
 """
 from pathlib import Path
 
@@ -31,6 +34,18 @@ _MIME = {
 # 注：桌面客户端的下载入口在题库检索页内（labexam/index.html 的下载框），
 #     不在 /notes 卡片列表里重复一个入口。
 NOTES = [
+    {
+        'title': '构造地质学 · 六个实验完整解答',
+        'cat': '构造地质学',
+        'tag': '6 个子页面',
+        'desc': '实验一~六各自独立成页：题目原文 → 完整解答 → 附图／作图。'
+                '含水平岩层与 K₁ 厚度、C₁ 产状与松溪三点法、V 字形法则与 A—B 剖面、'
+                '暮云岭读图、褶皱区剖面、节理玫瑰花图。',
+        'tags': ['一卡入口', '六页独立', '教材附图标注'],
+        'date': '2026-10-31',
+        'url': '/api/notes/assets/notes/construct-geology-index.html',
+        'new_tab': True,
+    },
     {
         'title': '实验室安全考试 · 题库检索',
         'cat': '实验室安全考试',
@@ -109,7 +124,7 @@ def _card_html(n):
 def init_notes(app, **_ignored):
     """注册笔记整理模块（纯前端，静态卡片陈列）。"""
     app.register_blueprint(notes_bp)
-    print('[模块] 笔记整理 → GET /notes')
+    print('[模块] 笔记整理 → GET /notes（晶体光学手册 / 实验室安全题库等）')
 
 
 @notes_bp.route('/notes')

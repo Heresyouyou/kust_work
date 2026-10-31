@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="aPA3l56ZTREt99szte3AlY">
+<head data-page-node-id="afq3fldTEVpOgZvRUVSys9">
+<meta charset="UTF-8" data-page-node-id="iSjtuZjyYwEpDXojDH7wqK">
+<meta name="viewport" content="width=device-width, initial-scale=1" data-page-node-id="lGaJGaLwLOv3e935bpk4g0">
+<title>期刊列表 · __PAGE_SUFFIX__</title>
+<style>
+  /* 深色为默认值（/theme.js 缺失也完整可读）；浅色由 theme.js 注入的
+     :root[data-theme="light"] 覆盖。新增颜色一律走变量，勿写死色值。 */
+  :root {
+    /* 面 */
+    --bg: #2b2b2b; --surface: #1f1f1f; --surface-2: #262626; --surface-3: #2f2f2f;
+    /* 线 */
+    --border: #3a3a3a; --border-hover: #4a4a4a;
+    /* 字 */
+    --text: #e8e4df; --muted: #8a867f; --dim: #6f6b64; --link: #cfd8d2;
+    /* 主色 */
+    --accent: #4a9e6a; --accent-dim: #2d6e46; --accent-line: #2d6e46;
+    --accent-soft: #232823; --accent-soft-hover: #242a24;
+    --on-accent: #101710; --logo-bg: #2d6e46; --logo-fg: #e2f3e8;
+    --meta-key: #5f7d69;
+    /* 语义 */
+    --warn: #f0a030; --warn-border: #6a4a15; --err: #c0524a;
+    /* 相关度分档 */
+    --tier-strong-bg: #23402e; --tier-strong-fg: #79d39b; --tier-strong-bd: #2f5a3e;
+    --tier-mid-bg: #23323f; --tier-mid-fg: #7fb5d8; --tier-mid-bd: #2f4757;
+    --tier-low-bg: #33312a; --tier-low-fg: #b3a67c; --tier-low-bd: #4a4638;
+    /* 关键词 chip */
+    --kw-bg: #22261f; --kw-bd: #333a30; --kw-fg: #8d9b8f;
+    /* 组件 */
+    --sw-border: rgba(255,255,255,.07); --sw-shadow: 0 4px 12px rgba(0,0,0,.45);
+    --toast-bg: #1a1a1a; --placeholder: #6a665f;
+    --vb-hover-bg: #24352a; --vb-hover-fg: #9dc9ae;
+    --scroll-bg: #1a1a1a; --scroll-track: #222222; --scroll-thumb: #444444;
+    --stage-track: rgba(255,255,255,.08); --stage-fill: rgba(255,255,255,.12);
+    --shimmer: rgba(255,255,255,.05);
+    --pdf-shadow: 0 4px 18px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04);
+    --card-shadow: none;
+    --radius: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+  a { color: inherit; text-decoration: none; }
+
+  header { height: 48px; background: var(--surface); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 20px; gap: 12px; flex-shrink: 0;
+    position: sticky; top: 0; z-index: 10; }
+  .back { font-size: 12px; color: var(--muted); }
+  .back:hover { color: var(--accent); }
+  .logo { width: 24px; height: 24px; border-radius: 5px; background: var(--logo-bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: var(--logo-fg); letter-spacing: -0.3px; }
+  .brand { font-weight: 600; font-size: 14px; letter-spacing: -0.3px; }
+  .spacer { flex: 1; }
+  .stat { font-size: 12px; color: var(--muted); }
+
+  main { flex: 1; width: 100%; max-width: 1240px; margin: 0 auto; padding: 32px 20px 48px; }
+
+  .head { margin-bottom: 20px; }
+  .head h1 { font-size: 21px; font-weight: 600; letter-spacing: -0.4px; margin-bottom: 6px; }
+  .head p { font-size: 12.5px; color: var(--muted); }
+
+  .bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 22px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  .tab { font-size: 12px; padding: 6px 13px; border-radius: 4px; border: 1px solid var(--border);
+    color: var(--muted); cursor: pointer; transition: .16s; background: transparent; }
+  .tab:hover { color: var(--text); border-color: var(--border-hover); }
+  .tab.on { color: var(--accent); border-color: var(--accent-line); background: var(--accent-soft); }
+  .sum { margin-left: auto; font-size: 11.5px; color: var(--muted); }
+  .sum b { color: var(--text); font-weight: 600; }
+
+  /* 全站搜索框（跨卡片实时过滤标题 + 中文小字） */
+  .search { font-size: 12px; padding: 6px 11px; border-radius: 4px; border: 1px solid var(--border);
+    background: var(--surface-2); color: var(--text); min-width: 210px; transition: .16s; }
+  .search:focus { outline: none; border-color: var(--accent-dim); }
+  .search::placeholder { color: var(--placeholder); }
+  .clr { font-size: 11px; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border);
+    background: transparent; color: var(--muted); cursor: pointer; transition: .16s; }
+  .clr:hover { color: var(--text); border-color: var(--border-hover); }
+  .clr[hidden] { display: none; }
+
+  .grp-t { font-size: 11px; color: var(--muted); letter-spacing: 1.2px;
+    margin: 26px 0 13px; padding-bottom: 9px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 14px; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px; display: flex; flex-direction: column; box-shadow: var(--card-shadow);
+    transition: border-color .18s, box-shadow .18s; }
+  .card:hover { border-color: var(--border-hover); }
+  .card.has-new { border-color: var(--accent-line); }
+
+  /* ── 今日更新（页顶板块）──
+     刻意不叫 .card：DOM 测试里用 `class="card` 统计卡片数，蹭类名会误计数。
+     内部条目完全复用 .art / .tzh / .vi，所以与下方卡片天然同一套样式。 */
+  .today { background: var(--surface); border: 1px solid var(--accent-line);
+    border-radius: var(--radius); padding: 16px; margin-bottom: 18px; }
+  .today[hidden] { display: none; }
+  .today-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 4px; }
+  .today-title { font-size: 14.5px; font-weight: 600; letter-spacing: -0.2px; line-height: 1.4;
+    display: flex; align-items: baseline; gap: 8px; }
+  /* 日期做成小胶囊，跟标题同一行但视觉降级 —— 当天板块里它只是标注，不是主角 */
+  .today-date { font-size: 10.5px; font-weight: 400; padding: 1px 7px; border-radius: 3px;
+    background: var(--accent-soft); color: var(--accent);
+    font-family: ui-monospace, Consolas, monospace; }
+  .today-tip { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+
+  /* 「补缺申请」（2026-10-25）：今日卡片右上角一颗按钮，点一下立刻跑一轮投放箱入库。
+     绿 = 可点；橙 = 补缺中 / 冷却中（与 .tr-btn 的 busy 语义保持一致）。
+     冷却、inbox 有没有货、投放箱入库是否在跑，全由后端判定，前端只画状态。 */
+  .today-actions { margin-left: auto; display: flex; align-items: center; gap: 8px;
+    flex-shrink: 0; }
+  .refill { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px;
+    padding: 3px 9px; border-radius: 3px; line-height: 1.6; white-space: nowrap;
+    border: 1px solid var(--accent-dim); background: var(--accent-soft);
+    color: var(--accent); cursor: pointer; font-family: inherit;
+    transition: background .18s, color .18s, border-color .18s, opacity .18s; }
+  .refill:hover { background: var(--accent); color: var(--on-accent);
+    border-color: var(--accent); }
+  .refill.is-busy, .refill.is-msg { border-color: var(--warn); color: var(--warn);
+    background: transparent; }
+  .refill.is-busy:hover, .refill.is-msg:hover { background: transparent;
+    color: var(--warn); }
+  .refill[disabled] { cursor: not-allowed; opacity: .82; }
+  .refill.is-busy .j-spin { border-top-color: var(--warn); }
+  /* 补缺中：橙色缓慢呼吸，说明「正在跑」而不是「点坏了」 */
+  .refill.is-live { animation: rf-breathe 1.8s ease-in-out infinite; }
+  @keyframes rf-breathe { 0%, 100% { opacity: 1; } 50% { opacity: .6; } }
+  @media (prefers-reduced-motion: reduce) { .refill.is-live { animation: none; } }
+
+  /* 分组：一个刊一节。首节不画分隔线，避免和 today-head 之间出现双线 */
+  .tgroup { padding-top: 11px; margin-top: 11px; border-top: 1px solid var(--surface-3); }
+  .tgroup:first-of-type { padding-top: 6px; margin-top: 6px; border-top: none; }
+  .tg-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 2px; }
+  .tg-name { font-size: 12.5px; font-weight: 600; color: var(--text); letter-spacing: -0.2px; }
+  a.tg-name:hover { color: var(--accent); }
+  .tg-region { font-size: 9.5px; padding: 1px 6px; border-radius: 3px; line-height: 1.5;
+    background: var(--surface-2); border: 1px solid var(--border); color: var(--muted); }
+  .tg-n { margin-left: auto; font-size: 10px; color: var(--dim);
+    font-family: ui-monospace, Consolas, monospace; }
+  /* 当天条目可能较多，按两列铺开；每列宽度与下方 .grid 一致 */
+  .today .arts { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+    gap: 0 20px; }
+  /* 今日板块的时刻：当天全是"今天"，MM-DD 无信息量，改显示 HH:MM */
+  .art .hm { color: var(--accent); font-size: 10.5px; flex-shrink: 0; padding-top: 2px;
+    opacity: .85; font-family: ui-monospace, Consolas, monospace; }
+
+  .c-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 9px; }
+  .c-name { font-size: 14.5px; font-weight: 600; line-height: 1.4; letter-spacing: -0.2px; }
+  .c-name:hover { color: var(--accent); }
+  .c-sub { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+  .c-badge { margin-left: auto; flex-shrink: 0; font-size: 10px; padding: 2px 7px;
+    border-radius: 3px; border: 1px solid var(--accent-dim); color: var(--accent); white-space: nowrap; }
+  .c-badge.none { border-color: var(--border); color: var(--dim); }
+
+  .chips { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 11px; }
+  .chip { font-size: 10px; padding: 2px 7px; border-radius: 3px;
+    background: var(--surface-2); border: 1px solid var(--border); color: var(--muted); }
+  /* 「今日 +N」标记：解释为什么这张卡被排到了最前面 */
+  .chip-today { background: var(--accent-soft); border-color: var(--accent-dim);
+    color: var(--accent); font-weight: 600; }
+
+  .arts { flex: 1; border-top: 1px solid var(--surface-3); padding-top: 9px; margin-top: 2px; }
+  .art { display: flex; gap: 8px; padding: 5px 0; font-size: 12px; line-height: 1.55; }
+  .art .t { flex: 1; min-width: 0; }
+  /* 英文标题下方的中文小字（离线预翻译；无翻译时不渲染这个节点，不占位） */
+  .tzh { font-size: 11px; color: var(--muted); line-height: 1.5; margin-top: 1px; }
+  .art .mk { color: var(--accent); flex-shrink: 0; font-size: 10px; padding-top: 4px; }
+  .art a { color: var(--link); }
+  .art a:hover { color: var(--accent); text-decoration: underline; }
+  .art .vi { color: var(--dim); font-size: 10.5px; flex-shrink: 0; padding-top: 2px;
+    font-family: ui-monospace, Consolas, monospace; }
+  /* 本地获取日期（MM-DD / 跨年 YYYY-MM-DD） */
+  .art .ob { color: var(--dim); font-size: 10px; flex-shrink: 0; padding-top: 3px;
+    font-family: ui-monospace, Consolas, monospace; }
+  /* ── 标题右侧三按钮：下载 / 阅读 / 翻译（2026-10-17）──────────
+     与知识库搜索页（geokb_public/base.html 的 .btn / .tr-btn）同款组件词汇：
+     同色值变量、同尺寸节奏、同状态机；行为见页底脚本与 geokb_translate.js。 */
+  .btn { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px;
+    border-radius: 5px; border: 1px solid var(--border); background: var(--surface-2);
+    color: var(--text); font-size: 11px; cursor: pointer; text-decoration: none;
+    font-family: inherit; line-height: 1.6; flex-shrink: 0; vertical-align: middle;
+    white-space: nowrap; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .btn-primary:hover { background: var(--accent-dim); border-color: var(--accent-dim); color: #fff; }
+  .btn svg { width: 11px; height: 11px; flex-shrink: 0; }
+  .btn.is-off { opacity: .5; cursor: default; }
+  .btn.is-off:hover { border-color: var(--border); color: var(--text); }
+  .art-btns { display: inline-flex; gap: 4px; margin-left: 7px; }
+  /* 已归档可下载 → 加下拉箭头暗示可展开版本菜单 */
+  .j-dl-ready::after { content: '\25BE'; font-size: 9px; line-height: 1;
+    opacity: .8; }
+  /* ── 按钮配色总策（用户 2026-10-18 定）────────────────────────────
+     全页唯一主色（绿）按钮 = 「下载 PDF」；其余按钮（期刊官网 / 在线阅读 /
+     一键翻译）一律默认灰。理由：主操作必须唯一且醒目，避免满页高饱和度按钮
+     反而找不到下载入口。「在线抓取」按钮已取消（补抓交回每日管线），
+     未归档时唯一引导是「期刊官网」。 */
+  @keyframes j-rot { to { transform: rotate(360deg); } }
+  /* 翻译按钮状态机（与搜索页 tr-btn 同款，行为在 geokb_translate.js） */
+  .tr-btn[disabled] { opacity: .55; cursor: not-allowed; }
+  .tr-btn[disabled]:hover { border-color: var(--border); color: inherit; }
+  .tr-btn.tr-busy { border-color: var(--warn); color: var(--warn); }
+  .tr-btn.tr-done { color: var(--muted); }
+  .tr-btn.tr-failed { border-color: var(--err); color: var(--err); }
+  .tr-spin { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0;
+    border: 2px solid var(--stage-track); border-top-color: var(--warn);
+    animation: j-rot .7s linear infinite; }
+  @media (prefers-reduced-motion: reduce) { .tr-spin { animation-duration: 3s; } }
+  /* ── 下载版本选择菜单（原文 / 中文版 / 双语对照版）──────────────
+     下载成功后 .j-dl 保持可点（不再是死灰钮），点击弹出 .j-ver 浮层；
+     译文尚未就绪时，译文两项置灰并标注「翻译后可下」。 */
+  .j-ver { position: absolute; z-index: 60; min-width: 176px; padding: 4px;
+    border-radius: 7px; border: 1px solid var(--border);
+    background: var(--surface); box-shadow: 0 6px 22px rgba(0, 0, 0, .16); }
+  .j-ver[hidden] { display: none; }
+  .j-ver-hd { padding: 5px 8px 4px; font-size: 10.5px; color: var(--dim);
+    border-bottom: 1px solid var(--border); }
+  .j-ver-i { display: flex; align-items: center; gap: 6px; width: 100%;
+    padding: 5px 8px; border: 0; border-radius: 5px; background: transparent;
+    color: var(--text); font-size: 11.5px; font-family: inherit;
+    text-align: left; cursor: pointer; }
+  .j-ver-i:hover { background: var(--surface-2); color: var(--accent); }
+  .j-ver-i[disabled] { opacity: .45; cursor: not-allowed; }
+  .j-ver-i[disabled]:hover { background: transparent; color: var(--text); }
+  .j-ver-i svg { width: 11px; height: 11px; flex-shrink: 0; }
+  .j-ver-i .sz { margin-left: auto; font-size: 10px; color: var(--dim);
+    font-family: ui-monospace, Consolas, monospace; }
+  .j-ver-i .tag { font-size: 9.5px; padding: 1px 4px; border-radius: 3px;
+    border: 1px solid var(--border); color: var(--dim); }
+  /* ── 「需要统一身份认证」弹窗 ────────────────────────────────────
+     只有跨站部署（sjck，CFG.authState 非空）才会出现：下载前探测认证态，
+     未认证先弹本框，认证后回到本页再点一次。门户本页不注入 → 永不出现。 */
+  .j-auth { position: fixed; inset: 0; z-index: 90; display: flex;
+    align-items: center; justify-content: center; padding: 20px;
+    background: rgba(0, 0, 0, .45); }
+  .j-auth-card { width: 100%; max-width: 360px; border-radius: 12px;
+    border: 1px solid var(--border); background: var(--surface);
+    padding: 20px 18px 16px; box-shadow: 0 12px 40px rgba(0, 0, 0, .28); }
+  .j-auth-card h3 { margin: 0 0 8px; font-size: 15px; font-weight: 600;
+    color: var(--text); }
+  .j-auth-card p { margin: 0 0 16px; font-size: 12.5px; line-height: 1.75;
+    color: var(--muted); }
+  .j-auth-btns { display: flex; gap: 8px; justify-content: flex-end;
+    align-items: center; }
+  .j-auth-btns a, .j-auth-btns button { font-size: 12px; padding: 6px 14px;
+    border-radius: 6px; cursor: pointer; font-family: inherit;
+    text-decoration: none; line-height: 1.5; }
+  .j-auth-go { background: var(--accent); border: 1px solid var(--accent);
+    color: var(--on-accent); }
+  .j-auth-go:hover { background: var(--accent-dim); border-color: var(--accent-dim); }
+  .j-auth-retry { background: transparent; border: 1px solid var(--border);
+    color: var(--text); }
+  .j-auth-retry:hover { border-color: var(--accent); color: var(--accent); }
+  .j-auth-retry[disabled] { opacity: .55; cursor: default; }
+  .j-auth-cancel { background: transparent; border: 1px solid transparent;
+    color: var(--muted); }
+  .j-auth-cancel:hover { color: var(--text); }
+  /* 「展开其余 N 篇 / 收起」 */
+  .more { display: block; font-size: 11px; color: var(--accent); margin-top: 6px;
+    padding: 3px 0; cursor: pointer; }
+  .more:hover { text-decoration: underline; }
+  .none-tip { font-size: 11.5px; color: var(--dim); padding: 7px 0; line-height: 1.6; }
+
+  /* ── 视图切换 ── */
+  .vbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .vtab { font-size: 12.5px; padding: 7px 15px; border-radius: 5px; cursor: pointer;
+    border: 1px solid var(--border); background: transparent; color: var(--muted); transition: .16s; }
+  .vtab:hover { color: var(--text); border-color: var(--border-hover); }
+  .vtab.on { color: var(--on-accent); background: var(--accent); border-color: var(--accent); font-weight: 600; }
+  /* 「全部展开 / 收起全部」—— 一键铺开本视图内所有被折叠的条目 */
+  .vbtn { font-size: 12.5px; padding: 7px 15px; border-radius: 5px; cursor: pointer;
+    border: 1px dashed var(--border); background: transparent; color: var(--accent); transition: .16s; }
+  .vbtn:hover { border-color: var(--accent); border-style: solid; }
+  .vbtn[hidden] { display: none; }
+  .vnote { font-size: 11.5px; color: var(--muted); margin-left: auto; text-align: right; line-height: 1.6; }
+
+  /* ── 主题归档：分档徽章 / 日期 / 命中词 ── */
+  .t-badge { display: inline-block; font-size: 9.5px; padding: 1px 6px; border-radius: 3px;
+    margin-left: 6px; vertical-align: 1px; white-space: nowrap; border: 1px solid transparent; }
+  .t-strong { background: var(--tier-strong-bg); color: var(--tier-strong-fg); border-color: var(--tier-strong-bd); }
+  .t-mid { background: var(--tier-mid-bg); color: var(--tier-mid-fg); border-color: var(--tier-mid-bd); }
+  .t-low { background: var(--tier-low-bg); color: var(--tier-low-fg); border-color: var(--tier-low-bd); }
+  .art .sc { color: var(--dim); font-size: 9.5px; flex-shrink: 0; padding-top: 3px;
+    font-family: ui-monospace, Consolas, monospace; }
+  .art-w { display: flex; gap: 8px; padding: 7px 0; font-size: 12px; line-height: 1.55;
+    border-bottom: 1px solid var(--surface-3); }
+  .art-w:last-child { border-bottom: none; }
+  .art-w .body { flex: 1; min-width: 0; }
+  .art-w .meta { font-size: 10px; color: var(--dim); margin-top: 3px; display: flex;
+    gap: 8px; flex-wrap: wrap; align-items: center; }
+  .art-w .meta .k { color: var(--meta-key); }
+  .kws { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
+  .kw { font-size: 9.5px; padding: 1px 5px; border-radius: 3px;
+    background: var(--kw-bg); border: 1px solid var(--kw-bd); color: var(--kw-fg); }
+  .c-badge.topic { border-color: var(--tier-mid-bd); color: var(--tier-mid-fg); }
+  .c-badge.topic.none { border-color: var(--border); color: var(--dim); }
+  .legend { display: flex; gap: 12px; align-items: center; font-size: 11px; color: var(--muted);
+    flex-wrap: wrap; }
+  .legend .t-badge { margin-left: 0; }
+
+  .c-foot { display: flex; align-items: center; gap: 12px; margin-top: 12px;
+    padding-top: 11px; border-top: 1px solid var(--surface-3); font-size: 11.5px; flex-wrap: wrap; }
+  .c-foot a { color: var(--muted); }
+  .c-foot a:hover { color: var(--accent); }
+  .c-foot .host { color: var(--dim); font-family: ui-monospace, Consolas, monospace; font-size: 10.5px; }
+  .c-foot .sep { color: var(--border); }
+
+  .loading { padding: 60px 0; text-align: center; color: var(--muted); font-size: 13px; }
+
+  footer { border-top: 1px solid var(--border); background: var(--surface);
+    padding: 11px 20px; font-size: 11px; color: var(--muted); flex-shrink: 0; }
+  footer code { font-family: ui-monospace, Consolas, monospace; color: var(--text); }
+
+  /* ── 移动端优先适配（2026-10-17）────────────────────────────────────
+     移动端为主：基准样式按窄屏写，宽屏用 min-width 渐进增强。
+     要点：
+       ① 触控目标 ≥ 40px 高（三个按钮在小屏是最小可点单元，宁可换行也不缩到点不中）
+       ② 三按钮在窄屏改为**独占一行**并横向平分宽度，避免与标题挤在一行导致误触
+       ③ header 高度与安全区适配刘海屏；sticky 保留便于长列表滚动
+       ④ 尊重 prefers-reduced-motion；禁用 hover-only 的信息暴露
+     桌面端原有的多列网格在 ≥900px 才恢复，避免中间宽度出现 2 列挤压。 */
+  @media (max-width: 860px) {
+    header { height: 52px; padding: 0 14px; gap: 10px;
+      padding-top: env(safe-area-inset-top); height: calc(52px + env(safe-area-inset-top)); }
+    .brand { font-size: 15px; }
+    .stat { font-size: 11.5px; }
+    main { padding: 18px 14px 40px; }
+    .head h1 { font-size: 19px; }
+    .head p { font-size: 12px; line-height: 1.65; }
+    /* 视图/区域切换与搜索各自成行，保证触摸目标够大 */
+    .vbar, .bar { gap: 8px; }
+    .vbar { padding-bottom: 12px; margin-bottom: 14px; }
+    .vtab, .vbtn { padding: 9px 16px; font-size: 13px; }
+    .tab { padding: 8px 14px; font-size: 12.5px; }
+    .search { flex: 1 1 100%; min-width: 0; padding: 9px 12px; font-size: 14px; }
+    .sum { margin-left: 0; width: 100%; font-size: 12px; }
+    .vnote { margin-left: 0; width: 100%; text-align: left; }
+    .grid { grid-template-columns: 1fr; gap: 12px; }
+    .today .arts { grid-template-columns: 1fr; }
+    .card { padding: 14px; }
+    .grp-t { margin: 20px 0 10px; }
+
+    /* 三按钮独占一行平分宽度：标题右侧的三个小按钮在手机上会挤成一团，
+       误触率极高；改为整行平分后每颗都有 ~33% 屏宽的点击区。 */
+    .art-btns { display: flex; gap: 6px; margin: 8px 0 0; width: 100%; }
+    .art-btns .btn { flex: 1 1 0; justify-content: center;
+      min-height: 40px; font-size: 12px; padding: 0 6px; }
+    .art-btns .btn svg { width: 13px; height: 13px; }
+    .art-w .art-btns { margin-top: 8px; }
+
+    .art, .art-w { padding: 8px 0; }
+    .art .t, .art-w .body { min-width: 0; }
+    .c-name { font-size: 15px; }
+    .c-badge { font-size: 10.5px; }
+    .legend { gap: 8px; font-size: 11px; }
+    footer { padding: 12px 14px; line-height: 1.8; font-size: 11px; }
+    /* 版本菜单在窄屏改为贴底浮层，避免被视口裁切 */
+    .j-ver { min-width: 200px; }
+  }
+
+  @media (min-width: 861px) {
+    .grid { grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
+  }
+</style>
+<!-- 主题引擎：必须同步加载（勿加 defer/async），否则会先闪深色再变浅色。
+     由它在右上角挂出「自动 / 浅色 / 深色」三态切换按钮。 -->
+<script src="__THEME_JS__"></script>
+<!-- GeoKB 一键翻译按钮（与知识库搜索页同源）：journals 页的翻译钮在下载成功后才挂
+     data-eid，geokb_translate.js 用 document 级事件委托，动态插入的按钮同样生效。 -->
+<script src="__TRANSLATE_JS__"></script>
+</head>
+<body data-page-node-id="2pMaEMTdaD0hcUkgLfMZ0i">
+
+<!-- ══ 站点配置（服务端注入，两端同一份模板的唯一差异点）═════════════════
+     这份模板同时渲染在两处，必须**一比一**复刻：
+         open.kust.work/journal  →  5555 门户（有 /PDFreader、自研阅读器）
+         sjck.kust.work/journal  →  5556 GeoKB（无 /PDFreader，纯 API 服务）
+     所以端点差异全部收敛到下面这个 CFG，渲染逻辑本身两端**逐字节相同** ——
+     改布局/样式/交互只需改模板一处，两端同时生效（这才是"同步更新"）。
+
+     由 journal_page.render() 注入；缺项一律回落到 5555 口径。
+     ────────────────────────────────────────────────────────────────── -->
+<script>
+window.JOURNAL_CFG = __JOURNAL_CFG__;
+</script>
+
+<header data-page-node-id="ZddT87RJPmLE6aehUL9Wnh">
+  __BACK_LINK__
+  <span class="logo" data-page-node-id="NE6jzMUZRxgrm0RwWlOG3Z">ku</span>
+  <span class="brand" data-page-node-id="3SP5Nwvjv3msk5Bj1TC9a0">期刊列表</span>
+  <span class="spacer" data-page-node-id="EyUIWgE271u3jFOzyPMowJ"></span>
+  <span class="stat" id="st" data-page-node-id="6M7PwcnHKCaviMh68E3QF3">加载中…</span>
+</header>
+
+<main data-page-node-id="PTaTMRQNQlOTtTgKoUVNs1">
+  <div class="head" data-page-node-id="8mbPo1sxQiyNOzTocwoVVw">
+    <h1 data-page-node-id="AoOwHCH9dgYBCjIVFnkl32">目标期刊列表</h1>
+    <p data-page-node-id="X0xcTWGoqBu5fDUcdY04AH">点击期刊名直达官网首页 · 「近 60 天」为本机近 60 天<b data-page-node-id="vABnw8HNqP1GLvznukRATv">获取到</b>的文章链接（本地日期时间为准，非当天发布）· 「主题归档」为近 2 个月与 filter 主题相关的命中文献</p>
+  </div>
+
+  <div class="vbar" data-page-node-id="KfcCmJLee7tlAQ9VJ9QJjs">
+    <button class="vtab on" data-view="latest" data-page-node-id="rTFBbsp18bphbcA60dw0Bx">近 60 天</button>
+    <button class="vtab" data-view="topic" data-page-node-id="Zws6ufgbmCb1vfKD8qhITL">主题归档</button>
+    <button class="vbtn" id="allbtn" hidden data-page-node-id="b0gGCwRs3HFxpCH6BvvY39">全部展开 ↓</button>
+    <span class="vnote" id="vnote" data-page-node-id="N1o8CZO0bv5HCsFPTxCE93"></span>
+  </div>
+
+  <div class="bar" id="bar" data-page-node-id="MVlz4pDkHGYmbGsamYJ7SF">
+    <button class="tab on" data-region="all" data-page-node-id="Xm7HR4kOS84bkSiBS1rDfy">全部</button>
+    <button class="tab" data-region="国际" data-page-node-id="cROl5n6O2jgDiDGHx2JF8N">国际期刊</button>
+    <button class="tab" data-region="国内" data-page-node-id="IYCzHDXUrx3PYwS4HaiYXu">国内期刊</button>
+    <input class="search" id="search" type="search" placeholder="搜索标题 / 中文翻译…" autocomplete="off" data-page-node-id="fUzALnRZxNqsXdPosvIFg9">
+    <button class="clr" id="clr" hidden data-page-node-id="4SC6TojZloqhMEZKobI0Z7">清除</button>
+    <span class="sum" id="sum" data-page-node-id="CvfJcPIiJbb6IQOeYIBnJA">—</span>
+  </div>
+
+  <div id="today" hidden data-page-node-id="C1bk5XMdpxSF2KZzIMiJ6m"></div>
+  <div id="legend" data-page-node-id="Wt4pZDXESq1qqApR2wLx0W"></div>
+  <div id="body" data-page-node-id="zzbUuM5qqj5BZqxonCi6ak"><div class="loading" data-page-node-id="iQwKAEXt3ren3ED3kQLyT6">正在读取期刊数据…</div></div>
+</main>
+
+<footer data-page-node-id="FDNnz4RYH1HBCr8jV1gNBa">
+  数据源 <code data-page-node-id="vT6C8cVnI2WBPPmuB7bbEG">journals.json</code> · <code data-page-node-id="QrPDQ1HHXESqnyzf9oJ3zu">journal_ledger.json</code> ·
+  <code data-page-node-id="hG8ltYmXyOmvmWKc3Z5e1i">journal_updates.json</code> · <code data-page-node-id="wUaAa3CwE8TANl6jwBUIxo">journal_batch_pending.json</code> ·
+  <code data-page-node-id="S9XG2CdQHWPC5u8PBtGd55">journal_doc_urls.json</code> · <code data-page-node-id="OUlpzlF8dO8OxxKnDKiIRo">journal_topic_archive.json</code>（只读）
+  <br>本页面与 <code>open.kust.work/journal</code> 共用同一取数模块（<code>journal_feed.py</code>）与同一份模板，两端始终一致。
+</footer>
+
+<script>
+(function () {
+  var CFG = window.JOURNAL_CFG || {};
+  // 端点全部走 CFG（服务端注入），模板本身不再出现任何硬编码路径 ——
+  // 这样同一份模板能在 5555 / 5556 两处渲染，且两端显示完全一致。
+  // ⚠️ 可能为空的字段（reader）必须用 `in` 判断而非 `||`：
+  // 5556 注入的是空字符串（无自研阅读器），而 `'' || 默认值` 会把空值
+  // 错误替换成默认路径 → 阅读按钮指向不存在的 /PDFreader。
+  var API_LIST = CFG.apiList || '/api/journals/list';
+  var API_PDF = CFG.apiPdf || '/api/journals/pdf/';      // 原文回源前缀
+  var URL_MONO = CFG.urlMono || '/geokb/pdf/';           // 中文版前缀
+  var URL_DUAL = CFG.urlDual || '/geokb/pdf/';           // 双语对照版前缀
+  var VAR_MONO = CFG.varMono || 'mono';
+  var VAR_DUAL = CFG.varDual || 'dual';
+  var TR_STATUS = CFG.trStatus || '/geokb/api/entry/';   // 译文检测前缀
+  var READER = ('reader' in CFG) ? CFG.reader : '/PDFreader';  // 在线阅读器入口
+  // 「补缺申请」端点（2026-10-25）：只有门户（5555）注入；5556 是公网只读，
+  // 注入空串 → 模板不渲染这颗按钮（绝不能让公网触发入库）。
+  // 缺省也给空串：宁可少颗按钮，也不能让没配置的部署长出一颗会 404 的写操作钮。
+  var API_REFILL = ('apiRefill' in CFG) ? CFG.apiRefill : '';
+
+  // 在线阅读链接：CFG.reader 给的是「阅读器 + 查询串模板」，
+  // 占位符 {file}/{title}/{peer} 由 makeReadLinks 填充。
+  // 5556 无自研 /PDFreader（纯 API 服务），故 CFG.reader 为空 →
+  // 阅读按钮退化为「在浏览器内打开原文 PDF」（object/iframe，移动端可用）。
+  function makeReadLinks(a) {
+    var single = '';
+    if (READER && a.eid) {
+      single = READER + '?file=' + encodeURIComponent(API_PDF + (a.pdf_rel || ''))
+        + '&title=' + encodeURIComponent(a.title || '');
+    } else if (a.eid) {
+      single = API_PDF + (a.pdf_rel || '');
+    }
+    var pair = '';
+    if (READER && a.eid) {
+      pair = single + '&peer='
+        + encodeURIComponent(URL_MONO + encodeURIComponent(a.eid) + '/' + VAR_MONO)
+        + '&layout=continuous&sync=1';
+    }
+    return { single: single, pair: pair };
+  }
+
+  var DATA = null, REGION = 'all', VIEW = 'latest', Q = '', MATCHED = 0;
+  // 单卡默认折叠条数；点「展开其余 N 篇」后按 data-id 记住展开状态
+  var PREVIEW_N = 6;
+  var EXPANDED = {};
+  var ALL_OPEN = false;   // 「全部展开」总开关：为 true 时所有卡片都铺开
+  var body = document.getElementById('body');
+  var allbtn = document.getElementById('allbtn');
+  var sum = document.getElementById('sum');
+  var st = document.getElementById('st');
+  var bar = document.getElementById('bar');
+  var vnote = document.getElementById('vnote');
+  var legend = document.getElementById('legend');
+  var todayEl = document.getElementById('today');
+
+  var TIER_LABEL = { strong: '强相关', mid: '相关', low: '一般' };
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function safeUrl(u) { return /^https?:\/\//i.test(u || '') ? u : ''; }
+
+  // ──「中文论文」判定：一键翻译按钮的显示闸门（2026-10-22）────────────
+  // 中文论文再翻成中文没有意义 → 本篇不挂「一键翻译」。
+  // 判据只看**原文标题** a.title（不能用 a.title_zh —— 那是英文标题的中文小字，
+  // 每篇都有，会把所有英文论文误判成中文）。
+  // 双条件：汉字数 ≥2 且 占比 ≥35%，或汉字数 ≥8（绝对量兜底，防数字/单位稀释）。
+  // 与知识库 is_zh_paper 完全同判据。
+  // ⚠️ 改判据必须与 geokb_public/routes.py::is_zh_paper 两处同改。
+  var CJK_RE = /[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]/g;
+  var CJK_MIN = 2, CJK_RATIO = 0.35, CJK_ABS = 8;
+  function isZhTitle(s) {
+    var t = String(s == null ? '' : s).replace(/\s+/g, '');
+    if (!t) return false;
+    var m = t.match(CJK_RE);
+    var n = m ? m.length : 0;
+    if (n >= CJK_ABS) return true;
+    return n >= CJK_MIN && n / t.length >= CJK_RATIO;
+  }
+
+  // ── 整刊中文判定（2026-10-22 补）：刊名含 ≥2 汉字 → 该刊全部论文按中文处理 ──
+  // 为什么必须有这一条：《矿物岩石地球化学通报》是中文刊，但源站给的标题几乎
+  // 全是英文（"Permeability Evolution Mechanism of Shale Oil…"），只逐篇看标题
+  // 会整刊漏判、每篇都挂上无意义的「一键翻译」。
+  // 为什么不会误伤英文刊：英文刊的 a.journal 一律是拉丁字母（Ore Geology Reviews /
+  // MINPET / FRONTES / IJES / GEOSCI / Lithos…），CJK_RE 命中 0 → 恒 false。
+  // 比白名单稳：日后新增中文刊自动生效，不依赖人工维护。
+  var ZH_J_MIN = 2;
+  function isZhJournal(s) {
+    var t = String(s == null ? '' : s).replace(/\s+/g, '');
+    return (t.match(CJK_RE) || []).length >= ZH_J_MIN;
+  }
+  // 整刊中文 或 标题中文 → 这篇按中文处理（不挂翻译、下载直下原文）
+  function isZhArticle(a) {
+    return isZhJournal(a && a.journal) || isZhTitle(a && a.title);
+  }
+
+  // ── 标题右侧按钮组：下载 PDF / 期刊官网 / 在线阅读 / 一键翻译 ──────────
+  // ★ 语义与配色（用户 2026-10-18 确认）：
+  //   「下载 PDF」= NAS → 用户本地，点开选版本（原文 / 中文版 / 双语对照版）；
+  //     仅已归档出现，且是全页唯一主色（绿）按钮 —— 主操作唯一且醒目
+  //   「期刊官网」= 每篇都有：直达文章在源站的页面，默认灰色（次要入口）
+  //   「在线抓取」已取消（用户 2026-10-18 决定）：网站 → NAS 的补抓统一交回
+  //     每日管线自动完成，页面不再提供任何写操作入口；未归档时唯一引导
+  //     就是「期刊官网」（后端 /api/journals/fetch-pdf 保留给 API 调用方）
+  //   阅读/翻译仅在有 eid（已归档并建档）时可用。
+  var ICON_DL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2 2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+  var ICON_DLOK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  var ICON_EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+  var ICON_TRANS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1"/><path d="M14 21l5-5 4 4-5 5-4-4z"/><path d="M17 14l-1.5-1.5"/><path d="M13 19h8v2h-8zM19 15l3 3"/></svg>';
+
+  /* 期刊官网外链图标（标准 external-link） */
+  var ICON_SITE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
+
+  // 阅读 / 翻译的共享属性（已归档才有 eid / pdf_rel）
+  function readAttrs(a) {
+    if (!a.eid) {
+      return ' href="javascript:void(0)" aria-disabled="true" class="btn is-off j-read"'
+        + ' title="尚未归档到 NAS：每日管线会在列表更新后自动抓取，抓到即可阅读"';
+    }
+    var L = makeReadLinks(a);
+    if (!L.single) {
+      return ' href="javascript:void(0)" aria-disabled="true" class="btn is-off j-read"'
+        + ' title="该篇尚未就绪"';
+    }
+    return ' href="' + esc(L.single) + '" class="btn j-read"'
+      + (L.pair ? ' data-read-link data-read-eid="' + esc(a.eid) + '"'
+                 + ' data-read-single="' + esc(L.single) + '"'
+                 + ' data-read-pair="' + esc(L.pair) + '"' : '')
+      + (L.pair ? '' : ' target="_blank" rel="noopener"')
+      + ' title="' + (L.pair
+          ? '自研 canvas 阅读器打开；译文就绪后自动切双语对照'
+          : '在浏览器中打开原文 PDF') + '"';
+  }
+
+  function trAttrs(a) {
+    if (!a.eid) {
+      return ' disabled data-state="idle"'
+        + ' title="尚未归档到 NAS：抓到 PDF 后才能提交翻译"';
+    }
+    return ' data-eid="' + esc(a.eid) + '" data-state="idle"'
+      + ' title="提交 NAS 原文到翻译队列，完成后译文归档到原文同目录"';
+  }
+
+  // 无 http(s) 链接的条目不渲染按钮（期刊官网入口必须有源地址）。
+  function artBtns(a) {
+    if (!safeUrl(a.url)) return '';
+    var ready = !!(a.archived && a.pdf_rel);
+    // 期刊官网：每篇都有，直达源站文章页；默认灰色（全页唯一主色是「下载 PDF」）
+    var site = '<a class="btn j-site"'
+      + ' href="' + esc(a.url) + '" target="_blank" rel="noopener"'
+      + ' title="在期刊官网查看该文（摘要 / 原文 / 补充材料）">'
+      + ICON_SITE + '<span>期刊官网</span></a>';
+    // 下载 PDF：仅已归档出现；主色（绿）—— 全页唯一的高饱和度按钮
+    // 中文论文（含整刊中文的《矿物岩石地球化学通报》）没有译文版本可选
+    // → 不挂版本菜单，点击直接下原文（2026-10-22）
+    var zh = isZhArticle(a);
+    var dl = ready
+      ? '<button type="button" class="btn btn-primary j-dl '
+        + (zh ? 'j-dl-direct' : 'j-dl-ready') + '"'
+        + ' data-eid="' + esc(a.eid || '') + '"'
+        + ' data-pdf-rel="' + esc(a.pdf_rel) + '"'
+        + ' title="' + (zh
+            ? '中文论文无需翻译：点击直接下载原文 PDF'
+            : '从 NAS 论文仓库下载到本地（点击选择版本：原文 / 中文版 / 双语对照版）') + '">'
+        + ICON_DL + '<span>下载 PDF</span></button>'
+      : '';
+    // 未归档 → 可点入口只有「期刊官网」（补抓由每日管线自动完成，页面不给写操作）
+    // 中文论文不挂翻译钮：翻成中文没有意义（判据见 isZhArticle）
+    var tr = zh
+      ? ''
+      : '<button type="button" class="btn tr-btn j-tr" data-tr-btn' + trAttrs(a) + '>'
+        + ICON_TRANS + '<span>一键翻译</span></button>';
+    return '<span class="art-btns">' + dl + site
+      + '<a' + readAttrs(a) + '>' + ICON_EYE + '<span>在线阅读</span></a>'
+      + tr
+      + '</span>';
+  }
+
+  // 全站搜索：按查询过滤某卡片的文章列表（标题 + 中文小字 + 主题命中词）。
+  // 返回卡片的「过滤副本」，并打 _force 标记让卡片铺开全部匹配项（不再折叠预览）。
+  function applyQuery(j) {
+    var q = Q.trim().toLowerCase();
+    if (!q) return j;
+    var c = {
+      id: j.id, name: j.name, name_cn: j.name_cn, name_en: j.name_en, short_name: j.short_name,
+      website: j.website, site_host: j.site_host, publisher: j.publisher,
+      doc_url: j.doc_url, category: j.category, level: j.level, frequency: j.frequency,
+      sub: j.sub, article_total: j.article_total, topic_total: j.topic_total, topic_tiers: j.topic_tiers,
+      has_today: j.has_today, today_count: j.today_count, article_newest_ts: j.article_newest_ts,
+      _force: true
+    };
+    if (VIEW === 'latest') {
+      var arts = (j.articles || []).filter(function (a) {
+        return (a.title || '').toLowerCase().indexOf(q) >= 0
+          || (a.title_zh || '').toLowerCase().indexOf(q) >= 0;
+      });
+      c.articles = arts;
+      c.article_total = arts.length;
+      c.article_newest = j.article_newest;
+      c.article_undated = j.article_undated;
+    } else {
+      var ta = (j.topic_articles || []).filter(function (a) {
+        return (a.title || '').toLowerCase().indexOf(q) >= 0
+          || (a.title_zh || '').toLowerCase().indexOf(q) >= 0
+          || (a.keywords || []).join(' ').toLowerCase().indexOf(q) >= 0
+          || (a.date_label || '').toLowerCase().indexOf(q) >= 0;
+      });
+      c.topic_articles = ta;
+      c.topic_total = ta.length;
+    }
+    return c;
+  }
+
+  // 近 60 天条目：标题 + 本地获取日期（MM-DD）+ 卷期
+  // ★ 形参只能有一个：下面是 `shown.map(artRow)`，map 会把「下标」当第二个实参传进来。
+  //   曾因签名写成 artRow(a, jname) 而把下标当刊名渲染，卡片里凭空冒出 1/2/3/4/5 灰字。
+  function artRow(a) {
+    var u = safeUrl(a.url);
+    var t = u
+      ? '<a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(a.title) + '</a>'
+      : esc(a.title);
+    var vi = a.volume ? '<span class="vi">v' + esc(a.volume) + (a.issue ? 'n' + esc(a.issue) : '') + '</span>' : '';
+    var ob = a.obtained_label
+      ? '<span class="ob" title="本地获取时间 ' + esc(a.obtained_at || a.obtained_label) + '">'
+        + esc(a.obtained_label) + '</span>'
+      : '';
+    // 英文条目下方挂中文小字（离线预翻译，没有就不显示，绝不占位）
+    var zh = a.title_zh ? '<div class="tzh">' + esc(a.title_zh) + '</div>' : '';
+    return '<div class="art"><span class="mk">▸</span><div class="t">' + t + artBtns(a) + zh + '</div>'
+      + ob + vi + '</div>';
+  }
+
+  // 今日条目：同为一条 .art（样式与下方卡片完全一致），两处与 artRow 不同 ——
+  //   ① 日期换成**时刻**（当天全是今天，MM-DD 无信息量，HH:MM 才看得出先后）
+  //   ② 不再挂来源刊名（刊名已上提到分组头，逐条重复是噪音）
+  function todayRow(a) {
+    var u = safeUrl(a.url);
+    var t = u
+      ? '<a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(a.title) + '</a>'
+      : esc(a.title);
+    var vi = a.volume ? '<span class="vi">v' + esc(a.volume) + (a.issue ? 'n' + esc(a.issue) : '') + '</span>' : '';
+    var hm = a.obtained_hm
+      ? '<span class="hm" title="本地获取时间 ' + esc(a.obtained_at || '') + '">'
+        + esc(a.obtained_hm) + '</span>'
+      : '';
+    var zh = a.title_zh ? '<div class="tzh">' + esc(a.title_zh) + '</div>' : '';
+    return '<div class="art">' + hm + '<span class="mk">▸</span><div class="t">' + t + artBtns(a) + zh + '</div>'
+      + vi + '</div>';
+  }
+
+  // 主题归档条目：分数 + 分档徽章 + 日期 + 卷期页码 + 命中关键词
+  function topicRow(a) {
+    var u = safeUrl(a.url);
+    var t = u
+      ? '<a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(a.title) + '</a>'
+      : esc(a.title);
+    var tier = TIER_LABEL[a.tier] || '一般';
+    var meta = ['<span>' + esc(a.date_label) + '</span>'];
+    var vi = a.volume ? ('v' + a.volume + (a.issue ? 'n' + a.issue : '')) : '';
+    if (vi) meta.push('<span>' + esc(vi) + '</span>');
+    if (a.pages) meta.push('<span>' + esc(a.pages) + '</span>');
+    if (a.date_basis) meta.push('<span class="k">' + esc(a.date_basis) + '</span>');
+    var kws = (a.keywords || []).length
+      ? '<div class="kws">' + a.keywords.map(function (k) {
+          return '<span class="kw">' + esc(k) + '</span>';
+        }).join('') + '</div>'
+      : '';
+    var zh = a.title_zh ? '<div class="tzh">' + esc(a.title_zh) + '</div>' : '';
+    return '<div class="art-w"><span class="sc">' + esc(a.score) + '</span>'
+      + '<div class="body"><div>' + t
+      + '<span class="t-badge t-' + esc(a.tier) + '">' + esc(tier) + '</span>'
+      + artBtns(a) + '</div>' + zh
+      + '<div class="meta">' + meta.join('') + '</div>' + kws + '</div></div>';
+  }
+
+  function headCard(j) {
+    var site = safeUrl(j.website);
+    var nameHtml = site
+      ? '<a class="c-name" href="' + esc(site) + '" target="_blank" rel="noopener" title="打开期刊首页">' + esc(j.name) + '</a>'
+      : '<div class="c-name">' + esc(j.name) + '</div>';
+    var sub = [];
+    if (j.name_cn && j.name_cn !== j.name) sub.push(j.name_cn);
+    if (j.name_en && j.name_en !== j.name) sub.push(j.name_en);
+    if (j.short_name) sub.push(j.short_name);
+    var chips = [];
+    // 「今日 +N」放最前：它就是这张卡被排到区域最前面的原因，要一眼看见。
+    // 只在「近 60 天」视图挂 —— 归档视图走发表日期口径，跟「今日获取」不是一回事。
+    if (VIEW === 'latest' && j.has_today) {
+      chips.push('<span class="chip chip-today">今日 +' + (j.today_count || 1) + '</span>');
+    }
+    if (j.category) chips.push('<span class="chip">' + esc(j.category) + '</span>');
+    (j.level || []).slice(0, 3).forEach(function (l) {
+      chips.push('<span class="chip">' + esc(l) + '</span>');
+    });
+    if (j.frequency) chips.push('<span class="chip">' + esc(j.frequency) + '</span>');
+    var foot = [];
+    if (site) foot.push('<a href="' + esc(site) + '" target="_blank" rel="noopener">期刊首页 &rarr;</a>');
+    var doc = safeUrl(j.doc_url);
+    if (doc) foot.push('<a href="' + esc(doc) + '" target="_blank" rel="noopener">飞书速递 &rarr;</a>');
+    if (j.site_host) foot.push('<span class="host">' + esc(j.site_host) + '</span>');
+    if (j.publisher) foot.push('<span class="sep">|</span><span>' + esc(j.publisher) + '</span>');
+    return {
+      nameHtml: nameHtml, sub: sub, chips: chips, foot: foot,
+      site: site, hasNew: !!j.article_total
+    };
+  }
+
+  // 近 60 天卡片：只展示「本地近 60 天获取到」的链接，按获取时间倒序
+  function cardLatest(j) {
+    var h = headCard(j);
+    var total = j.article_total || 0;
+    var items = j.articles || [];
+    var isOpen = !!EXPANDED[j.id] || !!j._force;   // 搜索时铺开全部匹配项
+    var shown = isOpen ? items : items.slice(0, PREVIEW_N);
+    var win = DATA.window || {};
+    var days = win.days || 60;
+    var searching = !!Q.trim();
+
+    var badge;
+    if (searching) {
+      badge = total
+        ? '<span class="c-badge">' + total + ' 篇匹配</span>'
+        : '<span class="c-badge none">无匹配</span>';
+    } else {
+      badge = total
+        ? '<span class="c-badge">' + days + ' 天内 ' + total + ' 篇</span>'
+        : '<span class="c-badge none">' + days + ' 天内无</span>';
+    }
+
+    var arts;
+    if (shown.length) {
+      arts = shown.map(artRow).join('');
+      var mk = function (label) {
+        return '<a class="more" data-more="' + esc(j.id) + '" href="javascript:void(0)">'
+          + label + '</a>';
+      };
+      if (!isOpen && total > shown.length) {
+        arts += mk('展开其余 ' + (total - shown.length) + ' 篇 ↓');
+      } else if (isOpen && total > PREVIEW_N) {
+        arts += mk('收起 ↑');
+      }
+      if (total > items.length) {
+        arts += '<div class="none-tip">另有 ' + (total - items.length) + ' 篇超出单卡展示上限</div>';
+      }
+    } else {
+      arts = '<div class="none-tip">近 ' + days + ' 天未获取到该刊文章，'
+        + '可点击期刊名前往官网查看最新目录</div>';
+    }
+    return '<div class="card' + (h.hasNew ? ' has-new' : '') + '">'
+      + '<div class="c-top"><div>' + h.nameHtml
+      + (h.sub.length ? '<div class="c-sub">' + esc(h.sub.join(' · ')) + '</div>' : '')
+      + '</div>' + badge + '</div>'
+      + (h.chips.length ? '<div class="chips">' + h.chips.join('') + '</div>' : '')
+      + '<div class="arts">' + arts + '</div>'
+      + '<div class="c-foot">' + h.foot.join('<span class="sep">|</span>') + '</div>'
+      + '</div>';
+  }
+
+  function cardTopic(j) {
+    var h = headCard(j);
+    var tiers = j.topic_tiers || {};
+    var parts = [];
+    ['strong', 'mid', 'low'].forEach(function (k) {
+      if (tiers[k]) parts.push(TIER_LABEL[k] + ' ' + tiers[k]);
+    });
+    var badge = j.topic_total
+      ? '<span class="c-badge topic">' + j.topic_total + ' 篇命中</span>'
+      : '<span class="c-badge topic none">无命中</span>';
+    var arts;
+    if (j.topic_articles && j.topic_articles.length) {
+      arts = j.topic_articles.map(topicRow).join('');
+      if (j.topic_total > j.topic_articles.length) {
+        arts += '<div class="none-tip">另有 ' + (j.topic_total - j.topic_articles.length) + ' 篇未展开</div>';
+      }
+    } else {
+      arts = '<div class="none-tip">近 2 个月该刊无与 filter 主题相关的命中文献</div>';
+    }
+    var sub2 = h.sub.length ? esc(h.sub.join(' · ')) + (parts.length ? ' · ' : '') : '';
+    return '<div class="card' + (j.topic_total ? ' has-new' : '') + '">'
+      + '<div class="c-top"><div>' + h.nameHtml
+      + '<div class="c-sub">' + sub2 + (parts.length ? esc(parts.join(' / ')) : '') + '</div>'
+      + '</div>' + badge + '</div>'
+      + (h.chips.length ? '<div class="chips">' + h.chips.join('') + '</div>' : '')
+      + '<div class="arts">' + arts + '</div>'
+      + '<div class="c-foot">' + h.foot.join('<span class="sep">|</span>') + '</div>'
+      + '</div>';
+  }
+
+  // 「今日更新」板块（页顶）：把当天获取到的文章跨刊汇总。
+  // 判据与下方完全同源 —— 都是「本地获取时间」，由服务端按当天日期切好，
+  // 前端只负责按区域/搜索过滤后渲染，不自己算日期（避免时区与口径分歧）。
+  // 只在「近 60 天」视图出现：主题归档是另一套数据（发表日期口径），混进来会误导。
+  //
+  // 排版：**按刊分组**，一组一个刊 ——
+  //   组头   = 刊名（可点进官网）+ 区域标 + 「N 篇」
+  //   组内   = 逐条时间线，按获取时刻倒序
+  //   组的先后 = 该刊当天最新一条的获取时刻（越新越靠前）
+  // 为什么不全平铺：当天条目可能是几十条跨十几个刊，平铺就是一面墙，
+  // 看不出「今天哪些刊有动静」；分组后一眼扫完刊名即可决定要不要展开细看。
+  function renderToday() {
+    if (!todayEl) return;
+    var t = DATA && DATA.today;
+    if (VIEW !== 'latest' || !t || !t.total) {
+      todayEl.hidden = true; todayEl.innerHTML = ''; return;
+    }
+    var q = Q.trim().toLowerCase();
+    var items = (t.items || []).filter(function (a) {
+      if (REGION !== 'all' && a.region !== REGION) return false;
+      if (!q) return true;
+      return ((a.title || '') + ' ' + (a.title_zh || '')).toLowerCase().indexOf(q) >= 0;
+    });
+    if (!items.length) { todayEl.hidden = true; todayEl.innerHTML = ''; return; }
+
+    // 聚合：顺序即「该刊首次出现的先后」，随后统一按 newest 重排（见下）。
+    var groups = [], idx = {};
+    items.forEach(function (a) {
+      var k = a.journal || '（未标注来源）';
+      var g = idx[k];
+      if (!g) {
+        g = idx[k] = { name: k, url: '', region: '', items: [], newest: 0 };
+        groups.push(g);
+      }
+      if (!g.url && a.journal_url) g.url = a.journal_url;
+      if (!g.region && a.region) g.region = a.region;
+      g.items.push(a);
+      if ((a.obtained_ts || 0) > g.newest) g.newest = a.obtained_ts || 0;
+    });
+    groups.forEach(function (g) {
+      g.items.sort(function (x, y) { return (y.obtained_ts || 0) - (x.obtained_ts || 0); });
+    });
+    groups.sort(function (x, y) { return y.newest - x.newest; });
+
+    var head = '<div class="today-head"><div>'
+      + '<div class="today-title">今日更新'
+      + '<span class="today-date">' + esc(t.date) + '</span></div>'
+      + '<div class="today-tip">本机当日获取到的文章链接 · 按刊分组、组内按获取时间倒序'
+      + ' · 与下方「近 60 天」同源同口径</div>'
+      + '</div><div class="today-actions">'
+      + '<span class="c-badge">' + items.length + ' 篇 · ' + groups.length + ' 种期刊</span>'
+      + (API_REFILL
+          ? '<button type="button" class="refill" id="refillBtn"'
+            + ' title="把投放箱里已下载的 PDF 立刻入库。防连点：每触发一次锁 60 秒'
+            + '（后端计时，多个标签页/设备共享）；inbox 为空或投放箱入库正在跑时不触发。">补缺申请</button>'
+          : '')
+      + '</div></div>';
+
+    var body = groups.map(function (g) {
+      var u = safeUrl(g.url);
+      var name = u
+        ? '<a class="tg-name" href="' + esc(u) + '" target="_blank" rel="noopener"'
+          + ' title="打开期刊首页">' + esc(g.name) + '</a>'
+        : '<span class="tg-name">' + esc(g.name) + '</span>';
+      var region = g.region ? '<span class="tg-region">' + esc(g.region) + '</span>' : '';
+      return '<div class="tgroup"><div class="tg-head">' + name + region
+        + '<span class="tg-n">' + g.items.length + ' 篇</span></div>'
+        + '<div class="arts">' + g.items.map(todayRow).join('') + '</div></div>';
+    }).join('');
+
+    if (t.hidden) {
+      body += '<div class="none-tip">另有 ' + t.hidden + ' 篇超出单日展示上限</div>';
+    }
+    todayEl.innerHTML = '<div class="today">' + head + body + '</div>';
+    todayEl.hidden = false;
+    rfPaint();          // 卡片每次重绘都会重建按钮 → 重绘后立刻套回当前状态
+  }
+
+  // ── 补缺申请（2026-10-25）─────────────────────────────────────────────
+  // 点一下 = 立刻跑一轮投放箱入库（inbox_ingest --run，与 12:01/18:01 同一流程）。
+  // 冷却 60s、inbox 有没有货、**投放箱入库**是否在跑，全部由后端判定
+  // （多前端共享同一份冷却；夜间 Agent 入库/历史补爬不算，不拦按钮）。
+  //   绿 = 可点 / 橙 = 补缺中或冷却中 / 橙字 = 一次性提示（暂无更新等）
+  var RF = { running: false, done: 0, total: 0, cd: 0, inbox: 0, ready: 0, papers: 0,
+             msg: '', msgUntil: 0, poll: null, tick: null, sending: false };
+
+  function rfPaint() {
+    var b = document.getElementById('refillBtn');
+    if (!b) return;
+    var txt, cls = 'refill', spin = '';
+    if (RF.msg && Date.now() < RF.msgUntil) {
+      txt = RF.msg;
+      cls += ' is-msg';
+    } else if (RF.running) {
+      txt = '补缺中，' + (RF.done || 0) + '/' + (RF.total || 0) + '篇';
+      cls += ' is-busy is-live';
+      spin = '<span class="j-spin"></span>';
+    } else if (RF.cd > 0) {
+      txt = '补缺申请 ' + RF.cd + 's';
+      cls += ' is-busy';
+    } else if (RF.papers > 0) {
+      // 论文模块正在入库：两边共用 GeoKB 的 pdf_ingest.lock，
+      // 现在按下去只会在锁上干等 —— 先把「在等谁」写出来
+      txt = '补缺申请 · 等入库 ' + RF.papers;
+      cls += ' is-busy';
+    } else if (RF.ready > 0) {
+      // 投放箱里已有下载好但还没入库的 PDF —— 明说出来，避免「明明下了却像没识别」
+      txt = '补缺申请 · 待入库 ' + RF.ready;
+    } else {
+      txt = '补缺申请';
+    }
+    b.className = cls;
+    b.disabled = !!(RF.running || RF.cd > 0);
+    b.innerHTML = spin + '<span>' + esc(txt) + '</span>';
+  }
+
+  function rfMsg(text, ms) {
+    var d = ms || 2400;
+    RF.msg = text;
+    RF.msgUntil = Date.now() + d;
+    rfPaint();
+    if (typeof setTimeout === 'function') {
+      setTimeout(function () {
+        if (Date.now() >= RF.msgUntil) { RF.msg = ''; rfPaint(); }
+      }, d + 40);
+    }
+  }
+
+  // 冷却倒计时纯展示：真正的闸门在后端，这里只是把 60s 数给人看
+  function rfTick() {
+    if (typeof setInterval !== 'function' || RF.tick) return;
+    RF.tick = setInterval(function () {
+      if (RF.cd > 0) { RF.cd -= 1; rfPaint(); }
+      if (RF.cd <= 0) { clearInterval(RF.tick); RF.tick = null; rfPaint(); }
+    }, 1000);
+  }
+
+  function rfApply(d) {
+    if (!d || d.ok === false) return;
+    RF.running = !!d.running;
+    RF.done = d.done || 0;
+    RF.total = d.total || 0;
+    RF.cd = d.cooldown || 0;
+    RF.inbox = d.inbox || 0;
+    RF.ready = d.ready || 0;
+    RF.papers = d.papers_ingest || 0;
+    if (RF.cd > 0) rfTick();
+    rfPaint();
+  }
+
+  // 补缺中每 2s 问一次进度；跑完自动停（不在跑就不再轮询）
+  function rfPoll() {
+    if (!API_REFILL || typeof fetch !== 'function') return;
+    fetch(API_REFILL + '/status', { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        var was = RF.running;
+        rfApply(d);
+        if (was && !RF.running) {
+          var lr = d.last_result || {};
+          var n = (lr.ok || 0) + (lr.partial || 0);
+          var dup = lr.duplicate || 0;
+          if (lr && lr.failed) rfMsg('补缺结束，失败 ' + lr.failed + ' 篇', 4200);
+          else if (!n && dup) rfMsg('补缺完成，' + dup + ' 篇已在库', 4200);
+          else rfMsg('补缺完成，新增 ' + n + ' 篇', 4200);
+        }
+        if (RF.running && !RF.poll && typeof setTimeout === 'function') {
+          RF.poll = setTimeout(function () { RF.poll = null; rfPoll(); }, 2000);
+        } else if (!RF.running && RF.papers > 0 && !RF.poll
+                   && typeof setTimeout === 'function') {
+          // 等论文模块入库期间每 15s 对一次，跑完自动把按钮恢复成可点
+          RF.poll = setTimeout(function () { RF.poll = null; rfPoll(); }, 15000);
+        }
+      })
+      .catch(function () {});
+  }
+
+  function rfStart() {
+    if (!API_REFILL) return;
+    if (RF.sending || RF.running) return;
+    if (RF.cd > 0) { rfMsg('冷却中，' + RF.cd + 's 后可再按', 1600); return; }
+    if (RF.papers > 0) {
+      rfMsg('论文模块正在入库 ' + RF.papers + ' 篇，等它跑完再补缺', 2600);
+      return;
+    }
+    if (typeof fetch !== 'function') return;
+    RF.sending = true;
+    fetch(API_REFILL, {
+      method: 'POST', cache: 'no-store',
+      headers: { 'Content-Type': 'application/json' }
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      RF.sending = false;
+      if (d && d.ok) {
+        RF.running = true; RF.done = 0; RF.total = d.total || 0;
+        RF.cd = d.cooldown || 60;
+        rfPaint(); rfTick();
+        if (typeof setTimeout === 'function') {
+          RF.poll = setTimeout(function () { RF.poll = null; rfPoll(); }, 800);
+        }
+        return;
+      }
+      var why = (d && d.reason) || '';
+      if (why === 'empty') rfMsg(d.hint || '暂无更新');
+      else if (why === 'cooldown') {
+        RF.cd = d.retry_after || 60; rfTick();
+        rfMsg('冷却中，' + RF.cd + 's 后可再按', 1800);
+      } else if (why === 'busy') rfMsg('补缺进行中', 2400);
+      else if (why === 'spawn' || why === 'env') rfMsg(d.hint || '启动失败', 4200);
+      else rfMsg((d && d.hint) || '暂无更新');
+    }).catch(function () {
+      RF.sending = false;
+      rfMsg('请求失败', 2400);
+    });
+  }
+
+  // 事件委托：按钮在每次 renderToday 时重建，绑在 document 上才不会掉
+  if (document.addEventListener) {
+    document.addEventListener('click', function (e) {
+      var t = e.target;
+      if (t && t.closest && t.closest('#refillBtn')) { rfStart(); return; }
+      if (t && t.id === 'refillBtn') rfStart();
+    });
+  }
+
+  function render() {
+    var q = Q.trim();
+    var html = '', shown = 0, matched = 0;
+    DATA.groups.forEach(function (g) {
+      if (REGION !== 'all' && g.region !== REGION) return;
+      var js = g.journals;
+      if (VIEW === 'topic' && !q) {
+        js = js.filter(function (j) { return j.topic_total > 0; });
+      }
+      // 搜索：先按查询过滤每卡片，再剔除非空卡片
+      if (q) {
+        js = js.map(applyQuery).filter(function (j) {
+          return VIEW === 'topic'
+            ? (j.topic_articles || []).length > 0
+            : (j.articles || []).length > 0;
+        });
+      }
+      if (!js.length) return;
+      shown += js.length;
+      if (q) {
+        matched += (VIEW === 'topic'
+          ? js.reduce(function (s, j) { return s + (j.topic_articles || []).length; }, 0)
+          : js.reduce(function (s, j) { return s + (j.articles || []).length; }, 0));
+      }
+      var label = VIEW === 'topic'
+        ? esc(g.region) + '期刊 · 有主题命中'
+        : esc(g.region) + '期刊';
+      html += '<div class="grp-t"><span>' + label + '</span><span>' + js.length + ' 种</span></div>';
+      html += '<div class="grid">'
+        + js.map(VIEW === 'topic' ? cardTopic : cardLatest).join('') + '</div>';
+    });
+    if (!html) {
+      if (q) {
+        html = '<div class="loading">没有匹配「' + esc(q) + '」的'
+          + (VIEW === 'topic' ? '主题命中文献' : '文章') + '</div>';
+      } else {
+        html = '<div class="loading">' + (VIEW === 'topic'
+          ? '暂无主题归档数据（先运行 journal_backfill.py 生成 journal_topic_archive.json）'
+          : '该分类下没有期刊') + '</div>';
+      }
+    }
+    body.innerHTML = html;
+    renderToday();     // 页顶「今日更新」跟着一起重绘（所有调用方都走这里）
+    MATCHED = matched;
+    return shown;
+  }
+
+  function updateSummary() {
+    var t = DATA.topic || {};
+    var w = DATA.window || {};
+    if (Q.trim()) {
+      sum.innerHTML = '搜索「<b>' + esc(Q.trim()) + '</b>」匹配 <b>' + MATCHED + '</b> 条'
+        + (VIEW === 'topic' ? ' 主题文献' : ' 文章');
+      syncAllBtn();
+      return;
+    }
+    if (VIEW === 'latest') {
+      sum.innerHTML = '共 <b>' + DATA.total_journals + '</b> 种 · 近 <b>'
+        + (w.days || 60) + '</b> 天有获取 <b>' + DATA.updated_journals
+        + '</b> 种 · 链接 <b>' + DATA.total_articles + '</b> 条';
+      vnote.innerHTML = '获取窗口 ' + esc(w.from || '—') + ' ~ ' + esc(w.to || '—')
+        + '（本地时间）'
+        + '<br>' + (w.ledger_available
+          ? '获取台账已建立 · ' + esc(w.ledger_updated_at || '—')
+          : '获取台账缺失，暂按文件写入时间兜底');
+      legend.innerHTML = '';
+    } else {
+      sum.innerHTML = '归档命中 <b>' + t.total + '</b> 篇 · 覆盖 <b>'
+        + t.journals_with_hits + '</b> 种期刊 · 阈值 score ≥ <b>' + (t.min_score == null ? 8 : t.min_score) + '</b>';
+      vnote.innerHTML = t.available
+        ? ('时间窗 ' + esc(t.window_from) + ' ~ ' + esc(t.window_to)
+           + '<br>生成于 ' + esc(t.generated_at || '—'))
+        : '暂无归档，请先运行 journal_backfill.py';
+      var lgd = '<div class="legend" style="margin-bottom:18px">'
+        + '<span>相关度分档</span>'
+        + '<span class="t-badge t-strong">强相关 ≥19</span>'
+        + '<span class="t-badge t-mid">相关 12–18</span>'
+        + '<span class="t-badge t-low">一般 8–11</span>'
+        + '<span>· 括号内数字为相关度得分，日期标 ≈ 者由卷期推算</span>'
+        + '</div>';
+      legend.innerHTML = lgd;
+    }
+    syncAllBtn();
+  }
+
+  function draw() { render(); updateSummary(); }
+
+  fetch(API_LIST, { cache: 'no-store' })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      DATA = d;
+      st.textContent = d.total_journals + ' 种期刊';
+      draw();
+      rfPoll();      // 进页面先对一次补缺状态（别的标签页/设备可能正在跑）
+    })
+    .catch(function () {
+      body.innerHTML = '<div class="loading">读取期刊数据失败</div>';
+      st.textContent = '读取失败';
+    });
+
+  bar.addEventListener('click', function (e) {
+    var t = e.target.closest('.tab');
+    if (!t || !DATA) return;
+    Array.prototype.forEach.call(bar.querySelectorAll('.tab'), function (x) { x.classList.remove('on'); });
+    t.classList.add('on');
+    REGION = t.getAttribute('data-region');
+    display();
+  });
+
+  // 全站搜索：输入即过滤（标题 + 中文小字 + 主题命中词），不区分视图
+  var searchEl = document.getElementById('search');
+  var clrEl = document.getElementById('clr');
+  function onSearch() {
+    if (!DATA) return;
+    Q = searchEl.value || '';
+    clrEl.hidden = !Q;
+    render();
+    updateSummary();
+  }
+  searchEl.addEventListener('input', onSearch);
+  clrEl.addEventListener('click', function () {
+    searchEl.value = ''; Q = '';
+    clrEl.hidden = true;
+    render();
+    updateSummary();
+    try { searchEl.focus(); } catch (e) {}
+  });
+
+  // 「全部展开 / 收起全部」——把当前视图里所有被折叠的卡片一次铺开。
+  // 只在「近 60 天」视图出现：该视图的条目全部随载荷下发，能真铺开；
+  // 「主题归档」的单卡上限由服务端裁剪，铺开也拿不到更多，故不给按钮。
+  function syncAllBtn() {
+    if (!allbtn) return;
+    if (Q.trim()) { allbtn.hidden = true; return; }   // 搜索时不显示「全部展开」
+    var n = 0;
+    if (DATA && VIEW === 'latest') {
+      DATA.groups.forEach(function (g) {
+        if (REGION !== 'all' && g.region !== REGION) return;
+        (g.journals || []).forEach(function (j) {
+          if ((j.article_total || 0) > PREVIEW_N) n++;
+        });
+      });
+    }
+    allbtn.hidden = !n;
+    allbtn.textContent = ALL_OPEN ? '收起全部 ↑' : '全部展开 ↓';
+    allbtn.title = n
+      ? (ALL_OPEN ? '收起 ' + n + ' 张卡片中已铺开的条目' : '把 ' + n + ' 张卡片中折叠的条目全部展开')
+      : '';
+  }
+
+  allbtn.addEventListener('click', function () {
+    if (!DATA) return;
+    ALL_OPEN = !ALL_OPEN;
+    EXPANDED = {};
+    if (ALL_OPEN) {
+      DATA.groups.forEach(function (g) {
+        if (REGION !== 'all' && g.region !== REGION) return;
+        (g.journals || []).forEach(function (j) {
+          if ((j.article_total || 0) > PREVIEW_N) EXPANDED[j.id] = 1;
+        });
+      });
+    }
+    syncAllBtn();
+    render();
+  });
+
+  // 卡片内「展开其余 N 篇 / 收起」——用事件委托，因为卡片整体会被重渲染
+  body.addEventListener('click', function (e) {
+    var a = (e.target && e.target.closest) ? e.target.closest('.more') : null;
+    if (!a) return;
+    var id = a.getAttribute('data-more');
+    if (!id) return;
+    if (EXPANDED[id]) { delete EXPANDED[id]; } else { EXPANDED[id] = 1; }
+    ALL_OPEN = false;   // 逐卡操作后总开关状态不再成立
+    syncAllBtn();
+    render();   // 只重绘卡片列表，不动汇总行、不滚动页面
+  });
+
+  document.querySelector('.vbar').addEventListener('click', function (e) {
+    var t = e.target.closest('.vtab');
+    if (!t || !DATA) return;
+    Array.prototype.forEach.call(document.querySelectorAll('.vtab'), function (x) { x.classList.remove('on'); });
+    t.classList.add('on');
+    VIEW = t.getAttribute('data-view');
+    display();
+  });
+
+  function display() {
+    body.innerHTML = '<div class="loading">加载中…</div>';
+    draw();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+})();
+</script>
+
+<!-- 按钮组交互（2026-10-18 用户确认改版）
+     语义分工：
+       · 「下载 PDF」= NAS → 用户本地（仅已归档，全页唯一主色「绿」按钮）。
+         点开版本菜单（原文 / 中文版 / 双语对照版），走 <a download> 直落本地。
+       · 「期刊官网」= 每篇都有，直达文章在源站的页面，默认灰色。
+       · 「在线抓取」已取消（2026-10-18 用户决定）：网站 → NAS 的补抓交回每日
+         管线自动完成，页面不再提供写操作入口；后端 POST /api/journals/fetch-pdf
+         保留给 API / 脚本调用方（handler 集下载 → NAS 落盘 → 题录条目 →
+         增量索引，链路本身不变，只是前端不再暴露按钮）。 -->
+<script>
+(function () {
+  'use strict';
+  var CFG = window.JOURNAL_CFG || {};
+  var API_PDF = CFG.apiPdf || '/api/journals/pdf/';
+  var URL_MONO = CFG.urlMono || '/geokb/pdf/';
+  var URL_DUAL = CFG.urlDual || '/geokb/pdf/';
+  var VAR_MONO = CFG.varMono || 'mono';
+  var VAR_DUAL = CFG.varDual || 'dual';
+  var TR_STATUS = CFG.trStatus || '/geokb/api/entry/';
+
+  // ── 认证闸门（2026-10-28 用户要求）──────────────────────────────
+  // 只有跨站部署（sjck，CFG.authState 非空）才启用：下载前先问 open.kust.work
+  // 「当前浏览器认证了吗」——
+  //   已认证 → 照常下载（PDF 走门户，受 CAS 保护）
+  //   未认证 → 弹「需要统一身份认证 / 去认证」，用户认证后回到本页再点一次
+  // 门户本页不注入 authState → gateThen 直接放行，行为与改版前完全一致。
+  var AUTH_STATE = CFG.authState || '';
+  var AUTH_LOGIN = CFG.authLogin || '';
+  var _auth = { checked: false, ok: false };
+
+  function probeAuth() {
+    if (!AUTH_STATE) return Promise.resolve(true);
+    return fetch(AUTH_STATE, { credentials: '<redacted-secret>', cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        _auth.checked = true;
+        _auth.ok = !!(d && d.authenticated);
+        return _auth.ok;
+      })
+      .catch(function () {          // 网络/CORS 异常一律按未认证处理（宁严勿松）
+        _auth.checked = true;
+        _auth.ok = false;
+        return false;
+      });
+  }
+
+  function gateThen(next) {
+    if (!AUTH_STATE) { next(); return; }
+    if (_auth.checked && _auth.ok) { next(); return; }
+    probeAuth().then(function (ok) {
+      if (ok) { next(); return; }
+      showAuthModal(next);
+    });
+  }
+
+  function closeAuth() {
+    var m = document.querySelector('.j-auth');
+    if (m) m.remove();
+  }
+
+  function showAuthModal(next) {
+    closeAuth();
+    var m = document.createElement('div');
+    m.className = 'j-auth';
+    m.innerHTML = '<div class="j-auth-card">'
+      + '<h3>需要统一身份认证</h3>'
+      + '<p>下载论文需要先在 open.kust.work 完成统一身份认证。<br>'
+      + '认证完成后请回到本页，再点一次「下载 PDF」。</p>'
+      + '<div class="j-auth-btns">'
+      + '<a class="j-auth-go" href="' + escAttr(AUTH_LOGIN) + '"'
+      + ' target="_blank" rel="noopener">去认证</a>'
+      + '<button type="button" class="j-auth-retry">我已认证</button>'
+      + '<button type="button" class="j-auth-cancel">取消</button>'
+      + '</div></div>';
+    document.body.appendChild(m);
+    m.addEventListener('click', function (e) {
+      if (e.target === m || e.target.closest('.j-auth-cancel')) {
+        closeAuth();
+        return;
+      }
+      var retry = e.target.closest('.j-auth-retry');
+      if (!retry) return;
+      retry.disabled = true;
+      probeAuth().then(function (ok) {
+        if (ok) { closeAuth(); if (next) next(); return; }
+        retry.disabled = false;
+        retry.textContent = '仍未认证，重试';
+      });
+    });
+  }
+
+  // 事件委托：卡片整体会被重渲染（搜索/切视图/展开），逐元素绑定会漏。
+  document.addEventListener('click', function (e) {
+    if (!e.target || !e.target.closest) return;
+    // 点菜单外部 / 按 Esc → 关闭版本浮层
+    var open = document.querySelector('.j-ver:not([hidden])');
+    if (open && !e.target.closest('.j-ver') && !e.target.closest('.j-dl')) closeVer();
+    var item = e.target.closest('.j-ver-i');
+    if (item) {
+      e.preventDefault();
+      // 先收起菜单再问认证：浮层不该留在弹窗背后（saveFile 只读 item 属性，
+      // 节点脱离文档仍可用）。未认证 → 弹「去认证」，认证后重开菜单再点一次。
+      closeVer();
+      gateThen(function () { saveFile(item); });
+      return;
+    }
+    var dl = e.target.closest('.j-dl');
+    if (dl) {
+      if (dl.disabled) return;
+      // 页面上 .j-dl 有两种形态（都只在已归档时出现）：
+      //   j-dl-direct → 中文论文，没有译文版本可选，点击**直接下原文**，不弹菜单
+      //   j-dl-ready  → 英文论文，弹版本菜单（原文 / 中文版 / 双语对照版）
+      // （NAS → 用户本地。补抓通道已随「在线抓取」按钮一并取消。）
+      if (dl.classList.contains('j-dl-direct')) {
+        gateThen(function () { downloadOrig(dl); });
+        return;
+      }
+      if (dl.classList.contains('j-dl-ready')) openVer(dl);   // 开菜单不算下载，不拦
+      return;
+    }
+    var rd = e.target.closest('.j-read');
+    if (rd && rd.classList.contains('is-off')) {
+      e.preventDefault();
+      alert('该篇尚未归档到 NAS：每日管线会自动抓取，抓到后即可阅读；'
+            + '急阅请点「期刊官网」查看原文。');
+    }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { closeVer(); closeAuth(); }
+  });
+  window.addEventListener('resize', closeVer);
+
+  // ── 版本选择浮层 ───────────────────────────────────────────
+  // 原文（始终可下）+ 中文版/双语对照版（译文就绪才可下）。
+  // 译文地址走 5556 代理 /geokb/pdf/<eid>/<variant>，由后端读 SQLite 定位 NAS 文件。
+  var VER_ICON = {
+    orig: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+    mono: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 10h10M4 15h13M4 20h8"/></svg>',
+    dual:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="18"/><rect x="13" y="3" width="8" height="18"/></svg>'
+  };
+
+  function fmtSize(n) {
+    if (!n) return '';
+    return n >= 1048576 ? (n / 1048576).toFixed(1) + 'M'
+                       : Math.round(n / 1024) + 'K';
+  }
+
+  // 从后端查译文状态（has_mono / has_dual），供菜单决定哪些项可下
+  function fetchTrans(eid) {
+    if (!eid) return Promise.resolve({});
+    return fetch(TR_STATUS + encodeURIComponent(eid) + '/translation',
+                 { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) { return (d && d.ok) ? d : {}; })
+      .catch(function () { return {}; });
+  }
+
+  // Windows 文件名非法字符（含全角冒号「：」——论文标题里真实出现过）
+  function safeName(s, max) {
+    return String(s == null ? '' : s)
+      .replace(/[\\/:*?"<>|]/g, '_')
+      .replace(/[：]/g, '_')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, max || 100);
+  }
+
+  function openVer(btn) {
+    closeVer();
+    var eid = btn.getAttribute('data-eid') || '';
+    // 原文地址：优先后端注入的 pdf_rel（回源 NAS），兼容补抓后写上的 pdf-url
+    var origUrl = origUrlOf(btn);
+    var origName = origNameOf(origUrl);
+    var monoUrl = eid ? URL_MONO + encodeURIComponent(eid) + '/' + VAR_MONO : '';
+    var dualUrl = eid ? URL_DUAL + encodeURIComponent(eid) + '/' + VAR_DUAL : '';
+    var base = origName.replace(/\.pdf$/i, '');
+
+    var menu = document.createElement('div');
+    menu.className = 'j-ver';
+    menu.innerHTML = '<div class="j-ver-hd">从 NAS 下载到本地</div>'
+      + verItem('orig', '原文 PDF', origUrl, origName, !!origUrl)
+      + verItem('mono', '中文版', monoUrl, base + '.zh.mono.pdf', false)
+      + verItem('dual', '双语对照版', dualUrl, base + '.zh.dual.pdf', false);
+    document.body.appendChild(menu);
+
+    // 定位到按钮下方右对齐；越界则翻到上方
+    var r = btn.getBoundingClientRect();
+    var mw = menu.offsetWidth, mh = menu.offsetHeight;
+    var left = Math.min(r.right - mw, window.innerWidth - mw - 8);
+    left = Math.max(8, left);
+    var top = r.bottom + 4;
+    if (top + mh > window.innerHeight - 8) top = Math.max(8, r.top - mh - 4);
+    menu.style.left = (left + window.scrollX) + 'px';
+    menu.style.top = (top + window.scrollY) + 'px';
+
+    // 译文就绪才解禁对应项（tag 也从「翻译后可下」切成「PDF」）
+    fetchTrans(eid).then(function (info) {
+      var items = menu.querySelectorAll('.j-ver-i');
+      [[items[1], info.has_mono], [items[2], info.has_dual || info.has_mono]]
+        .forEach(function (pair) {
+          var it = pair[0], ok = !!pair[1];
+          it.disabled = !ok;
+          if (ok) {
+            var t = it.querySelector('.tag');
+            if (t) t.textContent = 'PDF';
+          }
+        });
+    });
+  }
+
+  // 本 IIFE 独立作用域，esc 定义在页面主 IIFE 里，用不了，这里就地转义
+  function escAttr(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  function verItem(key, label, url, filename, ready) {
+    return '<button type="button" class="j-ver-i" data-key="' + key + '"'
+      + ' data-url="' + escAttr(url) + '" data-name="' + escAttr(filename) + '"'
+      + (ready ? '' : ' disabled') + '>'
+      + VER_ICON[key] + '<span>' + label + '</span>'
+      + '<span class="tag">' + (ready ? 'PDF' : '翻译后可下') + '</span>'
+      + '</button>';
+  }
+
+  function closeVer() {
+    var m = document.querySelector('.j-ver');
+    if (m) m.remove();
+  }
+
+  // 走同源地址下载（浏览器按 Content-Disposition 落盘），不用 fetch 攒 blob
+  function saveUrl(url, name) {
+    if (!url) return;
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = name || 'paper.pdf';
+    a.rel = 'noopener';
+    // 跨域地址（sjck.kust.work → open.kust.work）时 download 属性会被浏览器
+    // 忽略：不设 target 会直接把当前页面导航到 PDF、丢掉期刊列表。开新标签
+    // 保留原页；同源（5555）行为完全不变。
+    try {
+      if (new URL(url, location.href).origin !== location.origin) a.target = '_blank';
+    } catch (e) { /* 老浏览器：按原逻辑处理 */ }
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  function saveFile(item) {
+    saveUrl(item.getAttribute('data-url'), item.getAttribute('data-name'));
+  }
+
+  // 从 NAS 相对路径拼原文地址（优先后端注入的 pdf_rel，兼容补抓后写上的 pdf-url）
+  function origUrlOf(btn) {
+    var rel = btn.getAttribute('data-pdf-rel') || '';
+    return rel ? API_PDF + rel.split('/').map(encodeURIComponent).join('/')
+               : (btn.getAttribute('data-pdf-url') || '');
+  }
+
+  // 从 URL 末段还原文件名（标题可能被二次编码，需解两层）
+  function origNameOf(url) {
+    return safeName(decodeURIComponent(
+      (url.split('/').pop() || 'paper.pdf').replace(/%[0-9A-Fa-f]{2}/g,
+        function (h) { try { return decodeURIComponent(h); } catch (e) { return h; } })));
+  }
+
+  // 中文论文：没有译文版本可选 → 点「下载 PDF」直接落原文，不弹菜单（2026-10-22）
+  function downloadOrig(btn) {
+    var url = origUrlOf(btn);
+    if (!url) return;
+    saveUrl(url, origNameOf(url));
+  }
+})();
+</script>
+
+</body>
+</html>

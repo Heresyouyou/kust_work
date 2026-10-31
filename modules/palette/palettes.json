@@ -1,319 +1,3925 @@
 {
   "palettes": [
     {
-      "id": "npg",
-      "name": "Nature 风格",
-      "source": "ggsci · npg",
+      "id": "cb-set3",
+      "name": "ColorBrewer Set3",
+      "source": "ColorBrewer 2.0 · Set3（Cynthia Brewer）",
       "type": "categorical",
-      "group": "期刊分类配色",
-      "note": "源自 Nature Publishing Group 系列期刊图表用色，10 色分类循环",
+      "group": "地质图填色",
+      "note": "12 色柔和粉彩板，类别多又不刺眼，适合地层单元、岩性分区等多类别填色",
       "colors": [
         {
-          "hex": "#E64B35"
+          "hex": "#8DD3C7"
         },
         {
-          "hex": "#4DBBD5"
+          "hex": "#FFFFB3"
         },
         {
-          "hex": "#00A087"
+          "hex": "#BEBADA"
         },
         {
-          "hex": "#3C5488"
+          "hex": "#FB8072"
         },
         {
-          "hex": "#F39B7F"
+          "hex": "#80B1D3"
         },
         {
-          "hex": "#8491B4"
+          "hex": "#FDB462"
         },
         {
-          "hex": "#91D1C2"
+          "hex": "#B3DE69"
         },
         {
-          "hex": "#DC0000"
+          "hex": "#FCCDE5"
         },
         {
-          "hex": "#7E6148"
+          "hex": "#D9D9D9"
         },
         {
-          "hex": "#B09C85"
+          "hex": "#BC80BD"
+        },
+        {
+          "hex": "#CCEBC5"
+        },
+        {
+          "hex": "#FFED6F"
         }
       ]
     },
     {
-      "id": "aaas",
-      "name": "Science 风格",
-      "source": "ggsci · aaas",
+      "id": "tol-muted",
+      "name": "Paul Tol 柔和（Muted）",
+      "source": "Paul Tol 配色方案 · muted（SRON）",
       "type": "categorical",
-      "group": "期刊分类配色",
-      "note": "源自 AAAS / Science 系列期刊图表用色，10 色分类循环",
+      "group": "地质图填色",
+      "note": "低饱和 10 色，印刷友好、大面积填色不刺眼，是期刊与地质图常用的柔和分类板",
       "colors": [
         {
-          "hex": "#3B4992"
+          "hex": "#CC6677"
         },
         {
-          "hex": "#EE0000"
+          "hex": "#332288"
         },
         {
-          "hex": "#008B45"
+          "hex": "#DDCC77"
         },
         {
-          "hex": "#631879"
+          "hex": "#117733"
         },
         {
-          "hex": "#008280"
+          "hex": "#88CCEE"
         },
         {
-          "hex": "#BB0021"
+          "hex": "#882255"
         },
         {
-          "hex": "#5F559B"
+          "hex": "#44AA99"
         },
         {
-          "hex": "#A20056"
+          "hex": "#999933"
         },
         {
-          "hex": "#808180"
+          "hex": "#AA4499"
         },
         {
-          "hex": "#1B1919"
+          "hex": "#DDDDDD"
         }
       ]
     },
     {
-      "id": "nejm",
-      "name": "NEJM 风格",
-      "source": "ggsci · nejm",
+      "id": "cb-dark2",
+      "name": "ColorBrewer Dark2",
+      "source": "ColorBrewer 2.0 · Dark2（Cynthia Brewer）",
       "type": "categorical",
-      "group": "期刊分类配色",
-      "note": "新英格兰医学杂志风格，8 色，医疗/临床图表常用",
+      "group": "地质图填色",
+      "note": "8 色深色低饱和分类板，印刷稳、浅色底图上不抢眼，适合正式出版图件",
       "colors": [
         {
-          "hex": "#BC3C29"
+          "hex": "#1B9E77"
         },
         {
-          "hex": "#0072B5"
+          "hex": "#D95F02"
         },
         {
-          "hex": "#E18727"
+          "hex": "#7570B3"
         },
         {
-          "hex": "#20854E"
+          "hex": "#E7298A"
         },
         {
-          "hex": "#7876B1"
+          "hex": "#66A61E"
         },
         {
-          "hex": "#6F99AD"
+          "hex": "#E6AB02"
         },
         {
-          "hex": "#FFDC91"
+          "hex": "#A6761D"
         },
         {
-          "hex": "#EE4C97"
+          "hex": "#666666"
         }
       ]
     },
     {
-      "id": "lancet",
-      "name": "Lancet 风格",
-      "source": "ggsci · lancet",
+      "id": "cb-set1",
+      "name": "ColorBrewer Set1",
+      "source": "ColorBrewer 2.0 · Set1（Cynthia Brewer）",
       "type": "categorical",
-      "group": "期刊分类配色",
-      "note": "柳叶刀杂志风格，9 色，深蓝+正红对比鲜明",
+      "group": "地质图填色",
+      "note": "经典强对比 9 色分类板，红蓝绿紫橙区分明显，图例辨识度高",
       "colors": [
         {
-          "hex": "#00468B"
+          "hex": "#E41A1C"
         },
         {
-          "hex": "#ED0000"
+          "hex": "#377EB8"
         },
         {
-          "hex": "#42B540"
+          "hex": "#4DAF4A"
         },
         {
-          "hex": "#0099B4"
+          "hex": "#984EA3"
         },
         {
-          "hex": "#925E9F"
+          "hex": "#FF7F00"
         },
         {
-          "hex": "#FDAF91"
+          "hex": "#FFFF33"
         },
         {
-          "hex": "#AD002A"
+          "hex": "#A65628"
         },
         {
-          "hex": "#ADB6B6"
+          "hex": "#F781BF"
         },
         {
-          "hex": "#1B1919"
+          "hex": "#999999"
         }
       ]
     },
     {
-      "id": "jama",
-      "name": "JAMA 风格",
-      "source": "ggsci · jama",
+      "id": "tableau10",
+      "name": "Tableau 10",
+      "source": "Tableau 官方配色 · Tableau10（经 D3 d3-scale-chromatic 收录）",
       "type": "categorical",
-      "group": "期刊分类配色",
-      "note": "美国医学会杂志风格，7 色低饱和，稳重耐看",
+      "group": "地质图填色",
+      "note": "10 色通用均衡分类板，色相均匀、明度接近，跨软件（Tableau/QGIS/Python）通用",
       "colors": [
         {
-          "hex": "#374E55"
+          "hex": "#4E79A7"
         },
         {
-          "hex": "#DF8F44"
+          "hex": "#F28E2C"
         },
         {
-          "hex": "#00A1D5"
+          "hex": "#E15759"
         },
         {
-          "hex": "#B24745"
+          "hex": "#76B7B2"
         },
         {
-          "hex": "#79AF97"
+          "hex": "#59A14F"
         },
         {
-          "hex": "#6A6599"
+          "hex": "#EDC949"
         },
         {
-          "hex": "#80796B"
+          "hex": "#AF7AA1"
+        },
+        {
+          "hex": "#FF9DA7"
+        },
+        {
+          "hex": "#9C755F"
+        },
+        {
+          "hex": "#BAB0AB"
         }
       ]
     },
     {
-      "id": "jco",
-      "name": "JCO 风格",
-      "source": "ggsci · jco",
+      "id": "tol-bright",
+      "name": "Paul Tol 明亮（Bright）",
+      "source": "Paul Tol 配色方案 · bright（SRON）",
       "type": "categorical",
-      "group": "期刊分类配色",
-      "note": "临床肿瘤学杂志风格，10 色，明暗层次分明",
+      "group": "地质图填色",
+      "note": "明快但不刺眼的 7 色分类板，色盲友好；适合图斑不多的专题地质图与图例",
       "colors": [
         {
-          "hex": "#0073C2"
+          "hex": "#4477AA"
         },
         {
-          "hex": "#EFC000"
+          "hex": "#EE6677"
         },
         {
-          "hex": "#868686"
+          "hex": "#228833"
         },
         {
-          "hex": "#CD534C"
+          "hex": "#CCBB44"
         },
         {
-          "hex": "#7AA6DC"
+          "hex": "#66CCEE"
         },
         {
-          "hex": "#003C67"
+          "hex": "#AA3377"
         },
         {
-          "hex": "#8F7700"
-        },
-        {
-          "hex": "#3B3B3B"
-        },
-        {
-          "hex": "#A73030"
-        },
-        {
-          "hex": "#4A6990"
+          "hex": "#BBBBBB"
         }
       ]
     },
     {
-      "id": "ics-periods",
-      "name": "国际年代地层表（ICS/CGMW）",
-      "source": "ICS / CGMW 官方色码",
-      "type": "labeled",
-      "group": "地学专属配色",
-      "note": "国际年代地层表官方配色，地质图件与国际接轨的标准色，按由新到老排列",
+      "id": "carto-safe",
+      "name": "CARTO Safe",
+      "source": "CARTO Colors · safe（CARTO）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "11 色色盲安全地图板，各类色觉障碍下均可分辨，正式出版推荐",
       "colors": [
         {
-          "hex": "#F9F97F",
-          "label": "第四纪 Q"
+          "hex": "#88CCEE"
         },
         {
-          "hex": "#FFE619",
-          "label": "新近纪 Ng"
+          "hex": "#CC6677"
         },
         {
-          "hex": "#FD9A52",
-          "label": "古近纪 Pg"
+          "hex": "#DDCC77"
         },
         {
-          "hex": "#7FC64E",
-          "label": "白垩纪 K"
+          "hex": "#117733"
         },
         {
-          "hex": "#34B2C9",
-          "label": "侏罗纪 J"
+          "hex": "#332288"
         },
         {
-          "hex": "#812B92",
-          "label": "三叠纪 Tr"
+          "hex": "#AA4499"
         },
         {
-          "hex": "#F04028",
-          "label": "二叠纪 P"
+          "hex": "#44AA99"
         },
         {
-          "hex": "#67A599",
-          "label": "石炭纪 C"
+          "hex": "#999933"
         },
         {
-          "hex": "#CB8C37",
-          "label": "泥盆纪 D"
+          "hex": "#882255"
         },
         {
-          "hex": "#B3E1B6",
-          "label": "志留纪 S"
+          "hex": "#661100"
         },
         {
-          "hex": "#009270",
-          "label": "奥陶纪 O"
-        },
-        {
-          "hex": "#7FA056",
-          "label": "寒武纪 Cm"
+          "hex": "#6699CC"
         }
       ]
     },
     {
-      "id": "cmap-terrain",
-      "name": "地形高程色阶",
-      "source": "matplotlib · terrain",
-      "type": "sequential",
-      "group": "地学专属配色",
-      "note": "DEM / 高程图常用，低海拔绿→高海拔褐白，适合地形晕渲与等高线填色",
+      "id": "carto-bold",
+      "name": "CARTO Bold",
+      "source": "CARTO Colors · bold（CARTO）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "专为地图设计的 11 色强对比板，色相分布均匀，多图斑仍能区分",
       "colors": [
         {
-          "hex": "#333399"
+          "hex": "#7F3C8D"
         },
         {
-          "hex": "#0888EE"
+          "hex": "#11A579"
         },
         {
-          "hex": "#01CC66"
+          "hex": "#3969AC"
         },
         {
-          "hex": "#81E680"
+          "hex": "#F2B701"
         },
         {
-          "hex": "#FEFE98"
+          "hex": "#E73F74"
         },
         {
-          "hex": "#BEAC76"
+          "hex": "#80BA5A"
         },
         {
-          "hex": "#815E56"
+          "hex": "#E68310"
         },
         {
-          "hex": "#C1B0AC"
+          "hex": "#008695"
+        },
+        {
+          "hex": "#CF1C90"
+        },
+        {
+          "hex": "#F97B72"
+        },
+        {
+          "hex": "#4B4B8F"
+        }
+      ]
+    },
+    {
+      "id": "carto-antique",
+      "name": "CARTO Antique",
+      "source": "CARTO Colors · antique（CARTO）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "11 色复古低饱和地图配色，温润不刺眼，适合做地质图底图与专题分区",
+      "colors": [
+        {
+          "hex": "#855C75"
+        },
+        {
+          "hex": "#D9AF6B"
+        },
+        {
+          "hex": "#AF6458"
+        },
+        {
+          "hex": "#736F4C"
+        },
+        {
+          "hex": "#526A83"
+        },
+        {
+          "hex": "#625377"
+        },
+        {
+          "hex": "#68855C"
+        },
+        {
+          "hex": "#9C9C5E"
+        },
+        {
+          "hex": "#A06177"
+        },
+        {
+          "hex": "#8C785D"
+        },
+        {
+          "hex": "#467378"
+        }
+      ]
+    },
+    {
+      "id": "tol-land-cover",
+      "name": "Paul Tol 地表覆盖（Land Cover）",
+      "source": "Paul Tol 配色方案 · land_cover（SRON）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "蓝绿黄棕成套的 14 色地表覆盖板，适合土地利用、地表覆盖与地质环境类图件",
+      "colors": [
+        {
+          "hex": "#5566AA"
+        },
+        {
+          "hex": "#117733"
+        },
+        {
+          "hex": "#44AA66"
+        },
+        {
+          "hex": "#55AA22"
+        },
+        {
+          "hex": "#668822"
+        },
+        {
+          "hex": "#99BB55"
+        },
+        {
+          "hex": "#558877"
+        },
+        {
+          "hex": "#88BBAA"
+        },
+        {
+          "hex": "#AADDCC"
+        },
+        {
+          "hex": "#44AA88"
+        },
+        {
+          "hex": "#DDCC66"
+        },
+        {
+          "hex": "#FFDD44"
+        },
+        {
+          "hex": "#FFEE88"
+        },
+        {
+          "hex": "#BB0011"
+        }
+      ]
+    },
+    {
+      "id": "tol-medium-contrast",
+      "name": "Paul Tol 中对比（Medium Contrast）",
+      "source": "Paul Tol 配色方案 · medium_contrast（SRON）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "8 色中等对比板，介于明亮与柔和之间，兼顾辨识度与不刺眼",
+      "colors": [
+        {
+          "hex": "#6699CC"
+        },
+        {
+          "hex": "#004488"
+        },
+        {
+          "hex": "#EECC66"
+        },
+        {
+          "hex": "#997700"
+        },
+        {
+          "hex": "#EE99AA"
+        },
+        {
+          "hex": "#994455"
         },
         {
           "hex": "#FFFFFF"
+        },
+        {
+          "hex": "#000000"
+        }
+      ]
+    },
+    {
+      "id": "tol-light",
+      "name": "Paul Tol 浅色（Light）",
+      "source": "Paul Tol 配色方案 · light（SRON）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "9 色高明度低饱和板，色盲友好；适合需压暗底图的专题地质图",
+      "colors": [
+        {
+          "hex": "#77AADD"
+        },
+        {
+          "hex": "#EE8866"
+        },
+        {
+          "hex": "#EEDD88"
+        },
+        {
+          "hex": "#FFAABB"
+        },
+        {
+          "hex": "#99DDFF"
+        },
+        {
+          "hex": "#44BB99"
+        },
+        {
+          "hex": "#BBCC33"
+        },
+        {
+          "hex": "#AAAA00"
+        },
+        {
+          "hex": "#DDDDDD"
+        }
+      ]
+    },
+    {
+      "id": "tol-dark",
+      "name": "Paul Tol 深色（Dark）",
+      "source": "Paul Tol 配色方案 · dark（SRON）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "6 色低明度沉静板，印刷与深色底图上稳，正式图件显克制",
+      "colors": [
+        {
+          "hex": "#222255"
+        },
+        {
+          "hex": "#663333"
+        },
+        {
+          "hex": "#225522"
+        },
+        {
+          "hex": "#666633"
+        },
+        {
+          "hex": "#225555"
+        },
+        {
+          "hex": "#555555"
+        }
+      ]
+    },
+    {
+      "id": "tol-vibrant",
+      "name": "Paul Tol 鲜明（Vibrant）",
+      "source": "Paul Tol 配色方案 · vibrant（SRON）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "饱和度更高的 7 色板，色相跨度大、辨识度强，适合小图幅与少量分类",
+      "colors": [
+        {
+          "hex": "#EE7733"
+        },
+        {
+          "hex": "#0077BB"
+        },
+        {
+          "hex": "#33BBEE"
+        },
+        {
+          "hex": "#EE3377"
+        },
+        {
+          "hex": "#CC3311"
+        },
+        {
+          "hex": "#009988"
+        },
+        {
+          "hex": "#BBBBBB"
+        }
+      ]
+    },
+    {
+      "id": "carto-pastel",
+      "name": "CARTO Pastel",
+      "source": "CARTO Colors · pastel（CARTO）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "11 色地图专用淡彩板，色相均匀铺开，多图斑分区仍可区分",
+      "colors": [
+        {
+          "hex": "#66C5CC"
+        },
+        {
+          "hex": "#F6CF71"
+        },
+        {
+          "hex": "#F89C74"
+        },
+        {
+          "hex": "#DCB0F2"
+        },
+        {
+          "hex": "#87C55F"
+        },
+        {
+          "hex": "#9EB9F3"
+        },
+        {
+          "hex": "#FE88B1"
+        },
+        {
+          "hex": "#C9DB74"
+        },
+        {
+          "hex": "#8BE0A4"
+        },
+        {
+          "hex": "#B497E7"
+        },
+        {
+          "hex": "#D3B484"
+        }
+      ]
+    },
+    {
+      "id": "carto-vivid",
+      "name": "CARTO Vivid",
+      "source": "CARTO Colors · vivid（CARTO）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "11 色高饱和地图板，投影与屏幕上对比强烈，适合汇报用图",
+      "colors": [
+        {
+          "hex": "#E58606"
+        },
+        {
+          "hex": "#5D69B1"
+        },
+        {
+          "hex": "#52BCA3"
+        },
+        {
+          "hex": "#99C945"
+        },
+        {
+          "hex": "#CC61B0"
+        },
+        {
+          "hex": "#24796C"
+        },
+        {
+          "hex": "#DAA51B"
+        },
+        {
+          "hex": "#2F8AC4"
+        },
+        {
+          "hex": "#764E9F"
+        },
+        {
+          "hex": "#ED645A"
+        },
+        {
+          "hex": "#CC3A8E"
+        }
+      ]
+    },
+    {
+      "id": "carto-prism",
+      "name": "CARTO Prism",
+      "source": "CARTO Colors · prism（CARTO）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "11 色高辨识彩虹系地图板，相邻色相拉开，小图幅、多单元时醒目",
+      "colors": [
+        {
+          "hex": "#5F4690"
+        },
+        {
+          "hex": "#1D6996"
+        },
+        {
+          "hex": "#38A6A5"
+        },
+        {
+          "hex": "#0F8554"
+        },
+        {
+          "hex": "#73AF48"
+        },
+        {
+          "hex": "#EDAD08"
+        },
+        {
+          "hex": "#E17C05"
+        },
+        {
+          "hex": "#CC503E"
+        },
+        {
+          "hex": "#94346E"
+        },
+        {
+          "hex": "#6F4070"
+        },
+        {
+          "hex": "#994E95"
+        }
+      ]
+    },
+    {
+      "id": "cb-accent",
+      "name": "ColorBrewer Accent",
+      "source": "ColorBrewer 2.0 · Accent（Cynthia Brewer）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "8 色高亮低饱和板，粉黄绿蓝紫搭配，专题图图斑不多时清爽好辨",
+      "colors": [
+        {
+          "hex": "#7FC97F"
+        },
+        {
+          "hex": "#BEAED4"
+        },
+        {
+          "hex": "#FDC086"
+        },
+        {
+          "hex": "#FFFF99"
+        },
+        {
+          "hex": "#386CB0"
+        },
+        {
+          "hex": "#F0027F"
+        },
+        {
+          "hex": "#BF5B17"
+        },
+        {
+          "hex": "#666666"
+        }
+      ]
+    },
+    {
+      "id": "cb-pastel1",
+      "name": "ColorBrewer Pastel1",
+      "source": "ColorBrewer 2.0 · Pastel1（Cynthia Brewer）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "9 色粉彩板，明度统一、色相铺开，大面积岩性填色不刺眼",
+      "colors": [
+        {
+          "hex": "#FBB4AE"
+        },
+        {
+          "hex": "#B3CDE3"
+        },
+        {
+          "hex": "#CCEBC5"
+        },
+        {
+          "hex": "#DECBE4"
+        },
+        {
+          "hex": "#FED9A6"
+        },
+        {
+          "hex": "#FFFFCC"
+        },
+        {
+          "hex": "#E5D8BD"
+        },
+        {
+          "hex": "#FDDAEC"
+        },
+        {
+          "hex": "#F2F2F2"
+        }
+      ]
+    },
+    {
+      "id": "cb-pastel2",
+      "name": "ColorBrewer Pastel2",
+      "source": "ColorBrewer 2.0 · Pastel2（Cynthia Brewer）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "8 色更淡的粉彩板，压在等高线或影像底图上仍能看清界线",
+      "colors": [
+        {
+          "hex": "#B3E2CD"
+        },
+        {
+          "hex": "#FDCDAC"
+        },
+        {
+          "hex": "#CBD5E8"
+        },
+        {
+          "hex": "#F4CAE4"
+        },
+        {
+          "hex": "#E6F5C9"
+        },
+        {
+          "hex": "#FFF2AE"
+        },
+        {
+          "hex": "#F1E2CC"
+        },
+        {
+          "hex": "#CCCCCC"
+        }
+      ]
+    },
+    {
+      "id": "tol-high-contrast",
+      "name": "Paul Tol 高对比（High Contrast）",
+      "source": "Paul Tol 配色方案 · high_contrast（SRON）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "5 色高对比板，黑白黄蓝红并用，投影与低质量印刷下仍能分辨",
+      "colors": [
+        {
+          "hex": "#000000"
+        },
+        {
+          "hex": "#004488"
+        },
+        {
+          "hex": "#BB5566"
+        },
+        {
+          "hex": "#DDAA33"
+        },
+        {
+          "hex": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "id": "tol-pale",
+      "name": "Paul Tol 淡彩（Pale）",
+      "source": "Paul Tol 配色方案 · pale（SRON）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "6 色极淡彩板，适合压在影像、DEM 或等高线底图上做半透明填色",
+      "colors": [
+        {
+          "hex": "#BBCCEE"
+        },
+        {
+          "hex": "#FFCCCC"
+        },
+        {
+          "hex": "#CCDDAA"
+        },
+        {
+          "hex": "#EEEEBB"
+        },
+        {
+          "hex": "#CCEEFF"
+        },
+        {
+          "hex": "#DDDDDD"
+        }
+      ]
+    },
+    {
+      "id": "material-50",
+      "name": "Material 色阶 50",
+      "source": "ggsci · material（Google Material Design 官方色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Material 19 个色相在 50 级的颜色拼成分类板，图斑多时仍能区分",
+      "colors": [
+        {
+          "hex": "#FFEBEE"
+        },
+        {
+          "hex": "#FCE4EC"
+        },
+        {
+          "hex": "#F3E5F5"
+        },
+        {
+          "hex": "#EDE7F6"
+        },
+        {
+          "hex": "#E8EAF6"
+        },
+        {
+          "hex": "#E3F2FD"
+        },
+        {
+          "hex": "#E1F5FE"
+        },
+        {
+          "hex": "#E0F7FA"
+        },
+        {
+          "hex": "#E0F2F1"
+        },
+        {
+          "hex": "#E8F5E9"
+        },
+        {
+          "hex": "#F1F8E9"
+        },
+        {
+          "hex": "#F9FBE7"
+        },
+        {
+          "hex": "#FFFDE7"
+        },
+        {
+          "hex": "#FFF8E1"
+        },
+        {
+          "hex": "#FFF3E0"
+        },
+        {
+          "hex": "#FBE9E7"
+        },
+        {
+          "hex": "#EFEBE9"
+        },
+        {
+          "hex": "#FAFAFA"
+        },
+        {
+          "hex": "#ECEFF1"
+        }
+      ]
+    },
+    {
+      "id": "material-100",
+      "name": "Material 色阶 100",
+      "source": "ggsci · material（Google Material Design 官方色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Material 19 个色相在 100 级的颜色拼成分类板，图斑多时仍能区分",
+      "colors": [
+        {
+          "hex": "#FFCDD2"
+        },
+        {
+          "hex": "#F8BBD0"
+        },
+        {
+          "hex": "#E1BEE7"
+        },
+        {
+          "hex": "#D1C4E9"
+        },
+        {
+          "hex": "#C5CAE9"
+        },
+        {
+          "hex": "#BBDEFB"
+        },
+        {
+          "hex": "#B3E5FC"
+        },
+        {
+          "hex": "#B2EBF2"
+        },
+        {
+          "hex": "#B2DFDB"
+        },
+        {
+          "hex": "#C8E6C9"
+        },
+        {
+          "hex": "#DCEDC8"
+        },
+        {
+          "hex": "#F0F4C3"
+        },
+        {
+          "hex": "#FFF9C4"
+        },
+        {
+          "hex": "#FFECB3"
+        },
+        {
+          "hex": "#FFE0B2"
+        },
+        {
+          "hex": "#FFCCBC"
+        },
+        {
+          "hex": "#D7CCC8"
+        },
+        {
+          "hex": "#F5F5F5"
+        },
+        {
+          "hex": "#CFD8DC"
+        }
+      ]
+    },
+    {
+      "id": "material-200",
+      "name": "Material 色阶 200",
+      "source": "ggsci · material（Google Material Design 官方色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Material 19 个色相在 200 级的颜色拼成分类板，图斑多时仍能区分",
+      "colors": [
+        {
+          "hex": "#EF9A9A"
+        },
+        {
+          "hex": "#F48FB1"
+        },
+        {
+          "hex": "#CE93D8"
+        },
+        {
+          "hex": "#B39DDB"
+        },
+        {
+          "hex": "#9FA8DA"
+        },
+        {
+          "hex": "#90CAF9"
+        },
+        {
+          "hex": "#81D4FA"
+        },
+        {
+          "hex": "#80DEEA"
+        },
+        {
+          "hex": "#80CBC4"
+        },
+        {
+          "hex": "#A5D6A7"
+        },
+        {
+          "hex": "#C5E1A5"
+        },
+        {
+          "hex": "#E6EE9C"
+        },
+        {
+          "hex": "#FFF59D"
+        },
+        {
+          "hex": "#FFE082"
+        },
+        {
+          "hex": "#FFCC80"
+        },
+        {
+          "hex": "#FFAB91"
+        },
+        {
+          "hex": "#BCAAA4"
+        },
+        {
+          "hex": "#EEEEEE"
+        },
+        {
+          "hex": "#B0BEC5"
+        }
+      ]
+    },
+    {
+      "id": "material-300",
+      "name": "Material 色阶 300",
+      "source": "ggsci · material（Google Material Design 官方色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Material 19 个色相在 300 级的颜色拼成分类板，图斑多时仍能区分",
+      "colors": [
+        {
+          "hex": "#E57373"
+        },
+        {
+          "hex": "#F06292"
+        },
+        {
+          "hex": "#BA68C8"
+        },
+        {
+          "hex": "#9575CD"
+        },
+        {
+          "hex": "#7986CB"
+        },
+        {
+          "hex": "#64B5F6"
+        },
+        {
+          "hex": "#4FC3F7"
+        },
+        {
+          "hex": "#4DD0E1"
+        },
+        {
+          "hex": "#4DB6AC"
+        },
+        {
+          "hex": "#81C784"
+        },
+        {
+          "hex": "#AED581"
+        },
+        {
+          "hex": "#DCE775"
+        },
+        {
+          "hex": "#FFF176"
+        },
+        {
+          "hex": "#FFD54F"
+        },
+        {
+          "hex": "#FFB74D"
+        },
+        {
+          "hex": "#FF8A65"
+        },
+        {
+          "hex": "#A1887F"
+        },
+        {
+          "hex": "#E0E0E0"
+        },
+        {
+          "hex": "#90A4AE"
+        }
+      ]
+    },
+    {
+      "id": "material-400",
+      "name": "Material 色阶 400",
+      "source": "ggsci · material（Google Material Design 官方色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Material 19 个色相在 400 级的颜色拼成分类板，图斑多时仍能区分",
+      "colors": [
+        {
+          "hex": "#EF5350"
+        },
+        {
+          "hex": "#EC407A"
+        },
+        {
+          "hex": "#AB47BC"
+        },
+        {
+          "hex": "#7E57C2"
+        },
+        {
+          "hex": "#5C6BC0"
+        },
+        {
+          "hex": "#42A5F5"
+        },
+        {
+          "hex": "#29B6F6"
+        },
+        {
+          "hex": "#26C6DA"
+        },
+        {
+          "hex": "#26A69A"
+        },
+        {
+          "hex": "#66BB6A"
+        },
+        {
+          "hex": "#9CCC65"
+        },
+        {
+          "hex": "#D4E157"
+        },
+        {
+          "hex": "#FFEE58"
+        },
+        {
+          "hex": "#FFCA28"
+        },
+        {
+          "hex": "#FFA726"
+        },
+        {
+          "hex": "#FF7043"
+        },
+        {
+          "hex": "#8D6E63"
+        },
+        {
+          "hex": "#BDBDBD"
+        },
+        {
+          "hex": "#78909C"
+        }
+      ]
+    },
+    {
+      "id": "material-500",
+      "name": "Material 色阶 500",
+      "source": "ggsci · material（Google Material Design 官方色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Material 19 个色相在 500 级的颜色拼成分类板，图斑多时仍能区分",
+      "colors": [
+        {
+          "hex": "#F44336"
+        },
+        {
+          "hex": "#E91E63"
+        },
+        {
+          "hex": "#9C27B0"
+        },
+        {
+          "hex": "#673AB7"
+        },
+        {
+          "hex": "#3F51B5"
+        },
+        {
+          "hex": "#2196F3"
+        },
+        {
+          "hex": "#03A9F4"
+        },
+        {
+          "hex": "#00BCD4"
+        },
+        {
+          "hex": "#009688"
+        },
+        {
+          "hex": "#4CAF50"
+        },
+        {
+          "hex": "#8BC34A"
+        },
+        {
+          "hex": "#CDDC39"
+        },
+        {
+          "hex": "#FFEB3B"
+        },
+        {
+          "hex": "#FFC107"
+        },
+        {
+          "hex": "#FF9800"
+        },
+        {
+          "hex": "#FF5722"
+        },
+        {
+          "hex": "#795548"
+        },
+        {
+          "hex": "#9E9E9E"
+        },
+        {
+          "hex": "#607D8B"
+        }
+      ]
+    },
+    {
+      "id": "material-600",
+      "name": "Material 色阶 600",
+      "source": "ggsci · material（Google Material Design 官方色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Material 19 个色相在 600 级的颜色拼成分类板，图斑多时仍能区分",
+      "colors": [
+        {
+          "hex": "#E53935"
+        },
+        {
+          "hex": "#D81B60"
+        },
+        {
+          "hex": "#8E24AA"
+        },
+        {
+          "hex": "#5E35B1"
+        },
+        {
+          "hex": "#3949AB"
+        },
+        {
+          "hex": "#1E88E5"
+        },
+        {
+          "hex": "#039BE5"
+        },
+        {
+          "hex": "#00ACC1"
+        },
+        {
+          "hex": "#00897B"
+        },
+        {
+          "hex": "#43A047"
+        },
+        {
+          "hex": "#7CB342"
+        },
+        {
+          "hex": "#C0CA33"
+        },
+        {
+          "hex": "#FDD835"
+        },
+        {
+          "hex": "#FFB300"
+        },
+        {
+          "hex": "#FB8C00"
+        },
+        {
+          "hex": "#F4511E"
+        },
+        {
+          "hex": "#6D4C41"
+        },
+        {
+          "hex": "#757575"
+        },
+        {
+          "hex": "#546E7A"
+        }
+      ]
+    },
+    {
+      "id": "material-700",
+      "name": "Material 色阶 700",
+      "source": "ggsci · material（Google Material Design 官方色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Material 19 个色相在 700 级的颜色拼成分类板，图斑多时仍能区分",
+      "colors": [
+        {
+          "hex": "#D32F2F"
+        },
+        {
+          "hex": "#C2185B"
+        },
+        {
+          "hex": "#7B1FA2"
+        },
+        {
+          "hex": "#512DA8"
+        },
+        {
+          "hex": "#303F9F"
+        },
+        {
+          "hex": "#1976D2"
+        },
+        {
+          "hex": "#0288D1"
+        },
+        {
+          "hex": "#0097A7"
+        },
+        {
+          "hex": "#00796B"
+        },
+        {
+          "hex": "#388E3C"
+        },
+        {
+          "hex": "#689F38"
+        },
+        {
+          "hex": "#AFB42B"
+        },
+        {
+          "hex": "#FBC02D"
+        },
+        {
+          "hex": "#FFA000"
+        },
+        {
+          "hex": "#F57C00"
+        },
+        {
+          "hex": "#E64A19"
+        },
+        {
+          "hex": "#5D4037"
+        },
+        {
+          "hex": "#616161"
+        },
+        {
+          "hex": "#455A64"
+        }
+      ]
+    },
+    {
+      "id": "material-800",
+      "name": "Material 色阶 800",
+      "source": "ggsci · material（Google Material Design 官方色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Material 19 个色相在 800 级的颜色拼成分类板，图斑多时仍能区分",
+      "colors": [
+        {
+          "hex": "#C62828"
+        },
+        {
+          "hex": "#AD1457"
+        },
+        {
+          "hex": "#6A1B9A"
+        },
+        {
+          "hex": "#4527A0"
+        },
+        {
+          "hex": "#283593"
+        },
+        {
+          "hex": "#1565C0"
+        },
+        {
+          "hex": "#0277BD"
+        },
+        {
+          "hex": "#00838F"
+        },
+        {
+          "hex": "#00695C"
+        },
+        {
+          "hex": "#2E7D32"
+        },
+        {
+          "hex": "#558B2F"
+        },
+        {
+          "hex": "#9E9D24"
+        },
+        {
+          "hex": "#F9A825"
+        },
+        {
+          "hex": "#FF8F00"
+        },
+        {
+          "hex": "#EF6C00"
+        },
+        {
+          "hex": "#D84315"
+        },
+        {
+          "hex": "#4E342E"
+        },
+        {
+          "hex": "#424242"
+        },
+        {
+          "hex": "#37474F"
+        }
+      ]
+    },
+    {
+      "id": "material-900",
+      "name": "Material 色阶 900",
+      "source": "ggsci · material（Google Material Design 官方色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Material 19 个色相在 900 级的颜色拼成分类板，图斑多时仍能区分",
+      "colors": [
+        {
+          "hex": "#B71C1C"
+        },
+        {
+          "hex": "#880E4F"
+        },
+        {
+          "hex": "#4A148C"
+        },
+        {
+          "hex": "#311B92"
+        },
+        {
+          "hex": "#1A237E"
+        },
+        {
+          "hex": "#0D47A1"
+        },
+        {
+          "hex": "#01579B"
+        },
+        {
+          "hex": "#006064"
+        },
+        {
+          "hex": "#004D40"
+        },
+        {
+          "hex": "#1B5E20"
+        },
+        {
+          "hex": "#33691E"
+        },
+        {
+          "hex": "#827717"
+        },
+        {
+          "hex": "#F57F17"
+        },
+        {
+          "hex": "#FF6F00"
+        },
+        {
+          "hex": "#E65100"
+        },
+        {
+          "hex": "#BF360C"
+        },
+        {
+          "hex": "#3E2723"
+        },
+        {
+          "hex": "#212121"
+        },
+        {
+          "hex": "#263238"
+        }
+      ]
+    },
+    {
+      "id": "tw3-50",
+      "name": "Tailwind 色阶 50",
+      "source": "ggsci · tw3（Tailwind CSS 3 官方色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Tailwind 17 个彩色相在 50 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#FEF2F2"
+        },
+        {
+          "hex": "#FFF7ED"
+        },
+        {
+          "hex": "#FFFBEB"
+        },
+        {
+          "hex": "#FEFCE8"
+        },
+        {
+          "hex": "#F7FEE7"
+        },
+        {
+          "hex": "#F0FDF4"
+        },
+        {
+          "hex": "#ECFDF5"
+        },
+        {
+          "hex": "#F0FDFA"
+        },
+        {
+          "hex": "#ECFEFF"
+        },
+        {
+          "hex": "#F0F9FF"
+        },
+        {
+          "hex": "#EFF6FF"
+        },
+        {
+          "hex": "#EEF2FF"
+        },
+        {
+          "hex": "#F5F3FF"
+        },
+        {
+          "hex": "#FAF5FF"
+        },
+        {
+          "hex": "#FDF4FF"
+        },
+        {
+          "hex": "#FDF2F8"
+        },
+        {
+          "hex": "#FFF1F2"
+        }
+      ]
+    },
+    {
+      "id": "tw3-100",
+      "name": "Tailwind 色阶 100",
+      "source": "ggsci · tw3（Tailwind CSS 3 官方色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Tailwind 17 个彩色相在 100 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#FEE2E2"
+        },
+        {
+          "hex": "#FFEDD5"
+        },
+        {
+          "hex": "#FEF3C7"
+        },
+        {
+          "hex": "#FEF9C3"
+        },
+        {
+          "hex": "#ECFCCB"
+        },
+        {
+          "hex": "#DCFCE7"
+        },
+        {
+          "hex": "#D1FAE5"
+        },
+        {
+          "hex": "#CCFBF1"
+        },
+        {
+          "hex": "#CFFAFE"
+        },
+        {
+          "hex": "#E0F2FE"
+        },
+        {
+          "hex": "#DBEAFE"
+        },
+        {
+          "hex": "#E0E7FF"
+        },
+        {
+          "hex": "#EDE9FE"
+        },
+        {
+          "hex": "#F3E8FF"
+        },
+        {
+          "hex": "#FAE8FF"
+        },
+        {
+          "hex": "#FCE7F3"
+        },
+        {
+          "hex": "#FFE4E6"
+        }
+      ]
+    },
+    {
+      "id": "tw3-200",
+      "name": "Tailwind 色阶 200",
+      "source": "ggsci · tw3（Tailwind CSS 3 官方色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Tailwind 17 个彩色相在 200 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#FECACA"
+        },
+        {
+          "hex": "#FED7AA"
+        },
+        {
+          "hex": "#FDE68A"
+        },
+        {
+          "hex": "#FEF08A"
+        },
+        {
+          "hex": "#D9F99D"
+        },
+        {
+          "hex": "#BBF7D0"
+        },
+        {
+          "hex": "#A7F3D0"
+        },
+        {
+          "hex": "#99F6E4"
+        },
+        {
+          "hex": "#A5F3FC"
+        },
+        {
+          "hex": "#BAE6FD"
+        },
+        {
+          "hex": "#BFDBFE"
+        },
+        {
+          "hex": "#C7D2FE"
+        },
+        {
+          "hex": "#DDD6FE"
+        },
+        {
+          "hex": "#E9D5FF"
+        },
+        {
+          "hex": "#F5D0FE"
+        },
+        {
+          "hex": "#FBCFE8"
+        },
+        {
+          "hex": "#FECDD3"
+        }
+      ]
+    },
+    {
+      "id": "tw3-300",
+      "name": "Tailwind 色阶 300",
+      "source": "ggsci · tw3（Tailwind CSS 3 官方色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Tailwind 17 个彩色相在 300 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#FCA5A5"
+        },
+        {
+          "hex": "#FDBA74"
+        },
+        {
+          "hex": "#FCD34D"
+        },
+        {
+          "hex": "#FDE047"
+        },
+        {
+          "hex": "#BEF264"
+        },
+        {
+          "hex": "#86EFAC"
+        },
+        {
+          "hex": "#6EE7B7"
+        },
+        {
+          "hex": "#5EEAD4"
+        },
+        {
+          "hex": "#67E8F9"
+        },
+        {
+          "hex": "#7DD3FC"
+        },
+        {
+          "hex": "#93C5FD"
+        },
+        {
+          "hex": "#A5B4FC"
+        },
+        {
+          "hex": "#C4B5FD"
+        },
+        {
+          "hex": "#D8B4FE"
+        },
+        {
+          "hex": "#F0ABFC"
+        },
+        {
+          "hex": "#F9A8D4"
+        },
+        {
+          "hex": "#FDA4AF"
+        }
+      ]
+    },
+    {
+      "id": "tw3-400",
+      "name": "Tailwind 色阶 400",
+      "source": "ggsci · tw3（Tailwind CSS 3 官方色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Tailwind 17 个彩色相在 400 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#F87171"
+        },
+        {
+          "hex": "#FB923C"
+        },
+        {
+          "hex": "#FBBF24"
+        },
+        {
+          "hex": "#FACC15"
+        },
+        {
+          "hex": "#A3E635"
+        },
+        {
+          "hex": "#4ADE80"
+        },
+        {
+          "hex": "#34D399"
+        },
+        {
+          "hex": "#2DD4BF"
+        },
+        {
+          "hex": "#22D3EE"
+        },
+        {
+          "hex": "#38BDF8"
+        },
+        {
+          "hex": "#60A5FA"
+        },
+        {
+          "hex": "#818CF8"
+        },
+        {
+          "hex": "#A78BFA"
+        },
+        {
+          "hex": "#C084FC"
+        },
+        {
+          "hex": "#E879F9"
+        },
+        {
+          "hex": "#F472B6"
+        },
+        {
+          "hex": "#FB7185"
+        }
+      ]
+    },
+    {
+      "id": "tw3-500",
+      "name": "Tailwind 色阶 500",
+      "source": "ggsci · tw3（Tailwind CSS 3 官方色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Tailwind 17 个彩色相在 500 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#EF4444"
+        },
+        {
+          "hex": "#F97316"
+        },
+        {
+          "hex": "#F59E0B"
+        },
+        {
+          "hex": "#EAB308"
+        },
+        {
+          "hex": "#84CC16"
+        },
+        {
+          "hex": "#22C55E"
+        },
+        {
+          "hex": "#10B981"
+        },
+        {
+          "hex": "#14B8A6"
+        },
+        {
+          "hex": "#06B6D4"
+        },
+        {
+          "hex": "#0EA5E9"
+        },
+        {
+          "hex": "#3B82F6"
+        },
+        {
+          "hex": "#6366F1"
+        },
+        {
+          "hex": "#8B5CF6"
+        },
+        {
+          "hex": "#A855F7"
+        },
+        {
+          "hex": "#D946EF"
+        },
+        {
+          "hex": "#EC4899"
+        },
+        {
+          "hex": "#F43F5E"
+        }
+      ]
+    },
+    {
+      "id": "tw3-600",
+      "name": "Tailwind 色阶 600",
+      "source": "ggsci · tw3（Tailwind CSS 3 官方色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Tailwind 17 个彩色相在 600 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#DC2626"
+        },
+        {
+          "hex": "#EA580C"
+        },
+        {
+          "hex": "#D97706"
+        },
+        {
+          "hex": "#CA8A04"
+        },
+        {
+          "hex": "#65A30D"
+        },
+        {
+          "hex": "#16A34A"
+        },
+        {
+          "hex": "#059669"
+        },
+        {
+          "hex": "#0D9488"
+        },
+        {
+          "hex": "#0891B2"
+        },
+        {
+          "hex": "#0284C7"
+        },
+        {
+          "hex": "#2563EB"
+        },
+        {
+          "hex": "#4F46E5"
+        },
+        {
+          "hex": "#7C3AED"
+        },
+        {
+          "hex": "#9333EA"
+        },
+        {
+          "hex": "#C026D3"
+        },
+        {
+          "hex": "#DB2777"
+        },
+        {
+          "hex": "#E11D48"
+        }
+      ]
+    },
+    {
+      "id": "tw3-700",
+      "name": "Tailwind 色阶 700",
+      "source": "ggsci · tw3（Tailwind CSS 3 官方色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Tailwind 17 个彩色相在 700 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#B91C1C"
+        },
+        {
+          "hex": "#C2410C"
+        },
+        {
+          "hex": "#B45309"
+        },
+        {
+          "hex": "#A16207"
+        },
+        {
+          "hex": "#4D7C0F"
+        },
+        {
+          "hex": "#15803D"
+        },
+        {
+          "hex": "#047857"
+        },
+        {
+          "hex": "#0F766E"
+        },
+        {
+          "hex": "#0E7490"
+        },
+        {
+          "hex": "#0369A1"
+        },
+        {
+          "hex": "#1D4ED8"
+        },
+        {
+          "hex": "#4338CA"
+        },
+        {
+          "hex": "#6D28D9"
+        },
+        {
+          "hex": "#7E22CE"
+        },
+        {
+          "hex": "#A21CAF"
+        },
+        {
+          "hex": "#BE185D"
+        },
+        {
+          "hex": "#BE123C"
+        }
+      ]
+    },
+    {
+      "id": "tw3-800",
+      "name": "Tailwind 色阶 800",
+      "source": "ggsci · tw3（Tailwind CSS 3 官方色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Tailwind 17 个彩色相在 800 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#991B1B"
+        },
+        {
+          "hex": "#9A3412"
+        },
+        {
+          "hex": "#92400E"
+        },
+        {
+          "hex": "#854D0E"
+        },
+        {
+          "hex": "#3F6212"
+        },
+        {
+          "hex": "#166534"
+        },
+        {
+          "hex": "#065F46"
+        },
+        {
+          "hex": "#115E59"
+        },
+        {
+          "hex": "#155E75"
+        },
+        {
+          "hex": "#075985"
+        },
+        {
+          "hex": "#1E40AF"
+        },
+        {
+          "hex": "#3730A3"
+        },
+        {
+          "hex": "#5B21B6"
+        },
+        {
+          "hex": "#6B21A8"
+        },
+        {
+          "hex": "#86198F"
+        },
+        {
+          "hex": "#9D174D"
+        },
+        {
+          "hex": "#9F1239"
+        }
+      ]
+    },
+    {
+      "id": "tw3-900",
+      "name": "Tailwind 色阶 900",
+      "source": "ggsci · tw3（Tailwind CSS 3 官方色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Tailwind 17 个彩色相在 900 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#7F1D1D"
+        },
+        {
+          "hex": "#7C2D12"
+        },
+        {
+          "hex": "#78350F"
+        },
+        {
+          "hex": "#713F12"
+        },
+        {
+          "hex": "#365314"
+        },
+        {
+          "hex": "#14532D"
+        },
+        {
+          "hex": "#064E3B"
+        },
+        {
+          "hex": "#134E4A"
+        },
+        {
+          "hex": "#164E63"
+        },
+        {
+          "hex": "#0C4A6E"
+        },
+        {
+          "hex": "#1E3A8A"
+        },
+        {
+          "hex": "#312E81"
+        },
+        {
+          "hex": "#4C1D95"
+        },
+        {
+          "hex": "#581C87"
+        },
+        {
+          "hex": "#701A75"
+        },
+        {
+          "hex": "#831843"
+        },
+        {
+          "hex": "#881337"
+        }
+      ]
+    },
+    {
+      "id": "tw3-950",
+      "name": "Tailwind 色阶 950",
+      "source": "ggsci · tw3（Tailwind CSS 3 官方色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "Tailwind 最深一级（950）的 17 色分类板，深浅反差最强",
+      "colors": [
+        {
+          "hex": "#450A0A"
+        },
+        {
+          "hex": "#431407"
+        },
+        {
+          "hex": "#451A03"
+        },
+        {
+          "hex": "#422006"
+        },
+        {
+          "hex": "#1A2E05"
+        },
+        {
+          "hex": "#052E16"
+        },
+        {
+          "hex": "#022C22"
+        },
+        {
+          "hex": "#042F2E"
+        },
+        {
+          "hex": "#083344"
+        },
+        {
+          "hex": "#082F49"
+        },
+        {
+          "hex": "#172554"
+        },
+        {
+          "hex": "#1E1B4B"
+        },
+        {
+          "hex": "#2E1065"
+        },
+        {
+          "hex": "#3B0764"
+        },
+        {
+          "hex": "#4A044E"
+        },
+        {
+          "hex": "#500724"
+        },
+        {
+          "hex": "#4C0519"
+        }
+      ]
+    },
+    {
+      "id": "bs5-100",
+      "name": "Bootstrap 色阶 100",
+      "source": "ggsci · bs5（Bootstrap 5 官方主题色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Bootstrap 11 个主题色在 100 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#CFE2FF"
+        },
+        {
+          "hex": "#E0CFFC"
+        },
+        {
+          "hex": "#E2D9F3"
+        },
+        {
+          "hex": "#F7D6E6"
+        },
+        {
+          "hex": "#F8D7DA"
+        },
+        {
+          "hex": "#FFE5D0"
+        },
+        {
+          "hex": "#FFF3CD"
+        },
+        {
+          "hex": "#D1E7DD"
+        },
+        {
+          "hex": "#D2F4EA"
+        },
+        {
+          "hex": "#CFF4FC"
+        },
+        {
+          "hex": "#F8F9FA"
+        }
+      ]
+    },
+    {
+      "id": "bs5-200",
+      "name": "Bootstrap 色阶 200",
+      "source": "ggsci · bs5（Bootstrap 5 官方主题色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Bootstrap 11 个主题色在 200 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#9EC5FE"
+        },
+        {
+          "hex": "#C29FFA"
+        },
+        {
+          "hex": "#C5B3E6"
+        },
+        {
+          "hex": "#EFADCE"
+        },
+        {
+          "hex": "#F1AEB5"
+        },
+        {
+          "hex": "#FECBA1"
+        },
+        {
+          "hex": "#FFE69C"
+        },
+        {
+          "hex": "#A3CFBB"
+        },
+        {
+          "hex": "#A6E9D5"
+        },
+        {
+          "hex": "#9EEAF9"
+        },
+        {
+          "hex": "#E9ECEF"
+        }
+      ]
+    },
+    {
+      "id": "bs5-300",
+      "name": "Bootstrap 色阶 300",
+      "source": "ggsci · bs5（Bootstrap 5 官方主题色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Bootstrap 11 个主题色在 300 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#6EA8FE"
+        },
+        {
+          "hex": "#A370F7"
+        },
+        {
+          "hex": "#A98EDA"
+        },
+        {
+          "hex": "#E685B5"
+        },
+        {
+          "hex": "#EA868F"
+        },
+        {
+          "hex": "#FEB272"
+        },
+        {
+          "hex": "#FFDA6A"
+        },
+        {
+          "hex": "#75B798"
+        },
+        {
+          "hex": "#79DFC1"
+        },
+        {
+          "hex": "#6EDFF6"
+        },
+        {
+          "hex": "#DEE2E6"
+        }
+      ]
+    },
+    {
+      "id": "bs5-400",
+      "name": "Bootstrap 色阶 400",
+      "source": "ggsci · bs5（Bootstrap 5 官方主题色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Bootstrap 11 个主题色在 400 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#3D8BFD"
+        },
+        {
+          "hex": "#8540F5"
+        },
+        {
+          "hex": "#8C68CD"
+        },
+        {
+          "hex": "#DE5C9D"
+        },
+        {
+          "hex": "#E35D6A"
+        },
+        {
+          "hex": "#FD9843"
+        },
+        {
+          "hex": "#FFCD39"
+        },
+        {
+          "hex": "#479F76"
+        },
+        {
+          "hex": "#4DD4AC"
+        },
+        {
+          "hex": "#3DD5F3"
+        },
+        {
+          "hex": "#CED4DA"
+        }
+      ]
+    },
+    {
+      "id": "bs5-500",
+      "name": "Bootstrap 色阶 500",
+      "source": "ggsci · bs5（Bootstrap 5 官方主题色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Bootstrap 11 个主题色在 500 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#0D6EFD"
+        },
+        {
+          "hex": "#6610F2"
+        },
+        {
+          "hex": "#6F42C1"
+        },
+        {
+          "hex": "#D63384"
+        },
+        {
+          "hex": "#DC3545"
+        },
+        {
+          "hex": "#FD7E14"
+        },
+        {
+          "hex": "#FFC107"
+        },
+        {
+          "hex": "#198754"
+        },
+        {
+          "hex": "#20C997"
+        },
+        {
+          "hex": "#0DCAF0"
+        },
+        {
+          "hex": "#ADB5BD"
+        }
+      ]
+    },
+    {
+      "id": "bs5-600",
+      "name": "Bootstrap 色阶 600",
+      "source": "ggsci · bs5（Bootstrap 5 官方主题色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Bootstrap 11 个主题色在 600 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#0A58CA"
+        },
+        {
+          "hex": "#520DC2"
+        },
+        {
+          "hex": "#59359A"
+        },
+        {
+          "hex": "#AB296A"
+        },
+        {
+          "hex": "#B02A37"
+        },
+        {
+          "hex": "#CA6510"
+        },
+        {
+          "hex": "#CC9A06"
+        },
+        {
+          "hex": "#146C43"
+        },
+        {
+          "hex": "#1AA179"
+        },
+        {
+          "hex": "#0AA2C0"
+        },
+        {
+          "hex": "#6C757D"
+        }
+      ]
+    },
+    {
+      "id": "bs5-700",
+      "name": "Bootstrap 色阶 700",
+      "source": "ggsci · bs5（Bootstrap 5 官方主题色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Bootstrap 11 个主题色在 700 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#084298"
+        },
+        {
+          "hex": "#3D0A91"
+        },
+        {
+          "hex": "#432874"
+        },
+        {
+          "hex": "#801F4F"
+        },
+        {
+          "hex": "#842029"
+        },
+        {
+          "hex": "#984C0C"
+        },
+        {
+          "hex": "#997404"
+        },
+        {
+          "hex": "#0F5132"
+        },
+        {
+          "hex": "#13795B"
+        },
+        {
+          "hex": "#087990"
+        },
+        {
+          "hex": "#495057"
+        }
+      ]
+    },
+    {
+      "id": "bs5-800",
+      "name": "Bootstrap 色阶 800",
+      "source": "ggsci · bs5（Bootstrap 5 官方主题色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Bootstrap 11 个主题色在 800 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#052C65"
+        },
+        {
+          "hex": "#290661"
+        },
+        {
+          "hex": "#2C1A4D"
+        },
+        {
+          "hex": "#561435"
+        },
+        {
+          "hex": "#58151C"
+        },
+        {
+          "hex": "#653208"
+        },
+        {
+          "hex": "#664D03"
+        },
+        {
+          "hex": "#0A3622"
+        },
+        {
+          "hex": "#0D503C"
+        },
+        {
+          "hex": "#055160"
+        },
+        {
+          "hex": "#343A40"
+        }
+      ]
+    },
+    {
+      "id": "bs5-900",
+      "name": "Bootstrap 色阶 900",
+      "source": "ggsci · bs5（Bootstrap 5 官方主题色阶）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Bootstrap 11 个主题色在 900 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#031633"
+        },
+        {
+          "hex": "#140330"
+        },
+        {
+          "hex": "#160D27"
+        },
+        {
+          "hex": "#2B0A1A"
+        },
+        {
+          "hex": "#2C0B0E"
+        },
+        {
+          "hex": "#331904"
+        },
+        {
+          "hex": "#332701"
+        },
+        {
+          "hex": "#051B11"
+        },
+        {
+          "hex": "#06281E"
+        },
+        {
+          "hex": "#032830"
+        },
+        {
+          "hex": "#212529"
+        }
+      ]
+    },
+    {
+      "id": "open-50",
+      "name": "Open Color 色阶 50",
+      "source": "Open Color（yeun/open-color 官方 JSON，13 色相 × 10 级）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Open Color 13 个色相在 50 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#F8F9FA"
+        },
+        {
+          "hex": "#FFF5F5"
+        },
+        {
+          "hex": "#FFF0F6"
+        },
+        {
+          "hex": "#F8F0FC"
+        },
+        {
+          "hex": "#F3F0FF"
+        },
+        {
+          "hex": "#EDF2FF"
+        },
+        {
+          "hex": "#E7F5FF"
+        },
+        {
+          "hex": "#E3FAFC"
+        },
+        {
+          "hex": "#E6FCF5"
+        },
+        {
+          "hex": "#EBFBEE"
+        },
+        {
+          "hex": "#F4FCE3"
+        },
+        {
+          "hex": "#FFF9DB"
+        },
+        {
+          "hex": "#FFF4E6"
+        }
+      ]
+    },
+    {
+      "id": "open-100",
+      "name": "Open Color 色阶 100",
+      "source": "Open Color（yeun/open-color 官方 JSON，13 色相 × 10 级）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Open Color 13 个色相在 100 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#F1F3F5"
+        },
+        {
+          "hex": "#FFE3E3"
+        },
+        {
+          "hex": "#FFDEEB"
+        },
+        {
+          "hex": "#F3D9FA"
+        },
+        {
+          "hex": "#E5DBFF"
+        },
+        {
+          "hex": "#DBE4FF"
+        },
+        {
+          "hex": "#D0EBFF"
+        },
+        {
+          "hex": "#C5F6FA"
+        },
+        {
+          "hex": "#C3FAE8"
+        },
+        {
+          "hex": "#D3F9D8"
+        },
+        {
+          "hex": "#E9FAC8"
+        },
+        {
+          "hex": "#FFF3BF"
+        },
+        {
+          "hex": "#FFE8CC"
+        }
+      ]
+    },
+    {
+      "id": "open-200",
+      "name": "Open Color 色阶 200",
+      "source": "Open Color（yeun/open-color 官方 JSON，13 色相 × 10 级）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Open Color 13 个色相在 200 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#E9ECEF"
+        },
+        {
+          "hex": "#FFC9C9"
+        },
+        {
+          "hex": "#FCC2D7"
+        },
+        {
+          "hex": "#EEBEFA"
+        },
+        {
+          "hex": "#D0BFFF"
+        },
+        {
+          "hex": "#BAC8FF"
+        },
+        {
+          "hex": "#A5D8FF"
+        },
+        {
+          "hex": "#99E9F2"
+        },
+        {
+          "hex": "#96F2D7"
+        },
+        {
+          "hex": "#B2F2BB"
+        },
+        {
+          "hex": "#D8F5A2"
+        },
+        {
+          "hex": "#FFEC99"
+        },
+        {
+          "hex": "#FFD8A8"
+        }
+      ]
+    },
+    {
+      "id": "open-300",
+      "name": "Open Color 色阶 300",
+      "source": "Open Color（yeun/open-color 官方 JSON，13 色相 × 10 级）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Open Color 13 个色相在 300 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#DEE2E6"
+        },
+        {
+          "hex": "#FFA8A8"
+        },
+        {
+          "hex": "#FAA2C1"
+        },
+        {
+          "hex": "#E599F7"
+        },
+        {
+          "hex": "#B197FC"
+        },
+        {
+          "hex": "#91A7FF"
+        },
+        {
+          "hex": "#74C0FC"
+        },
+        {
+          "hex": "#66D9E8"
+        },
+        {
+          "hex": "#63E6BE"
+        },
+        {
+          "hex": "#8CE99A"
+        },
+        {
+          "hex": "#C0EB75"
+        },
+        {
+          "hex": "#FFE066"
+        },
+        {
+          "hex": "#FFC078"
+        }
+      ]
+    },
+    {
+      "id": "open-400",
+      "name": "Open Color 色阶 400",
+      "source": "Open Color（yeun/open-color 官方 JSON，13 色相 × 10 级）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Open Color 13 个色相在 400 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#CED4DA"
+        },
+        {
+          "hex": "#FF8787"
+        },
+        {
+          "hex": "#F783AC"
+        },
+        {
+          "hex": "#DA77F2"
+        },
+        {
+          "hex": "#9775FA"
+        },
+        {
+          "hex": "#748FFC"
+        },
+        {
+          "hex": "#4DABF7"
+        },
+        {
+          "hex": "#3BC9DB"
+        },
+        {
+          "hex": "#38D9A9"
+        },
+        {
+          "hex": "#69DB7C"
+        },
+        {
+          "hex": "#A9E34B"
+        },
+        {
+          "hex": "#FFD43B"
+        },
+        {
+          "hex": "#FFA94D"
+        }
+      ]
+    },
+    {
+      "id": "open-500",
+      "name": "Open Color 色阶 500",
+      "source": "Open Color（yeun/open-color 官方 JSON，13 色相 × 10 级）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Open Color 13 个色相在 500 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#ADB5BD"
+        },
+        {
+          "hex": "#FF6B6B"
+        },
+        {
+          "hex": "#F06595"
+        },
+        {
+          "hex": "#CC5DE8"
+        },
+        {
+          "hex": "#845EF7"
+        },
+        {
+          "hex": "#5C7CFA"
+        },
+        {
+          "hex": "#339AF0"
+        },
+        {
+          "hex": "#22B8CF"
+        },
+        {
+          "hex": "#20C997"
+        },
+        {
+          "hex": "#51CF66"
+        },
+        {
+          "hex": "#94D82D"
+        },
+        {
+          "hex": "#FCC419"
+        },
+        {
+          "hex": "#FF922B"
+        }
+      ]
+    },
+    {
+      "id": "open-600",
+      "name": "Open Color 色阶 600",
+      "source": "Open Color（yeun/open-color 官方 JSON，13 色相 × 10 级）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Open Color 13 个色相在 600 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#868E96"
+        },
+        {
+          "hex": "#FA5252"
+        },
+        {
+          "hex": "#E64980"
+        },
+        {
+          "hex": "#BE4BDB"
+        },
+        {
+          "hex": "#7950F2"
+        },
+        {
+          "hex": "#4C6EF5"
+        },
+        {
+          "hex": "#228BE6"
+        },
+        {
+          "hex": "#15AABF"
+        },
+        {
+          "hex": "#12B886"
+        },
+        {
+          "hex": "#40C057"
+        },
+        {
+          "hex": "#82C91E"
+        },
+        {
+          "hex": "#FAB005"
+        },
+        {
+          "hex": "#FD7E14"
+        }
+      ]
+    },
+    {
+      "id": "open-700",
+      "name": "Open Color 色阶 700",
+      "source": "Open Color（yeun/open-color 官方 JSON，13 色相 × 10 级）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Open Color 13 个色相在 700 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#495057"
+        },
+        {
+          "hex": "#F03E3E"
+        },
+        {
+          "hex": "#D6336C"
+        },
+        {
+          "hex": "#AE3EC9"
+        },
+        {
+          "hex": "#7048E8"
+        },
+        {
+          "hex": "#4263EB"
+        },
+        {
+          "hex": "#1C7ED6"
+        },
+        {
+          "hex": "#1098AD"
+        },
+        {
+          "hex": "#0CA678"
+        },
+        {
+          "hex": "#37B24D"
+        },
+        {
+          "hex": "#74B816"
+        },
+        {
+          "hex": "#F59F00"
+        },
+        {
+          "hex": "#F76707"
+        }
+      ]
+    },
+    {
+      "id": "open-800",
+      "name": "Open Color 色阶 800",
+      "source": "Open Color（yeun/open-color 官方 JSON，13 色相 × 10 级）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Open Color 13 个色相在 800 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#343A40"
+        },
+        {
+          "hex": "#E03131"
+        },
+        {
+          "hex": "#C2255C"
+        },
+        {
+          "hex": "#9C36B5"
+        },
+        {
+          "hex": "#6741D9"
+        },
+        {
+          "hex": "#3B5BDB"
+        },
+        {
+          "hex": "#1971C2"
+        },
+        {
+          "hex": "#0C8599"
+        },
+        {
+          "hex": "#099268"
+        },
+        {
+          "hex": "#2F9E44"
+        },
+        {
+          "hex": "#66A80F"
+        },
+        {
+          "hex": "#F08C00"
+        },
+        {
+          "hex": "#E8590C"
+        }
+      ]
+    },
+    {
+      "id": "open-900",
+      "name": "Open Color 色阶 900",
+      "source": "Open Color（yeun/open-color 官方 JSON，13 色相 × 10 级）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "取 Open Color 13 个色相在 900 级的颜色拼成分类板",
+      "colors": [
+        {
+          "hex": "#212529"
+        },
+        {
+          "hex": "#C92A2A"
+        },
+        {
+          "hex": "#A61E4D"
+        },
+        {
+          "hex": "#862E9C"
+        },
+        {
+          "hex": "#5F3DC4"
+        },
+        {
+          "hex": "#364FC7"
+        },
+        {
+          "hex": "#1864AB"
+        },
+        {
+          "hex": "#0B7285"
+        },
+        {
+          "hex": "#087F5B"
+        },
+        {
+          "hex": "#2B8A3E"
+        },
+        {
+          "hex": "#5C940D"
+        },
+        {
+          "hex": "#E67700"
+        },
+        {
+          "hex": "#D9480F"
+        }
+      ]
+    },
+    {
+      "id": "plotly-alphabet",
+      "name": "Plotly Alphabet",
+      "source": "Plotly 官方定性色板 · Alphabet",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "26 色字母表色板，颜色数量多且区分明显",
+      "colors": [
+        {
+          "hex": "#AA0DFE"
+        },
+        {
+          "hex": "#3283FE"
+        },
+        {
+          "hex": "#85660D"
+        },
+        {
+          "hex": "#782AB6"
+        },
+        {
+          "hex": "#565656"
+        },
+        {
+          "hex": "#1C8356"
+        },
+        {
+          "hex": "#16FF32"
+        },
+        {
+          "hex": "#F7E1A0"
+        },
+        {
+          "hex": "#E2E2E2"
+        },
+        {
+          "hex": "#1CBE4F"
+        },
+        {
+          "hex": "#C4451C"
+        },
+        {
+          "hex": "#DEA0FD"
+        },
+        {
+          "hex": "#FE00FA"
+        },
+        {
+          "hex": "#325A9B"
+        },
+        {
+          "hex": "#FEAF16"
+        },
+        {
+          "hex": "#F8A19F"
+        },
+        {
+          "hex": "#90AD1C"
+        },
+        {
+          "hex": "#F6222E"
+        },
+        {
+          "hex": "#1CFFCE"
+        },
+        {
+          "hex": "#2ED9FF"
+        },
+        {
+          "hex": "#B10DA1"
+        },
+        {
+          "hex": "#C075A6"
+        },
+        {
+          "hex": "#FC1CBF"
+        },
+        {
+          "hex": "#B00068"
+        },
+        {
+          "hex": "#FBE426"
+        },
+        {
+          "hex": "#FA0087"
+        }
+      ]
+    },
+    {
+      "id": "plotly-dark24",
+      "name": "Plotly Dark24",
+      "source": "Plotly 官方定性色板 · Dark24",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "24 色深色分类板，深色底图与投影上更沉稳",
+      "colors": [
+        {
+          "hex": "#2E91E5"
+        },
+        {
+          "hex": "#E15F99"
+        },
+        {
+          "hex": "#1CA71C"
+        },
+        {
+          "hex": "#FB0D0D"
+        },
+        {
+          "hex": "#DA16FF"
+        },
+        {
+          "hex": "#222A2A"
+        },
+        {
+          "hex": "#B68100"
+        },
+        {
+          "hex": "#750D86"
+        },
+        {
+          "hex": "#EB663B"
+        },
+        {
+          "hex": "#511CFB"
+        },
+        {
+          "hex": "#00A08B"
+        },
+        {
+          "hex": "#FB00D1"
+        },
+        {
+          "hex": "#FC0080"
+        },
+        {
+          "hex": "#B2828D"
+        },
+        {
+          "hex": "#6C7C32"
+        },
+        {
+          "hex": "#778AAE"
+        },
+        {
+          "hex": "#862A16"
+        },
+        {
+          "hex": "#A777F1"
+        },
+        {
+          "hex": "#620042"
+        },
+        {
+          "hex": "#1616A7"
+        },
+        {
+          "hex": "#DA60CA"
+        },
+        {
+          "hex": "#6C4516"
+        },
+        {
+          "hex": "#0D2A63"
+        },
+        {
+          "hex": "#AF0038"
+        }
+      ]
+    },
+    {
+      "id": "plotly-light24",
+      "name": "Plotly Light24",
+      "source": "Plotly 官方定性色板 · Light24",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "24 色浅色分类板，浅底印刷图件不易压盖底图",
+      "colors": [
+        {
+          "hex": "#FD3216"
+        },
+        {
+          "hex": "#00FE35"
+        },
+        {
+          "hex": "#6A76FC"
+        },
+        {
+          "hex": "#FED4C4"
+        },
+        {
+          "hex": "#FE00CE"
+        },
+        {
+          "hex": "#0DF9FF"
+        },
+        {
+          "hex": "#F6F926"
+        },
+        {
+          "hex": "#FF9616"
+        },
+        {
+          "hex": "#479B55"
+        },
+        {
+          "hex": "#EEA6FB"
+        },
+        {
+          "hex": "#DC587D"
+        },
+        {
+          "hex": "#D626FF"
+        },
+        {
+          "hex": "#6E899C"
+        },
+        {
+          "hex": "#00B5F7"
+        },
+        {
+          "hex": "#B68E00"
+        },
+        {
+          "hex": "#C9FBE5"
+        },
+        {
+          "hex": "#FF0092"
+        },
+        {
+          "hex": "#22FFA7"
+        },
+        {
+          "hex": "#E3EE9E"
+        },
+        {
+          "hex": "#86CE00"
+        },
+        {
+          "hex": "#BC7196"
+        },
+        {
+          "hex": "#7E7DCD"
+        },
+        {
+          "hex": "#FC6955"
+        },
+        {
+          "hex": "#E48F72"
+        }
+      ]
+    },
+    {
+      "id": "plotly-10",
+      "name": "Plotly 默认 10 色",
+      "source": "Plotly 官方定性色板 · Plotly",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "Plotly 默认 10 色循环，是很多在线图表的起始配色",
+      "colors": [
+        {
+          "hex": "#636EFA"
+        },
+        {
+          "hex": "#EF553B"
+        },
+        {
+          "hex": "#00CC96"
+        },
+        {
+          "hex": "#AB63FA"
+        },
+        {
+          "hex": "#FFA15A"
+        },
+        {
+          "hex": "#19D3F3"
+        },
+        {
+          "hex": "#FF6692"
+        },
+        {
+          "hex": "#B6E880"
+        },
+        {
+          "hex": "#FF97FF"
+        },
+        {
+          "hex": "#FECB52"
+        }
+      ]
+    },
+    {
+      "id": "plotly-g10",
+      "name": "Plotly G10 灰阶",
+      "source": "Plotly 官方定性色板 · G10",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "10 级灰度分类板，用于黑白印刷或叠加彩色专题层",
+      "colors": [
+        {
+          "hex": "#3366CC"
+        },
+        {
+          "hex": "#DC3912"
+        },
+        {
+          "hex": "#FF9900"
+        },
+        {
+          "hex": "#109618"
+        },
+        {
+          "hex": "#990099"
+        },
+        {
+          "hex": "#0099C6"
+        },
+        {
+          "hex": "#DD4477"
+        },
+        {
+          "hex": "#66AA00"
+        },
+        {
+          "hex": "#B82E2E"
+        },
+        {
+          "hex": "#316395"
+        }
+      ]
+    },
+    {
+      "id": "locuszoom",
+      "name": "LocusZoom",
+      "source": "ggsci · locuszoom（LocusZoom 基因组可视化）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "LocusZoom 默认配色，适合多轨剖面与沿线路的地球化学图",
+      "colors": [
+        {
+          "hex": "#D43F3A"
+        },
+        {
+          "hex": "#EEA236"
+        },
+        {
+          "hex": "#5CB85C"
+        },
+        {
+          "hex": "#46B8DA"
+        },
+        {
+          "hex": "#357EBD"
+        },
+        {
+          "hex": "#9632B8"
+        },
+        {
+          "hex": "#B8B8B8"
+        }
+      ]
+    },
+    {
+      "id": "flatui-flattastic",
+      "name": "Flat UI Flattastic",
+      "source": "ggsci · flatui（flattastic）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "Flat UI 另一套官方变体，明快但不刺眼，适合汇报用图",
+      "colors": [
+        {
+          "hex": "#DA4453"
+        },
+        {
+          "hex": "#E95546"
+        },
+        {
+          "hex": "#F6BA59"
+        },
+        {
+          "hex": "#8BC163"
+        },
+        {
+          "hex": "#34BC9D"
+        },
+        {
+          "hex": "#3BB0D6"
+        },
+        {
+          "hex": "#4B8AD6"
+        },
+        {
+          "hex": "#977BD5"
+        },
+        {
+          "hex": "#D870A9"
+        },
+        {
+          "hex": "#E6E9ED"
+        },
+        {
+          "hex": "#AAB2BC"
+        },
+        {
+          "hex": "#434A53"
+        }
+      ]
+    },
+    {
+      "id": "flatui-aussie",
+      "name": "Flat UI Aussie",
+      "source": "ggsci · flatui（aussie）",
+      "type": "categorical",
+      "group": "地质图填色",
+      "note": "Flat UI 的澳式变体，植被绿与土黄为主，适合地表覆盖类图斑",
+      "colors": [
+        {
+          "hex": "#F9CA24"
+        },
+        {
+          "hex": "#F0932B"
+        },
+        {
+          "hex": "#EB4D4B"
+        },
+        {
+          "hex": "#6AB04C"
+        },
+        {
+          "hex": "#C7ECEE"
+        },
+        {
+          "hex": "#22A6B3"
+        },
+        {
+          "hex": "#BE2EDD"
+        },
+        {
+          "hex": "#4834D4"
+        },
+        {
+          "hex": "#130F40"
+        },
+        {
+          "hex": "#535C68"
+        }
+      ]
+    },
+    {
+      "id": "ics2024-periods",
+      "name": "ICS 年代色 · 纪（v2024/12）",
+      "source": "ICS/CGMW 国际年代地层表 v2024/12 · 官方 RGB 码",
+      "type": "labeled",
+      "group": "地质年代标准色",
+      "note": "国际年代地层表 2024 年 12 月新版纪（Period）色标，比 2018 版更淡雅；地质图按纪设色、图例配色的国际标准依据",
+      "colors": [
+        {
+          "hex": "#FFF49A",
+          "label": "第四纪 Q"
+        },
+        {
+          "hex": "#FFDE0F",
+          "label": "新近纪 N"
+        },
+        {
+          "hex": "#F5AD6D",
+          "label": "古近纪 E"
+        },
+        {
+          "hex": "#94C25F",
+          "label": "白垩纪 K"
+        },
+        {
+          "hex": "#00AFDE",
+          "label": "侏罗纪 J"
+        },
+        {
+          "hex": "#924B93",
+          "label": "三叠纪 T"
+        },
+        {
+          "hex": "#E15D40",
+          "label": "二叠纪 P"
+        },
+        {
+          "hex": "#6FAEB0",
+          "label": "石炭纪 C"
+        },
+        {
+          "hex": "#D39F50",
+          "label": "泥盆纪 D"
+        },
+        {
+          "hex": "#C0DFCB",
+          "label": "志留纪 S"
+        },
+        {
+          "hex": "#00957D",
+          "label": "奥陶纪 O"
+        },
+        {
+          "hex": "#93AB6E",
+          "label": "寒武纪 Є"
+        }
+      ]
+    },
+    {
+      "id": "ics2024-eras",
+      "name": "ICS 年代色 · 代与前寒武纪（v2024/12）",
+      "source": "ICS/CGMW 国际年代地层表 v2024/12 · 官方 RGB 码",
+      "type": "labeled",
+      "group": "地质年代标准色",
+      "note": "同版代（Era）及太古宙、元古宙各代色标；小比例尺图与前寒武纪区填色用",
+      "colors": [
+        {
+          "hex": "#FCEA0D",
+          "label": "新生代 Cz"
+        },
+        {
+          "hex": "#62C3DD",
+          "label": "中生代 Mz"
+        },
+        {
+          "hex": "#A9C5A5",
+          "label": "古生代 Pz"
+        },
+        {
+          "hex": "#F9BE5C",
+          "label": "新元古代 NP"
+        },
+        {
+          "hex": "#F9C07E",
+          "label": "中元古代 MP"
+        },
+        {
+          "hex": "#E9607B",
+          "label": "古元古代 PP"
+        },
+        {
+          "hex": "#F4B4C8",
+          "label": "新太古代 NA"
+        },
+        {
+          "hex": "#ED87AC",
+          "label": "中太古代 MA"
+        },
+        {
+          "hex": "#E8609B",
+          "label": "古太古代 PA"
+        },
+        {
+          "hex": "#D3007A",
+          "label": "始太古代 EA"
+        },
+        {
+          "hex": "#B5007B",
+          "label": "冥古宙 H"
+        }
+      ]
+    },
+    {
+      "id": "ics2024-epoch-q",
+      "name": "ICS 世色 · 第四纪",
+      "source": "ICS/CGMW 国际年代地层表 v2024/12 · 官方 RGB 码",
+      "type": "labeled",
+      "group": "地质年代标准色",
+      "note": "同版第四纪的 2 个世（Epoch）色标：全新世、更新世；大比例尺图件按世填色时直接取用",
+      "colors": [
+        {
+          "hex": "#FFEAD2",
+          "label": "全新世 Qh"
+        },
+        {
+          "hex": "#FFEFAE",
+          "label": "更新世 Qp"
+        }
+      ]
+    },
+    {
+      "id": "ics2024-epoch-n",
+      "name": "ICS 世色 · 新近纪",
+      "source": "ICS/CGMW 国际年代地层表 v2024/12 · 官方 RGB 码",
+      "type": "labeled",
+      "group": "地质年代标准色",
+      "note": "同版新近纪的 2 个世（Epoch）色标：上新世、中新世；大比例尺图件按世填色时直接取用",
+      "colors": [
+        {
+          "hex": "#FFF6B1",
+          "label": "上新世 N2"
+        },
+        {
+          "hex": "#FFEC00",
+          "label": "中新世 N1"
+        }
+      ]
+    },
+    {
+      "id": "ics2024-epoch-e",
+      "name": "ICS 世色 · 古近纪",
+      "source": "ICS/CGMW 国际年代地层表 v2024/12 · 官方 RGB 码",
+      "type": "labeled",
+      "group": "地质年代标准色",
+      "note": "同版古近纪的 3 个世（Epoch）色标：渐新世、始新世、古新世；大比例尺图件按世填色时直接取用",
+      "colors": [
+        {
+          "hex": "#FACB96",
+          "label": "渐新世 E3"
+        },
+        {
+          "hex": "#F9C189",
+          "label": "始新世 E2"
+        },
+        {
+          "hex": "#F7B77B",
+          "label": "古新世 E1"
+        }
+      ]
+    },
+    {
+      "id": "ics2024-epoch-k",
+      "name": "ICS 世色 · 白垩纪",
+      "source": "ICS/CGMW 国际年代地层表 v2024/12 · 官方 RGB 码",
+      "type": "labeled",
+      "group": "地质年代标准色",
+      "note": "同版白垩纪的 2 个世（Epoch）色标：晚白垩世、早白垩世；大比例尺图件按世填色时直接取用",
+      "colors": [
+        {
+          "hex": "#BBD05D",
+          "label": "晚白垩世 K2"
+        },
+        {
+          "hex": "#A1C86D",
+          "label": "早白垩世 K1"
+        }
+      ]
+    },
+    {
+      "id": "ics2024-epoch-j",
+      "name": "ICS 世色 · 侏罗纪",
+      "source": "ICS/CGMW 国际年代地层表 v2024/12 · 官方 RGB 码",
+      "type": "labeled",
+      "group": "地质年代标准色",
+      "note": "同版侏罗纪的 3 个世（Epoch）色标：晚侏罗世、中侏罗世、早侏罗世；大比例尺图件按世填色时直接取用",
+      "colors": [
+        {
+          "hex": "#BCE4F6",
+          "label": "晚侏罗世 J3"
+        },
+        {
+          "hex": "#85CEE8",
+          "label": "中侏罗世 J2"
+        },
+        {
+          "hex": "#00B4E0",
+          "label": "早侏罗世 J1"
+        }
+      ]
+    },
+    {
+      "id": "ics2024-epoch-t",
+      "name": "ICS 世色 · 三叠纪",
+      "source": "ICS/CGMW 国际年代地层表 v2024/12 · 官方 RGB 码",
+      "type": "labeled",
+      "group": "地质年代标准色",
+      "note": "同版三叠纪的 3 个世（Epoch）色标：晚三叠世、中三叠世、早三叠世；大比例尺图件按世填色时直接取用",
+      "colors": [
+        {
+          "hex": "#C5A6CB",
+          "label": "晚三叠世 T3"
+        },
+        {
+          "hex": "#BA86B6",
+          "label": "中三叠世 T2"
+        },
+        {
+          "hex": "#A6589A",
+          "label": "早三叠世 T1"
+        }
+      ]
+    },
+    {
+      "id": "ics2024-epoch-p",
+      "name": "ICS 世色 · 二叠纪",
+      "source": "ICS/CGMW 国际年代地层表 v2024/12 · 官方 RGB 码",
+      "type": "labeled",
+      "group": "地质年代标准色",
+      "note": "同版二叠纪的 3 个世（Epoch）色标：乐平世、瓜德鲁普世、乌拉尔世；大比例尺图件按世填色时直接取用",
+      "colors": [
+        {
+          "hex": "#F6BBA9",
+          "label": "乐平世 P3"
+        },
+        {
+          "hex": "#F08E74",
+          "label": "瓜德鲁普世 P2"
+        },
+        {
+          "hex": "#E4755C",
+          "label": "乌拉尔世 P1"
+        }
+      ]
+    },
+    {
+      "id": "ics2024-epoch-c",
+      "name": "ICS 世色 · 石炭纪",
+      "source": "ICS/CGMW 国际年代地层表 v2024/12 · 官方 RGB 码",
+      "type": "labeled",
+      "group": "地质年代标准色",
+      "note": "同版石炭纪的 2 个世（Epoch）色标：宾夕法尼亚亚世、密西西比亚世；大比例尺图件按世填色时直接取用",
+      "colors": [
+        {
+          "hex": "#83BFC7",
+          "label": "宾夕法尼亚亚世 C2"
+        },
+        {
+          "hex": "#779D7E",
+          "label": "密西西比亚世 C1"
+        }
+      ]
+    },
+    {
+      "id": "ics2024-epoch-d",
+      "name": "ICS 世色 · 泥盆纪",
+      "source": "ICS/CGMW 国际年代地层表 v2024/12 · 官方 RGB 码",
+      "type": "labeled",
+      "group": "地质年代标准色",
+      "note": "同版泥盆纪的 3 个世（Epoch）色标：晚泥盆世、中泥盆世、早泥盆世；大比例尺图件按世填色时直接取用",
+      "colors": [
+        {
+          "hex": "#F5E4B4",
+          "label": "晚泥盆世 D3"
+        },
+        {
+          "hex": "#F3CF83",
+          "label": "中泥盆世 D2"
+        },
+        {
+          "hex": "#E8B868",
+          "label": "早泥盆世 D1"
+        }
+      ]
+    },
+    {
+      "id": "ics2024-epoch-s",
+      "name": "ICS 世色 · 志留纪",
+      "source": "ICS/CGMW 国际年代地层表 v2024/12 · 官方 RGB 码",
+      "type": "labeled",
+      "group": "地质年代标准色",
+      "note": "同版志留纪的 4 个世（Epoch）色标：普里道利世、罗德洛世、温洛克世、兰多维列世；大比例尺图件按世填色时直接取用",
+      "colors": [
+        {
+          "hex": "#EBF4EB",
+          "label": "普里道利世 S4"
+        },
+        {
+          "hex": "#CBE6DE",
+          "label": "罗德洛世 S3"
+        },
+        {
+          "hex": "#BFE0D4",
+          "label": "温洛克世 S2"
+        },
+        {
+          "hex": "#A7D5C9",
+          "label": "兰多维列世 S1"
+        }
+      ]
+    },
+    {
+      "id": "ics2024-epoch-o",
+      "name": "ICS 世色 · 奥陶纪",
+      "source": "ICS/CGMW 国际年代地层表 v2024/12 · 官方 RGB 码",
+      "type": "labeled",
+      "group": "地质年代标准色",
+      "note": "同版奥陶纪的 3 个世（Epoch）色标：晚奥陶世、中奥陶世、早奥陶世；大比例尺图件按世填色时直接取用",
+      "colors": [
+        {
+          "hex": "#8DC8AA",
+          "label": "晚奥陶世 O3"
+        },
+        {
+          "hex": "#46B293",
+          "label": "中奥陶世 O2"
+        },
+        {
+          "hex": "#009E7E",
+          "label": "早奥陶世 O1"
+        }
+      ]
+    },
+    {
+      "id": "ics2024-epoch-cm",
+      "name": "ICS 世色 · 寒武纪",
+      "source": "ICS/CGMW 国际年代地层表 v2024/12 · 官方 RGB 码",
+      "type": "labeled",
+      "group": "地质年代标准色",
+      "note": "同版寒武纪的 4 个世（Epoch）色标：芙蓉世、苗岭世、第二世、纽芬兰世；大比例尺图件按世填色时直接取用",
+      "colors": [
+        {
+          "hex": "#C2DCAF",
+          "label": "芙蓉世 Є4"
+        },
+        {
+          "hex": "#B7D09F",
+          "label": "苗岭世 Є3"
+        },
+        {
+          "hex": "#ABC392",
+          "label": "第二世 Є2"
+        },
+        {
+          "hex": "#9FB784",
+          "label": "纽芬兰世 Є1"
+        }
+      ]
+    },
+    {
+      "id": "usgs-ages",
+      "name": "USGS 年代配色（美国色系）",
+      "source": "USGS TM 11-B1《Selection of Colors and Patterns for Geologic Maps》Plate 1",
+      "type": "labeled",
+      "group": "地质年代标准色",
+      "note": "美国地质调查局地质图年代用色体系（American color system）；自官方色卡各年代色带按标准色相取一档，CMYK 原值换算 RGB，以浅色底不遮挡地形为原则",
+      "colors": [
+        {
+          "hex": "#FFF684",
+          "label": "第四系 Q"
+        },
+        {
+          "hex": "#FFDB7E",
+          "label": "第三系 T"
+        },
+        {
+          "hex": "#D7DF23",
+          "label": "白垩系 K"
+        },
+        {
+          "hex": "#00A650",
+          "label": "侏罗系 J"
+        },
+        {
+          "hex": "#00929E",
+          "label": "三叠系 Tr"
+        },
+        {
+          "hex": "#007DC5",
+          "label": "二叠系 P"
+        },
+        {
+          "hex": "#005AA0",
+          "label": "宾夕法尼亚亚系 Pn"
+        },
+        {
+          "hex": "#2E3092",
+          "label": "密西西比亚系 M"
+        },
+        {
+          "hex": "#9BA5C6",
+          "label": "泥盆系 D"
+        },
+        {
+          "hex": "#C6168D",
+          "label": "志留系 S"
+        },
+        {
+          "hex": "#F27292",
+          "label": "奥陶系 O"
+        },
+        {
+          "hex": "#CD7B2C",
+          "label": "寒武系 Є"
+        },
+        {
+          "hex": "#BB7831",
+          "label": "前寒武系 PC"
         }
       ]
     },
@@ -355,39 +3961,76 @@
       ]
     },
     {
-      "id": "cividis",
-      "name": "Cividis",
-      "source": "matplotlib · cividis",
+      "id": "cmocean-thermal",
+      "name": "Thermal 温度场",
+      "source": "cmocean · thermal（Oceanography 2016）",
       "type": "sequential",
       "group": "连续色阶",
-      "note": "专为色盲优化的连续色阶，红绿色盲人群辨识度最高",
+      "note": "海洋/地学温度场标准色标，热流、地温梯度首选",
       "colors": [
         {
-          "hex": "#00224E"
+          "hex": "#042333"
         },
         {
-          "hex": "#1A386F"
+          "hex": "#19337C"
         },
         {
-          "hex": "#434E6C"
+          "hex": "#563B9C"
         },
         {
-          "hex": "#61656F"
+          "hex": "#83508F"
         },
         {
-          "hex": "#7D7C78"
+          "hex": "#B15F82"
         },
         {
-          "hex": "#9B9476"
+          "hex": "#DE7065"
         },
         {
-          "hex": "#BCAE6C"
+          "hex": "#F99242"
         },
         {
-          "hex": "#DEC958"
+          "hex": "#F9C441"
         },
         {
-          "hex": "#FEE838"
+          "hex": "#E8FA5B"
+        }
+      ]
+    },
+    {
+      "id": "crameri-batlow",
+      "name": "Batlow（Crameri）",
+      "source": "Crameri 科学色标 · batlow",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "Crameri 默认通用色标，感知均匀且色盲友好，可替代 jet/rainbow",
+      "colors": [
+        {
+          "hex": "#011959"
+        },
+        {
+          "hex": "#114360"
+        },
+        {
+          "hex": "#226061"
+        },
+        {
+          "hex": "#4D734D"
+        },
+        {
+          "hex": "#828231"
+        },
+        {
+          "hex": "#BE9035"
+        },
+        {
+          "hex": "#F19D6B"
+        },
+        {
+          "hex": "#FDB4B4"
+        },
+        {
+          "hex": "#FACCFA"
         }
       ]
     },
@@ -503,6 +4146,228 @@
       ]
     },
     {
+      "id": "cividis",
+      "name": "Cividis",
+      "source": "matplotlib · cividis",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "专为色盲优化的连续色阶，红绿色盲人群辨识度最高",
+      "colors": [
+        {
+          "hex": "#00224E"
+        },
+        {
+          "hex": "#1A386F"
+        },
+        {
+          "hex": "#434E6C"
+        },
+        {
+          "hex": "#61656F"
+        },
+        {
+          "hex": "#7D7C78"
+        },
+        {
+          "hex": "#9B9476"
+        },
+        {
+          "hex": "#BCAE6C"
+        },
+        {
+          "hex": "#DEC958"
+        },
+        {
+          "hex": "#FEE838"
+        }
+      ]
+    },
+    {
+      "id": "cmocean-haline",
+      "name": "Haline 盐度",
+      "source": "cmocean · haline（Oceanography 2016）",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "盐度/卤水浓度专用，也可用于孔隙水化学指标",
+      "colors": [
+        {
+          "hex": "#2A186C"
+        },
+        {
+          "hex": "#2034A2"
+        },
+        {
+          "hex": "#0F5B90"
+        },
+        {
+          "hex": "#297789"
+        },
+        {
+          "hex": "#3C9387"
+        },
+        {
+          "hex": "#4FAF7E"
+        },
+        {
+          "hex": "#78CB68"
+        },
+        {
+          "hex": "#C1DD64"
+        },
+        {
+          "hex": "#FDEF9A"
+        }
+      ]
+    },
+    {
+      "id": "cmocean-oxy",
+      "name": "Oxy 溶解氧",
+      "source": "cmocean · oxy（Oceanography 2016）",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "氧化还原/含氧量专用色标，地球化学Redox 剖面适用",
+      "colors": [
+        {
+          "hex": "#400505"
+        },
+        {
+          "hex": "#76050F"
+        },
+        {
+          "hex": "#5C5B5B"
+        },
+        {
+          "hex": "#7A7A79"
+        },
+        {
+          "hex": "#9B9A9A"
+        },
+        {
+          "hex": "#BDBDBC"
+        },
+        {
+          "hex": "#E4E4E3"
+        },
+        {
+          "hex": "#E9E334"
+        },
+        {
+          "hex": "#DDAF19"
+        }
+      ]
+    },
+    {
+      "id": "crameri-lajolla",
+      "name": "La Jolla（Crameri）",
+      "source": "Crameri 科学色标 · lajolla",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "低亮度端不刺眼，浅色底印刷与投影表现好",
+      "colors": [
+        {
+          "hex": "#191900"
+        },
+        {
+          "hex": "#372411"
+        },
+        {
+          "hex": "#67342A"
+        },
+        {
+          "hex": "#A64644"
+        },
+        {
+          "hex": "#D9604E"
+        },
+        {
+          "hex": "#E58751"
+        },
+        {
+          "hex": "#ECAC54"
+        },
+        {
+          "hex": "#F7D971"
+        },
+        {
+          "hex": "#FFFECB"
+        }
+      ]
+    },
+    {
+      "id": "crameri-oslo",
+      "name": "Oslo（Crameri）",
+      "source": "Crameri 科学色标 · oslo",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "冷色调单向色阶，适合温度梯度、深度一类变量",
+      "colors": [
+        {
+          "hex": "#010101"
+        },
+        {
+          "hex": "#0E1E2E"
+        },
+        {
+          "hex": "#15395B"
+        },
+        {
+          "hex": "#26578C"
+        },
+        {
+          "hex": "#507BBC"
+        },
+        {
+          "hex": "#7B98CA"
+        },
+        {
+          "hex": "#A2B0CA"
+        },
+        {
+          "hex": "#CED1D7"
+        },
+        {
+          "hex": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "id": "crameri-devon",
+      "name": "Devon（Crameri）",
+      "source": "Crameri 科学色标 · devon",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "柔和单向色阶，大面积填色时不易产生虚假边界",
+      "colors": [
+        {
+          "hex": "#2C1A4C"
+        },
+        {
+          "hex": "#29386A"
+        },
+        {
+          "hex": "#29588F"
+        },
+        {
+          "hex": "#4272BC"
+        },
+        {
+          "hex": "#7E8FDD"
+        },
+        {
+          "hex": "#AFAAEE"
+        },
+        {
+          "hex": "#CAC6F4"
+        },
+        {
+          "hex": "#E4E2FA"
+        },
+        {
+          "hex": "#FFFFFF"
+        }
+      ]
+    },
+    {
       "id": "blues",
       "name": "Blues 单色渐进",
       "source": "matplotlib · Blues",
@@ -540,11 +4405,1232 @@
       ]
     },
     {
+      "id": "turbo",
+      "name": "Turbo（彩虹改良）",
+      "source": "Google Turbo · matplotlib",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "Google 对 jet 的改良版：保留彩虹辨识度，去掉虚假条带；需要彩虹色时的推荐替代，但单向变量仍优先 viridis",
+      "colors": [
+        {
+          "hex": "#30123B"
+        },
+        {
+          "hex": "#466BE3"
+        },
+        {
+          "hex": "#28BCEB"
+        },
+        {
+          "hex": "#32F298"
+        },
+        {
+          "hex": "#A4FC3C"
+        },
+        {
+          "hex": "#EECF3A"
+        },
+        {
+          "hex": "#FB7E21"
+        },
+        {
+          "hex": "#D02F05"
+        },
+        {
+          "hex": "#7A0403"
+        }
+      ]
+    },
+    {
+      "id": "crameri-davos",
+      "name": "Davos（Crameri）",
+      "source": "Crameri 科学色标 · davos",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "冷灰蓝单向色阶，适合高程、深度、压力一类变量",
+      "colors": [
+        {
+          "hex": "#00054A"
+        },
+        {
+          "hex": "#143277"
+        },
+        {
+          "hex": "#2F5A96"
+        },
+        {
+          "hex": "#4E799D"
+        },
+        {
+          "hex": "#6C8E93"
+        },
+        {
+          "hex": "#8BA388"
+        },
+        {
+          "hex": "#BBC794"
+        },
+        {
+          "hex": "#EFF0CB"
+        },
+        {
+          "hex": "#FEFEFE"
+        }
+      ]
+    },
+    {
+      "id": "crameri-hawaii",
+      "name": "Hawaii（Crameri）",
+      "source": "Crameri 科学色标 · hawaii",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "绿-蓝-紫渐变，适合植被覆盖、湿度与含水率",
+      "colors": [
+        {
+          "hex": "#8C0273"
+        },
+        {
+          "hex": "#922E55"
+        },
+        {
+          "hex": "#974E3E"
+        },
+        {
+          "hex": "#9B6F28"
+        },
+        {
+          "hex": "#9C961C"
+        },
+        {
+          "hex": "#8ABC48"
+        },
+        {
+          "hex": "#6CD48C"
+        },
+        {
+          "hex": "#66E8D3"
+        },
+        {
+          "hex": "#B3F2FD"
+        }
+      ]
+    },
+    {
+      "id": "crameri-imola",
+      "name": "Imola（Crameri）",
+      "source": "Crameri 科学色标 · imola",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "蓝紫转暖黄，色相跨度大、层次分明，适合连续场分级",
+      "colors": [
+        {
+          "hex": "#1A33B3"
+        },
+        {
+          "hex": "#2549A8"
+        },
+        {
+          "hex": "#305E9D"
+        },
+        {
+          "hex": "#3F718E"
+        },
+        {
+          "hex": "#54867F"
+        },
+        {
+          "hex": "#70A377"
+        },
+        {
+          "hex": "#91C36F"
+        },
+        {
+          "hex": "#BDE667"
+        },
+        {
+          "hex": "#FFFF66"
+        }
+      ]
+    },
+    {
+      "id": "crameri-tokyo",
+      "name": "Tokyo（Crameri）",
+      "source": "Crameri 科学色标 · tokyo",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "暗紫到黄褐，整体偏暗，投影与深色底图上稳重",
+      "colors": [
+        {
+          "hex": "#1C0E34"
+        },
+        {
+          "hex": "#512446"
+        },
+        {
+          "hex": "#6C4750"
+        },
+        {
+          "hex": "#715D52"
+        },
+        {
+          "hex": "#747053"
+        },
+        {
+          "hex": "#798B56"
+        },
+        {
+          "hex": "#87B666"
+        },
+        {
+          "hex": "#B8E8A1"
+        },
+        {
+          "hex": "#EFFCDD"
+        }
+      ]
+    },
+    {
+      "id": "crameri-turku",
+      "name": "Turku（Crameri）",
+      "source": "Crameri 科学色标 · turku",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "柔和土色系，印刷友好，大面积填色不刺眼",
+      "colors": [
+        {
+          "hex": "#000000"
+        },
+        {
+          "hex": "#282823"
+        },
+        {
+          "hex": "#49493A"
+        },
+        {
+          "hex": "#6B6A49"
+        },
+        {
+          "hex": "#938C5B"
+        },
+        {
+          "hex": "#C2A373"
+        },
+        {
+          "hex": "#E4AA8F"
+        },
+        {
+          "hex": "#FBC3BD"
+        },
+        {
+          "hex": "#FFE6E6"
+        }
+      ]
+    },
+    {
+      "id": "cmocean-dense",
+      "name": "Dense 密度场（cmocean）",
+      "source": "cmocean · dense（Oceanography 2016）",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "海水密度、重力密度类标量场专用色标",
+      "colors": [
+        {
+          "hex": "#E6F1F1"
+        },
+        {
+          "hex": "#B1D6E3"
+        },
+        {
+          "hex": "#86B9E3"
+        },
+        {
+          "hex": "#7397E4"
+        },
+        {
+          "hex": "#7871D5"
+        },
+        {
+          "hex": "#784EB3"
+        },
+        {
+          "hex": "#6F2E85"
+        },
+        {
+          "hex": "#5A1851"
+        },
+        {
+          "hex": "#360E24"
+        }
+      ]
+    },
+    {
+      "id": "cmocean-ice",
+      "name": "Ice 冰盖冻结（cmocean）",
+      "source": "cmocean · ice（Oceanography 2016）",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "冰量、冻土、低温场适用，冷色系层次清楚",
+      "colors": [
+        {
+          "hex": "#040613"
+        },
+        {
+          "hex": "#212041"
+        },
+        {
+          "hex": "#383975"
+        },
+        {
+          "hex": "#3F57A3"
+        },
+        {
+          "hex": "#427BB7"
+        },
+        {
+          "hex": "#579CC3"
+        },
+        {
+          "hex": "#79BED0"
+        },
+        {
+          "hex": "#AFDDE1"
+        },
+        {
+          "hex": "#EAFDFD"
+        }
+      ]
+    },
+    {
+      "id": "cmocean-algae",
+      "name": "Algae 藻类生产力（cmocean）",
+      "source": "cmocean · algae（Oceanography 2016）",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "叶绿素、初级生产力、有机质含量等生物地化指标",
+      "colors": [
+        {
+          "hex": "#D7F9D0"
+        },
+        {
+          "hex": "#AFDDA2"
+        },
+        {
+          "hex": "#84C47A"
+        },
+        {
+          "hex": "#50AD59"
+        },
+        {
+          "hex": "#129450"
+        },
+        {
+          "hex": "#0C7849"
+        },
+        {
+          "hex": "#185B3B"
+        },
+        {
+          "hex": "#194029"
+        },
+        {
+          "hex": "#122414"
+        }
+      ]
+    },
+    {
+      "id": "cmocean-solar",
+      "name": "Solar 太阳辐射（cmocean）",
+      "source": "cmocean · solar（Oceanography 2016）",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "辐射通量、日照、热流密度等能量类变量",
+      "colors": [
+        {
+          "hex": "#331418"
+        },
+        {
+          "hex": "#5B2023"
+        },
+        {
+          "hex": "#822D22"
+        },
+        {
+          "hex": "#A04519"
+        },
+        {
+          "hex": "#B66413"
+        },
+        {
+          "hex": "#C78616"
+        },
+        {
+          "hex": "#D4AB23"
+        },
+        {
+          "hex": "#DDD236"
+        },
+        {
+          "hex": "#E1FD4B"
+        }
+      ]
+    },
+    {
+      "id": "mpl-ylgnbu",
+      "name": "YlGnBu 黄绿蓝",
+      "source": "matplotlib · YlGnBu（ColorBrewer 顺序板）",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "黄-绿-蓝顺序渐深，适合降水、湿度、强度分级",
+      "colors": [
+        {
+          "hex": "#FFFFD9"
+        },
+        {
+          "hex": "#EDF8B1"
+        },
+        {
+          "hex": "#C6E9B4"
+        },
+        {
+          "hex": "#7ECDBB"
+        },
+        {
+          "hex": "#40B5C4"
+        },
+        {
+          "hex": "#1D90C0"
+        },
+        {
+          "hex": "#225DA8"
+        },
+        {
+          "hex": "#243392"
+        },
+        {
+          "hex": "#081D58"
+        }
+      ]
+    },
+    {
+      "id": "mpl-ylorrd",
+      "name": "YlOrRd 黄橙红",
+      "source": "matplotlib · YlOrRd（ColorBrewer 顺序板）",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "黄橙红递进，适合品位、热度、异常强度一类变量",
+      "colors": [
+        {
+          "hex": "#FFFFCC"
+        },
+        {
+          "hex": "#FFEDA0"
+        },
+        {
+          "hex": "#FED976"
+        },
+        {
+          "hex": "#FEB24C"
+        },
+        {
+          "hex": "#FD8C3C"
+        },
+        {
+          "hex": "#FC4D2A"
+        },
+        {
+          "hex": "#E2191C"
+        },
+        {
+          "hex": "#BB0026"
+        },
+        {
+          "hex": "#800026"
+        }
+      ]
+    },
+    {
+      "id": "mpl-cubehelix",
+      "name": "Cubehelix 螺旋色阶",
+      "source": "matplotlib · cubehelix（Green 2011）",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "亮度单调递增的螺旋色阶，转灰度后信息不丢失",
+      "colors": [
+        {
+          "hex": "#000000"
+        },
+        {
+          "hex": "#1B1E3B"
+        },
+        {
+          "hex": "#16534C"
+        },
+        {
+          "hex": "#447731"
+        },
+        {
+          "hex": "#A1794A"
+        },
+        {
+          "hex": "#D484A9"
+        },
+        {
+          "hex": "#C6B4EE"
+        },
+        {
+          "hex": "#CBE8F0"
+        },
+        {
+          "hex": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "id": "crameri-acton",
+      "name": "Acton（Crameri）",
+      "source": "Crameri 科学色标 · acton",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "低饱和冷色单向色阶，适合连续场平滑过渡",
+      "colors": [
+        {
+          "hex": "#260D40"
+        },
+        {
+          "hex": "#413362"
+        },
+        {
+          "hex": "#595481"
+        },
+        {
+          "hex": "#7E638E"
+        },
+        {
+          "hex": "#A86690"
+        },
+        {
+          "hex": "#CF789E"
+        },
+        {
+          "hex": "#DDA1C2"
+        },
+        {
+          "hex": "#E8CAE1"
+        },
+        {
+          "hex": "#F0EAFA"
+        }
+      ]
+    },
+    {
+      "id": "crameri-bam",
+      "name": "Bam（Crameri）",
+      "source": "Crameri 科学色标 · bam",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "粉紫到深绿的柔和色阶，印刷与投影都稳",
+      "colors": [
+        {
+          "hex": "#65024B"
+        },
+        {
+          "hex": "#A5438C"
+        },
+        {
+          "hex": "#D17FBC"
+        },
+        {
+          "hex": "#ECC6E2"
+        },
+        {
+          "hex": "#F6F1F0"
+        },
+        {
+          "hex": "#D8E8C2"
+        },
+        {
+          "hex": "#8DB565"
+        },
+        {
+          "hex": "#4C812F"
+        },
+        {
+          "hex": "#0D4C00"
+        }
+      ]
+    },
+    {
+      "id": "crameri-bamako",
+      "name": "Bamako（Crameri）",
+      "source": "Crameri 科学色标 · bamako",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "暖沙色系单向色阶，适合干旱区与地表过程变量",
+      "colors": [
+        {
+          "hex": "#003B47"
+        },
+        {
+          "hex": "#10453E"
+        },
+        {
+          "hex": "#255231"
+        },
+        {
+          "hex": "#41641F"
+        },
+        {
+          "hex": "#637A0A"
+        },
+        {
+          "hex": "#898900"
+        },
+        {
+          "hex": "#B4A022"
+        },
+        {
+          "hex": "#DDC464"
+        },
+        {
+          "hex": "#FFE5AD"
+        }
+      ]
+    },
+    {
+      "id": "crameri-bilbao",
+      "name": "Bilbao（Crameri）",
+      "source": "Crameri 科学色标 · bilbao",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "灰白到紫红，低亮度端干净，适合印刷图件",
+      "colors": [
+        {
+          "hex": "#4C0001"
+        },
+        {
+          "hex": "#78292F"
+        },
+        {
+          "hex": "#994E51"
+        },
+        {
+          "hex": "#A36B59"
+        },
+        {
+          "hex": "#A9825E"
+        },
+        {
+          "hex": "#B09B66"
+        },
+        {
+          "hex": "#BFB897"
+        },
+        {
+          "hex": "#CECDC7"
+        },
+        {
+          "hex": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "id": "crameri-bukavu",
+      "name": "Bukavu（Crameri）",
+      "source": "Crameri 科学色标 · bukavu",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "蓝绿到暖黄的宽色域色阶，层次丰富",
+      "colors": [
+        {
+          "hex": "#1A3333"
+        },
+        {
+          "hex": "#235786"
+        },
+        {
+          "hex": "#3F92C8"
+        },
+        {
+          "hex": "#7AC7CC"
+        },
+        {
+          "hex": "#014026"
+        },
+        {
+          "hex": "#476C19"
+        },
+        {
+          "hex": "#9A7D42"
+        },
+        {
+          "hex": "#CEB99C"
+        },
+        {
+          "hex": "#EDEDFC"
+        }
+      ]
+    },
+    {
+      "id": "crameri-fes",
+      "name": "FES（Crameri）",
+      "source": "Crameri 科学色标 · fes",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "棕黄到青蓝的自然色阶，适合地貌与地表覆盖",
+      "colors": [
+        {
+          "hex": "#0D0D0D"
+        },
+        {
+          "hex": "#464646"
+        },
+        {
+          "hex": "#777777"
+        },
+        {
+          "hex": "#ABABAB"
+        },
+        {
+          "hex": "#024026"
+        },
+        {
+          "hex": "#5C5D26"
+        },
+        {
+          "hex": "#A8763C"
+        },
+        {
+          "hex": "#D0BA9C"
+        },
+        {
+          "hex": "#EDEDFC"
+        }
+      ]
+    },
+    {
+      "id": "crameri-glasgow",
+      "name": "Glasgow（Crameri）",
+      "source": "Crameri 科学色标 · glasgow",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "深紫到浅黄的感知均匀色阶，色盲友好",
+      "colors": [
+        {
+          "hex": "#361338"
+        },
+        {
+          "hex": "#521B20"
+        },
+        {
+          "hex": "#702D06"
+        },
+        {
+          "hex": "#745101"
+        },
+        {
+          "hex": "#6D702D"
+        },
+        {
+          "hex": "#638968"
+        },
+        {
+          "hex": "#69A3A5"
+        },
+        {
+          "hex": "#A0BBD3"
+        },
+        {
+          "hex": "#DBD3FF"
+        }
+      ]
+    },
+    {
+      "id": "crameri-lapaz",
+      "name": "La Paz（Crameri）",
+      "source": "Crameri 科学色标 · lapaz",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "深蓝到浅粉的冷色阶，适合深度与低温场",
+      "colors": [
+        {
+          "hex": "#1A0C64"
+        },
+        {
+          "hex": "#24327E"
+        },
+        {
+          "hex": "#2D5393"
+        },
+        {
+          "hex": "#3D71A0"
+        },
+        {
+          "hex": "#5C8CA3"
+        },
+        {
+          "hex": "#859E9C"
+        },
+        {
+          "hex": "#B3AC96"
+        },
+        {
+          "hex": "#EACEB9"
+        },
+        {
+          "hex": "#FEF2F3"
+        }
+      ]
+    },
+    {
+      "id": "cmocean-matter",
+      "name": "Matter 悬浮物（cmocean）",
+      "source": "cmocean · matter（Oceanography 2016）",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "悬浮物浓度、浊度、总有机质等指标",
+      "colors": [
+        {
+          "hex": "#FEEDB0"
+        },
+        {
+          "hex": "#F9C187"
+        },
+        {
+          "hex": "#F29567"
+        },
+        {
+          "hex": "#E66A54"
+        },
+        {
+          "hex": "#CE4356"
+        },
+        {
+          "hex": "#AC2A60"
+        },
+        {
+          "hex": "#841C63"
+        },
+        {
+          "hex": "#591757"
+        },
+        {
+          "hex": "#2F0F3E"
+        }
+      ]
+    },
+    {
+      "id": "cmocean-turbid",
+      "name": "Turbid 浊度（cmocean）",
+      "source": "cmocean · turbid（Oceanography 2016）",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "浑浊度/含沙量专用，棕黄到深绿",
+      "colors": [
+        {
+          "hex": "#E9F6AB"
+        },
+        {
+          "hex": "#D8D17E"
+        },
+        {
+          "hex": "#CAAE58"
+        },
+        {
+          "hex": "#B98C42"
+        },
+        {
+          "hex": "#A1703B"
+        },
+        {
+          "hex": "#845A39"
+        },
+        {
+          "hex": "#634634"
+        },
+        {
+          "hex": "#423329"
+        },
+        {
+          "hex": "#221F1B"
+        }
+      ]
+    },
+    {
+      "id": "cmocean-speed",
+      "name": "Speed 流速（cmocean）",
+      "source": "cmocean · speed（Oceanography 2016）",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "流速、风速、剪切速率等速率场",
+      "colors": [
+        {
+          "hex": "#FFFDCD"
+        },
+        {
+          "hex": "#E9D889"
+        },
+        {
+          "hex": "#C9BA45"
+        },
+        {
+          "hex": "#98A512"
+        },
+        {
+          "hex": "#5F920C"
+        },
+        {
+          "hex": "#287C23"
+        },
+        {
+          "hex": "#0B602D"
+        },
+        {
+          "hex": "#174127"
+        },
+        {
+          "hex": "#172313"
+        }
+      ]
+    },
+    {
+      "id": "cmocean-amp",
+      "name": "Amp 振幅（cmocean）",
+      "source": "cmocean · amp（Oceanography 2016）",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "振幅、强度、能量类标量场",
+      "colors": [
+        {
+          "hex": "#F1EDEC"
+        },
+        {
+          "hex": "#E2C7BF"
+        },
+        {
+          "hex": "#D7A291"
+        },
+        {
+          "hex": "#CC7E64"
+        },
+        {
+          "hex": "#C0583B"
+        },
+        {
+          "hex": "#AF3024"
+        },
+        {
+          "hex": "#901029"
+        },
+        {
+          "hex": "#650F24"
+        },
+        {
+          "hex": "#3C0912"
+        }
+      ]
+    },
+    {
+      "id": "cmocean-tempo",
+      "name": "Tempo 时间相位（cmocean）",
+      "source": "cmocean · tempo（Oceanography 2016）",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "时间进度、相位与周期性过程",
+      "colors": [
+        {
+          "hex": "#FFF6F4"
+        },
+        {
+          "hex": "#D2D9C7"
+        },
+        {
+          "hex": "#A1C1A1"
+        },
+        {
+          "hex": "#69AB89"
+        },
+        {
+          "hex": "#2A937F"
+        },
+        {
+          "hex": "#117777"
+        },
+        {
+          "hex": "#1B5968"
+        },
+        {
+          "hex": "#1B3C56"
+        },
+        {
+          "hex": "#151D44"
+        }
+      ]
+    },
+    {
+      "id": "cmocean-rain",
+      "name": "Rain 降水（cmocean）",
+      "source": "cmocean · rain（Oceanography 2016）",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "降水量、补给量、通量类变量",
+      "colors": [
+        {
+          "hex": "#EEEDF3"
+        },
+        {
+          "hex": "#DBCBBC"
+        },
+        {
+          "hex": "#B5B38A"
+        },
+        {
+          "hex": "#7EA177"
+        },
+        {
+          "hex": "#3D8E6E"
+        },
+        {
+          "hex": "#06756E"
+        },
+        {
+          "hex": "#145867"
+        },
+        {
+          "hex": "#253951"
+        },
+        {
+          "hex": "#221B38"
+        }
+      ]
+    },
+    {
+      "id": "cb-ylgn",
+      "name": "ColorBrewer YlGn",
+      "source": "ColorBrewer 2.0 · YlGn（Cynthia Brewer）",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "黄到深绿顺序板，适合植被与覆盖度分级",
+      "colors": [
+        {
+          "hex": "#FFFFE5"
+        },
+        {
+          "hex": "#F7FCB9"
+        },
+        {
+          "hex": "#D9F0A3"
+        },
+        {
+          "hex": "#ADDD8E"
+        },
+        {
+          "hex": "#78C679"
+        },
+        {
+          "hex": "#41AB5D"
+        },
+        {
+          "hex": "#238443"
+        },
+        {
+          "hex": "#006837"
+        },
+        {
+          "hex": "#004529"
+        }
+      ]
+    },
+    {
+      "id": "cb-orrd",
+      "name": "ColorBrewer OrRd",
+      "source": "ColorBrewer 2.0 · OrRd（Cynthia Brewer）",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "橙到深红顺序板，适合温度与强度分级",
+      "colors": [
+        {
+          "hex": "#FFF7EC"
+        },
+        {
+          "hex": "#FEE8C8"
+        },
+        {
+          "hex": "#FDD49E"
+        },
+        {
+          "hex": "#FDBB84"
+        },
+        {
+          "hex": "#FC8D59"
+        },
+        {
+          "hex": "#EF6548"
+        },
+        {
+          "hex": "#D7301F"
+        },
+        {
+          "hex": "#B30000"
+        },
+        {
+          "hex": "#7F0000"
+        }
+      ]
+    },
+    {
+      "id": "cb-pubu",
+      "name": "ColorBrewer PuBu",
+      "source": "ColorBrewer 2.0 · PuBu（Cynthia Brewer）",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "紫到深蓝顺序板，适合降水与湿度分级",
+      "colors": [
+        {
+          "hex": "#FFF7FB"
+        },
+        {
+          "hex": "#ECE7F2"
+        },
+        {
+          "hex": "#D0D1E6"
+        },
+        {
+          "hex": "#A6BDDB"
+        },
+        {
+          "hex": "#74A9CF"
+        },
+        {
+          "hex": "#3690C0"
+        },
+        {
+          "hex": "#0570B0"
+        },
+        {
+          "hex": "#045A8D"
+        },
+        {
+          "hex": "#023858"
+        }
+      ]
+    },
+    {
+      "id": "cb-gnbu",
+      "name": "ColorBrewer GnBu",
+      "source": "ColorBrewer 2.0 · GnBu（Cynthia Brewer）",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "绿到深蓝顺序板，适合水体与冷量场",
+      "colors": [
+        {
+          "hex": "#F7FCF0"
+        },
+        {
+          "hex": "#E0F3DB"
+        },
+        {
+          "hex": "#CCEBC5"
+        },
+        {
+          "hex": "#A8DDB5"
+        },
+        {
+          "hex": "#7BCCC4"
+        },
+        {
+          "hex": "#4EB3D3"
+        },
+        {
+          "hex": "#2B8CBE"
+        },
+        {
+          "hex": "#0868AC"
+        },
+        {
+          "hex": "#084081"
+        }
+      ]
+    },
+    {
+      "id": "cb-bugn",
+      "name": "ColorBrewer BuGn",
+      "source": "ColorBrewer 2.0 · BuGn（Cynthia Brewer）",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "蓝到深绿顺序板，适合含水与生态指标",
+      "colors": [
+        {
+          "hex": "#F7FCFD"
+        },
+        {
+          "hex": "#E5F5F9"
+        },
+        {
+          "hex": "#CCECE6"
+        },
+        {
+          "hex": "#99D8C9"
+        },
+        {
+          "hex": "#66C2A4"
+        },
+        {
+          "hex": "#41AE76"
+        },
+        {
+          "hex": "#238B45"
+        },
+        {
+          "hex": "#006D2C"
+        },
+        {
+          "hex": "#00441B"
+        }
+      ]
+    },
+    {
+      "id": "cb-bupu",
+      "name": "ColorBrewer BuPu",
+      "source": "ColorBrewer 2.0 · BuPu（Cynthia Brewer）",
+      "type": "sequential",
+      "group": "连续色阶",
+      "note": "蓝到深紫顺序板，适合浓度与密度分级",
+      "colors": [
+        {
+          "hex": "#F7FCFD"
+        },
+        {
+          "hex": "#E0ECF4"
+        },
+        {
+          "hex": "#BFD3E6"
+        },
+        {
+          "hex": "#9EBCDA"
+        },
+        {
+          "hex": "#8C96C6"
+        },
+        {
+          "hex": "#8C6BB1"
+        },
+        {
+          "hex": "#88419D"
+        },
+        {
+          "hex": "#810F7C"
+        },
+        {
+          "hex": "#4D004B"
+        }
+      ]
+    },
+    {
       "id": "rdbu",
       "name": "RdBu 红蓝发散",
       "source": "matplotlib · RdBu_r",
       "type": "diverging",
-      "group": "发散型配色",
+      "group": "发散色阶",
       "note": "以中性灰为界，红蓝双向发散；适合正负异常、同位素偏差、相关性矩阵",
       "colors": [
         {
@@ -583,11 +5669,140 @@
       ]
     },
     {
+      "id": "crameri-vik",
+      "name": "Vik（Crameri 发散）",
+      "source": "Crameri 科学色标 · vik",
+      "type": "diverging",
+      "group": "发散色阶",
+      "note": "冷暖双向发散，跨度大，适合异常场与差值图",
+      "colors": [
+        {
+          "hex": "#001261"
+        },
+        {
+          "hex": "#023A7B"
+        },
+        {
+          "hex": "#116496"
+        },
+        {
+          "hex": "#5496B7"
+        },
+        {
+          "hex": "#A7C9DA"
+        },
+        {
+          "hex": "#ECE5E0"
+        },
+        {
+          "hex": "#E1B8A0"
+        },
+        {
+          "hex": "#CD8961"
+        },
+        {
+          "hex": "#B75A26"
+        },
+        {
+          "hex": "#852206"
+        },
+        {
+          "hex": "#590008"
+        }
+      ]
+    },
+    {
+      "id": "cmocean-delta",
+      "name": "Delta 发散",
+      "source": "cmocean · delta（Oceanography 2016）",
+      "type": "diverging",
+      "group": "发散色阶",
+      "note": "正负异常发散色标，重力异常、磁异常、同位素偏差适用",
+      "colors": [
+        {
+          "hex": "#112040"
+        },
+        {
+          "hex": "#234397"
+        },
+        {
+          "hex": "#2378A3"
+        },
+        {
+          "hex": "#4EA8AF"
+        },
+        {
+          "hex": "#ACCEC6"
+        },
+        {
+          "hex": "#FFFDCD"
+        },
+        {
+          "hex": "#D8C55F"
+        },
+        {
+          "hex": "#8EA20B"
+        },
+        {
+          "hex": "#32801F"
+        },
+        {
+          "hex": "#10542C"
+        },
+        {
+          "hex": "#172313"
+        }
+      ]
+    },
+    {
+      "id": "crameri-roma",
+      "name": "Roma（Crameri 发散）",
+      "source": "Crameri 科学色标 · roma",
+      "type": "diverging",
+      "group": "发散色阶",
+      "note": "双向发散，感知均匀，是 RdBu 的改良替代",
+      "colors": [
+        {
+          "hex": "#7E1700"
+        },
+        {
+          "hex": "#984E14"
+        },
+        {
+          "hex": "#AC7726"
+        },
+        {
+          "hex": "#C1A343"
+        },
+        {
+          "hex": "#D2D484"
+        },
+        {
+          "hex": "#C0EAC3"
+        },
+        {
+          "hex": "#89DAD7"
+        },
+        {
+          "hex": "#4DB3CF"
+        },
+        {
+          "hex": "#2D88BE"
+        },
+        {
+          "hex": "#1E5FAC"
+        },
+        {
+          "hex": "#033198"
+        }
+      ]
+    },
+    {
       "id": "spectral",
       "name": "Spectral 光谱发散",
       "source": "matplotlib · Spectral_r",
       "type": "diverging",
-      "group": "发散型配色",
+      "group": "发散色阶",
       "note": "红黄蓝光谱型发散，中间过渡柔和，适合大范围异常场展示",
       "colors": [
         {
@@ -630,7 +5845,7 @@
       "name": "PiYG 粉绿发散",
       "source": "matplotlib · PiYG",
       "type": "diverging",
-      "group": "发散型配色",
+      "group": "发散色阶",
       "note": "粉绿双向发散，冷暖对比强烈，适合二分类对立关系",
       "colors": [
         {
@@ -663,42 +5878,896 @@
       ]
     },
     {
-      "id": "d3-category10",
-      "name": "D3 Category10",
-      "source": "D3.js · category10",
-      "type": "categorical",
-      "group": "分类型配色",
-      "note": "数据可视化领域最通用的 10 色分类板，兼容性最好",
+      "id": "crameri-berlin",
+      "name": "Berlin（Crameri 发散）",
+      "source": "Crameri 科学色标 · berlin",
+      "type": "diverging",
+      "group": "发散色阶",
+      "note": "蓝-黑-红，零值端压暗，适合突出正负异常的极值",
       "colors": [
         {
-          "hex": "#1F77B4"
+          "hex": "#9EB0FF"
         },
         {
-          "hex": "#FF7F0E"
+          "hex": "#60A5DF"
         },
         {
-          "hex": "#2CA02C"
+          "hex": "#3280A6"
         },
         {
-          "hex": "#D62728"
+          "hex": "#20526A"
         },
         {
-          "hex": "#9467BD"
+          "hex": "#112732"
         },
         {
-          "hex": "#8C564B"
+          "hex": "#190C09"
         },
         {
-          "hex": "#E377C2"
+          "hex": "#371000"
         },
         {
-          "hex": "#7F7F7F"
+          "hex": "#5F1F0A"
         },
         {
-          "hex": "#BCBD22"
+          "hex": "#964A36"
         },
         {
-          "hex": "#17BECF"
+          "hex": "#CA7B71"
+        },
+        {
+          "hex": "#FFADAD"
+        }
+      ]
+    },
+    {
+      "id": "crameri-broc",
+      "name": "Broc（Crameri 发散）",
+      "source": "Crameri 科学色标 · broc",
+      "type": "diverging",
+      "group": "发散色阶",
+      "note": "蓝绿-米白-棕，低饱和双向色阶，印刷与投影都稳",
+      "colors": [
+        {
+          "hex": "#2C1A4C"
+        },
+        {
+          "hex": "#284174"
+        },
+        {
+          "hex": "#3F6B99"
+        },
+        {
+          "hex": "#7697B7"
+        },
+        {
+          "hex": "#B3C5D7"
+        },
+        {
+          "hex": "#EBEEEC"
+        },
+        {
+          "hex": "#DCDBB8"
+        },
+        {
+          "hex": "#B6B67C"
+        },
+        {
+          "hex": "#81814C"
+        },
+        {
+          "hex": "#505023"
+        },
+        {
+          "hex": "#262600"
+        }
+      ]
+    },
+    {
+      "id": "crameri-cork",
+      "name": "Cork（Crameri 发散）",
+      "source": "Crameri 科学色标 · cork",
+      "type": "diverging",
+      "group": "发散色阶",
+      "note": "绿-白-紫双向，色相区分强且色盲友好",
+      "colors": [
+        {
+          "hex": "#2C194C"
+        },
+        {
+          "hex": "#284275"
+        },
+        {
+          "hex": "#3D6B98"
+        },
+        {
+          "hex": "#6F92B3"
+        },
+        {
+          "hex": "#ADC1D4"
+        },
+        {
+          "hex": "#E6EDEC"
+        },
+        {
+          "hex": "#B7CFB7"
+        },
+        {
+          "hex": "#7BA77A"
+        },
+        {
+          "hex": "#438142"
+        },
+        {
+          "hex": "#195615"
+        },
+        {
+          "hex": "#0F2903"
+        }
+      ]
+    },
+    {
+      "id": "crameri-managua",
+      "name": "Managua（Crameri 发散）",
+      "source": "Crameri 科学色标 · managua",
+      "type": "diverging",
+      "group": "发散色阶",
+      "note": "蓝-白-橙红，正负两端对比清晰，适合异常场与差值图",
+      "colors": [
+        {
+          "hex": "#FFCF67"
+        },
+        {
+          "hex": "#DF9D56"
+        },
+        {
+          "hex": "#C17449"
+        },
+        {
+          "hex": "#A0513E"
+        },
+        {
+          "hex": "#773339"
+        },
+        {
+          "hex": "#572949"
+        },
+        {
+          "hex": "#4C3D73"
+        },
+        {
+          "hex": "#5161A1"
+        },
+        {
+          "hex": "#5F89C3"
+        },
+        {
+          "hex": "#6FB6E2"
+        },
+        {
+          "hex": "#81E7FF"
+        }
+      ]
+    },
+    {
+      "id": "cmocean-balance",
+      "name": "Balance 收支平衡（cmocean）",
+      "source": "cmocean · balance（Oceanography 2016）",
+      "type": "diverging",
+      "group": "发散色阶",
+      "note": "正负收支、通量平衡、源汇项专用发散色标",
+      "colors": [
+        {
+          "hex": "#181C43"
+        },
+        {
+          "hex": "#293F9A"
+        },
+        {
+          "hex": "#1670BC"
+        },
+        {
+          "hex": "#599CBB"
+        },
+        {
+          "hex": "#AAC2CB"
+        },
+        {
+          "hex": "#F1ECEB"
+        },
+        {
+          "hex": "#DCB2A4"
+        },
+        {
+          "hex": "#CA795D"
+        },
+        {
+          "hex": "#B33826"
+        },
+        {
+          "hex": "#7E0E29"
+        },
+        {
+          "hex": "#3C0912"
+        }
+      ]
+    },
+    {
+      "id": "cmocean-curl",
+      "name": "Curl 涡度（cmocean）",
+      "source": "cmocean · curl（Oceanography 2016）",
+      "type": "diverging",
+      "group": "发散色阶",
+      "note": "旋度/涡度场专用，环流与剪切变形区辨识清楚",
+      "colors": [
+        {
+          "hex": "#151D44"
+        },
+        {
+          "hex": "#1C4D61"
+        },
+        {
+          "hex": "#117D79"
+        },
+        {
+          "hex": "#5DA786"
+        },
+        {
+          "hex": "#B6CBAF"
+        },
+        {
+          "hex": "#FEF6F5"
+        },
+        {
+          "hex": "#E6B7A2"
+        },
+        {
+          "hex": "#D4776A"
+        },
+        {
+          "hex": "#AE4060"
+        },
+        {
+          "hex": "#76195D"
+        },
+        {
+          "hex": "#340D35"
+        }
+      ]
+    },
+    {
+      "id": "mpl-coolwarm",
+      "name": "Coolwarm 冷暖",
+      "source": "matplotlib · coolwarm（Moreland 2009）",
+      "type": "diverging",
+      "group": "发散色阶",
+      "note": "经典冷暖双向色阶，中心近白，适合零基准异常场",
+      "colors": [
+        {
+          "hex": "#3B4CC0"
+        },
+        {
+          "hex": "#5977E3"
+        },
+        {
+          "hex": "#7B9FF9"
+        },
+        {
+          "hex": "#9EBEFF"
+        },
+        {
+          "hex": "#C0D4F5"
+        },
+        {
+          "hex": "#DDDCDC"
+        },
+        {
+          "hex": "#F2CBB7"
+        },
+        {
+          "hex": "#F7AC8E"
+        },
+        {
+          "hex": "#EE8468"
+        },
+        {
+          "hex": "#D65244"
+        },
+        {
+          "hex": "#B40426"
+        }
+      ]
+    },
+    {
+      "id": "mpl-brbg",
+      "name": "BrBG 棕绿发散",
+      "source": "matplotlib · BrBG（ColorBrewer 发散板）",
+      "type": "diverging",
+      "group": "发散色阶",
+      "note": "棕-白-青绿双向，适合干旱/湿润、氧化/还原一类对立变量",
+      "colors": [
+        {
+          "hex": "#543005"
+        },
+        {
+          "hex": "#8B500A"
+        },
+        {
+          "hex": "#BF812D"
+        },
+        {
+          "hex": "#DEC17B"
+        },
+        {
+          "hex": "#F6E8C3"
+        },
+        {
+          "hex": "#F4F5F5"
+        },
+        {
+          "hex": "#C7EAE5"
+        },
+        {
+          "hex": "#7FCCC0"
+        },
+        {
+          "hex": "#35978F"
+        },
+        {
+          "hex": "#01655D"
+        },
+        {
+          "hex": "#003C30"
+        }
+      ]
+    },
+    {
+      "id": "crameri-viko",
+      "name": "VikO（Crameri 循环）",
+      "source": "Crameri 科学色标 · vikO",
+      "type": "diverging",
+      "group": "发散色阶",
+      "note": "Vik 的循环版本，首尾相接，适合相位/方位角数据",
+      "colors": [
+        {
+          "hex": "#4F1A3D"
+        },
+        {
+          "hex": "#3C3263"
+        },
+        {
+          "hex": "#355C8D"
+        },
+        {
+          "hex": "#5E8DB1"
+        },
+        {
+          "hex": "#A4B9C8"
+        },
+        {
+          "hex": "#D5BEB3"
+        },
+        {
+          "hex": "#D59C7D"
+        },
+        {
+          "hex": "#BA6A45"
+        },
+        {
+          "hex": "#8A3320"
+        },
+        {
+          "hex": "#651725"
+        },
+        {
+          "hex": "#50193C"
+        }
+      ]
+    },
+    {
+      "id": "crameri-romao",
+      "name": "RomaO（Crameri 循环）",
+      "source": "Crameri 科学色标 · romaO",
+      "type": "diverging",
+      "group": "发散色阶",
+      "note": "Roma 的循环版本，双向过渡平滑，适合周期性场",
+      "colors": [
+        {
+          "hex": "#733957"
+        },
+        {
+          "hex": "#863F38"
+        },
+        {
+          "hex": "#9C5D2B"
+        },
+        {
+          "hex": "#B88E3B"
+        },
+        {
+          "hex": "#D3C876"
+        },
+        {
+          "hex": "#CBE1B3"
+        },
+        {
+          "hex": "#9BD4CD"
+        },
+        {
+          "hex": "#65ADCA"
+        },
+        {
+          "hex": "#4E7CB2"
+        },
+        {
+          "hex": "#5E4F85"
+        },
+        {
+          "hex": "#723959"
+        }
+      ]
+    },
+    {
+      "id": "crameri-broco",
+      "name": "BrocO（Crameri 循环）",
+      "source": "Crameri 科学色标 · brocO",
+      "type": "diverging",
+      "group": "发散色阶",
+      "note": "Broc 的循环版本，低饱和双向且首尾连续",
+      "colors": [
+        {
+          "hex": "#372F38"
+        },
+        {
+          "hex": "#373F60"
+        },
+        {
+          "hex": "#4C6790"
+        },
+        {
+          "hex": "#7894B4"
+        },
+        {
+          "hex": "#ADBECD"
+        },
+        {
+          "hex": "#CFD3C5"
+        },
+        {
+          "hex": "#BCBC92"
+        },
+        {
+          "hex": "#8F8F5C"
+        },
+        {
+          "hex": "#615F36"
+        },
+        {
+          "hex": "#423C29"
+        },
+        {
+          "hex": "#372F37"
+        }
+      ]
+    },
+    {
+      "id": "crameri-corko",
+      "name": "CorkO（Crameri 循环）",
+      "source": "Crameri 科学色标 · corkO",
+      "type": "diverging",
+      "group": "发散色阶",
+      "note": "Cork 的循环版本，色盲友好的周期色阶",
+      "colors": [
+        {
+          "hex": "#3F3E3A"
+        },
+        {
+          "hex": "#3E425A"
+        },
+        {
+          "hex": "#4D6389"
+        },
+        {
+          "hex": "#738FB0"
+        },
+        {
+          "hex": "#A1B8C7"
+        },
+        {
+          "hex": "#AFCBBC"
+        },
+        {
+          "hex": "#90BA91"
+        },
+        {
+          "hex": "#66955E"
+        },
+        {
+          "hex": "#4A6934"
+        },
+        {
+          "hex": "#424C2D"
+        },
+        {
+          "hex": "#3F3E3A"
+        }
+      ]
+    },
+    {
+      "id": "cmocean-diff",
+      "name": "Diff 差异（cmocean）",
+      "source": "cmocean · diff（Oceanography 2016）",
+      "type": "diverging",
+      "group": "发散色阶",
+      "note": "差异场、变化量、模型对比专用双向色标",
+      "colors": [
+        {
+          "hex": "#082340"
+        },
+        {
+          "hex": "#244F6B"
+        },
+        {
+          "hex": "#5A7487"
+        },
+        {
+          "hex": "#8D9CA7"
+        },
+        {
+          "hex": "#C6CACF"
+        },
+        {
+          "hex": "#F6F1F0"
+        },
+        {
+          "hex": "#CEC7B8"
+        },
+        {
+          "hex": "#A3987B"
+        },
+        {
+          "hex": "#7A6D41"
+        },
+        {
+          "hex": "#4B471C"
+        },
+        {
+          "hex": "#1C2207"
+        }
+      ]
+    },
+    {
+      "id": "cmocean-tarn",
+      "name": "Tarn 暗色双向（cmocean）",
+      "source": "cmocean · tarn（Oceanography 2016）",
+      "type": "diverging",
+      "group": "发散色阶",
+      "note": "暗底双向色标，正负异常在深色背景上仍清楚",
+      "colors": [
+        {
+          "hex": "#17230E"
+        },
+        {
+          "hex": "#3F4E0E"
+        },
+        {
+          "hex": "#846A25"
+        },
+        {
+          "hex": "#CB8448"
+        },
+        {
+          "hex": "#E3BFA3"
+        },
+        {
+          "hex": "#FCF7F6"
+        },
+        {
+          "hex": "#CBCCAA"
+        },
+        {
+          "hex": "#7FA591"
+        },
+        {
+          "hex": "#2E7E7E"
+        },
+        {
+          "hex": "#154F6A"
+        },
+        {
+          "hex": "#101E4F"
+        }
+      ]
+    },
+    {
+      "id": "cb-puor",
+      "name": "ColorBrewer PuOr",
+      "source": "ColorBrewer 2.0 · PuOr（Cynthia Brewer）",
+      "type": "diverging",
+      "group": "发散色阶",
+      "note": "紫-白-橙双向板，适合正负差值分级",
+      "colors": [
+        {
+          "hex": "#7F3B08"
+        },
+        {
+          "hex": "#B35806"
+        },
+        {
+          "hex": "#E08214"
+        },
+        {
+          "hex": "#FDB863"
+        },
+        {
+          "hex": "#FEE0B6"
+        },
+        {
+          "hex": "#F7F7F7"
+        },
+        {
+          "hex": "#D8DAEB"
+        },
+        {
+          "hex": "#B2ABD2"
+        },
+        {
+          "hex": "#8073AC"
+        },
+        {
+          "hex": "#542788"
+        },
+        {
+          "hex": "#2D004B"
+        }
+      ]
+    },
+    {
+      "id": "cb-rdylbu",
+      "name": "ColorBrewer RdYlBu",
+      "source": "ColorBrewer 2.0 · RdYlBu（Cynthia Brewer）",
+      "type": "diverging",
+      "group": "发散色阶",
+      "note": "红-黄-蓝双向板，气象与温度异常常用",
+      "colors": [
+        {
+          "hex": "#A50026"
+        },
+        {
+          "hex": "#D73027"
+        },
+        {
+          "hex": "#F46D43"
+        },
+        {
+          "hex": "#FDAE61"
+        },
+        {
+          "hex": "#FEE090"
+        },
+        {
+          "hex": "#FFFFBF"
+        },
+        {
+          "hex": "#E0F3F8"
+        },
+        {
+          "hex": "#ABD9E9"
+        },
+        {
+          "hex": "#74ADD1"
+        },
+        {
+          "hex": "#4575B4"
+        },
+        {
+          "hex": "#313695"
+        }
+      ]
+    },
+    {
+      "id": "cb-rdylgn",
+      "name": "ColorBrewer RdYlGn",
+      "source": "ColorBrewer 2.0 · RdYlGn（Cynthia Brewer）",
+      "type": "diverging",
+      "group": "发散色阶",
+      "note": "红-黄-绿双向板，适合好坏/盈亏一类评估",
+      "colors": [
+        {
+          "hex": "#A50026"
+        },
+        {
+          "hex": "#D73027"
+        },
+        {
+          "hex": "#F46D43"
+        },
+        {
+          "hex": "#FDAE61"
+        },
+        {
+          "hex": "#FEE08B"
+        },
+        {
+          "hex": "#FFFFBF"
+        },
+        {
+          "hex": "#D9EF8B"
+        },
+        {
+          "hex": "#A6D96A"
+        },
+        {
+          "hex": "#66BD63"
+        },
+        {
+          "hex": "#1A9850"
+        },
+        {
+          "hex": "#006837"
+        }
+      ]
+    },
+    {
+      "id": "cb-prgn",
+      "name": "ColorBrewer PRGn",
+      "source": "ColorBrewer 2.0 · PRGn（Cynthia Brewer）",
+      "type": "diverging",
+      "group": "发散色阶",
+      "note": "紫-白-绿双向板，适合干湿、升降一类对立变量",
+      "colors": [
+        {
+          "hex": "#40004B"
+        },
+        {
+          "hex": "#762A83"
+        },
+        {
+          "hex": "#9970AB"
+        },
+        {
+          "hex": "#C2A5CF"
+        },
+        {
+          "hex": "#E7D4E8"
+        },
+        {
+          "hex": "#F7F7F7"
+        },
+        {
+          "hex": "#D9F0D3"
+        },
+        {
+          "hex": "#A6DBA0"
+        },
+        {
+          "hex": "#5AAE61"
+        },
+        {
+          "hex": "#1B7837"
+        },
+        {
+          "hex": "#00441B"
+        }
+      ]
+    },
+    {
+      "id": "mpl-seismic",
+      "name": "Seismic 地震波",
+      "source": "matplotlib · seismic",
+      "type": "diverging",
+      "group": "发散色阶",
+      "note": "蓝-白-红双向，地震波阻抗与振幅极性显示",
+      "colors": [
+        {
+          "hex": "#00004C"
+        },
+        {
+          "hex": "#000092"
+        },
+        {
+          "hex": "#0000DB"
+        },
+        {
+          "hex": "#3131FF"
+        },
+        {
+          "hex": "#9999FF"
+        },
+        {
+          "hex": "#FFFDFD"
+        },
+        {
+          "hex": "#FF9999"
+        },
+        {
+          "hex": "#FF3131"
+        },
+        {
+          "hex": "#E60000"
+        },
+        {
+          "hex": "#B20000"
+        },
+        {
+          "hex": "#800000"
+        }
+      ]
+    },
+    {
+      "id": "mpl-bwr",
+      "name": "Bwr 蓝白红",
+      "source": "matplotlib · bwr",
+      "type": "diverging",
+      "group": "发散色阶",
+      "note": "蓝-白-红对称双向色阶，零基准差值图即取即用",
+      "colors": [
+        {
+          "hex": "#0000FF"
+        },
+        {
+          "hex": "#3232FF"
+        },
+        {
+          "hex": "#6666FF"
+        },
+        {
+          "hex": "#9898FF"
+        },
+        {
+          "hex": "#CCCCFF"
+        },
+        {
+          "hex": "#FFFEFE"
+        },
+        {
+          "hex": "#FFCCCC"
+        },
+        {
+          "hex": "#FF9898"
+        },
+        {
+          "hex": "#FF6666"
+        },
+        {
+          "hex": "#FF3232"
+        },
+        {
+          "hex": "#FF0000"
+        }
+      ]
+    },
+    {
+      "id": "okabe-ito",
+      "name": "Okabe-Ito 色盲友好",
+      "source": "Okabe & Ito（Wong, Nature Methods 推荐）",
+      "type": "categorical",
+      "group": "通用分类配色",
+      "note": "色盲友好 8 色，各类色觉障碍下均可区分；Bang Wong 在 Nature Methods 推广，是期刊最常推荐的分类色板",
+      "colors": [
+        {
+          "hex": "#E69F00"
+        },
+        {
+          "hex": "#56B4E9"
+        },
+        {
+          "hex": "#009E73"
+        },
+        {
+          "hex": "#F0E442"
+        },
+        {
+          "hex": "#0072B2"
+        },
+        {
+          "hex": "#D55E00"
+        },
+        {
+          "hex": "#CC79A7"
+        },
+        {
+          "hex": "#000000"
         }
       ]
     },
@@ -707,7 +6776,7 @@
       "name": "ColorBrewer Set2",
       "source": "ColorBrewer · Set2",
       "type": "categorical",
-      "group": "分类型配色",
+      "group": "通用分类配色",
       "note": "低饱和柔和分类色，色觉障碍友好，适合并列柱状与箱线图",
       "colors": [
         {
@@ -741,7 +6810,7 @@
       "name": "ColorBrewer Paired",
       "source": "ColorBrewer · Paired",
       "type": "categorical",
-      "group": "分类型配色",
+      "group": "通用分类配色",
       "note": "成对深/浅同色相，适合处理前-后、实验组-对照组成对比较",
       "colors": [
         {
@@ -783,11 +6852,51 @@
       ]
     },
     {
+      "id": "d3-category10",
+      "name": "D3 Category10",
+      "source": "D3.js · category10",
+      "type": "categorical",
+      "group": "通用分类配色",
+      "note": "数据可视化领域最通用的 10 色分类板，兼容性最好",
+      "colors": [
+        {
+          "hex": "#1F77B4"
+        },
+        {
+          "hex": "#FF7F0E"
+        },
+        {
+          "hex": "#2CA02C"
+        },
+        {
+          "hex": "#D62728"
+        },
+        {
+          "hex": "#9467BD"
+        },
+        {
+          "hex": "#8C564B"
+        },
+        {
+          "hex": "#E377C2"
+        },
+        {
+          "hex": "#7F7F7F"
+        },
+        {
+          "hex": "#BCBD22"
+        },
+        {
+          "hex": "#17BECF"
+        }
+      ]
+    },
+    {
       "id": "uchicago",
       "name": "UChicago 风格",
       "source": "ggsci · uchicago",
       "type": "categorical",
-      "group": "分类型配色",
+      "group": "通用分类配色",
       "note": "芝加哥大学视觉规范配色，9 色，学术报告质感强",
       "colors": [
         {
@@ -820,122 +6929,11 @@
       ]
     },
     {
-      "id": "bmj",
-      "name": "BMJ 风格",
-      "source": "ggsci · bmj",
-      "type": "categorical",
-      "group": "期刊分类配色",
-      "note": "英国医学杂志 BMJ 系列期刊图表用色，9 色，蓝黄紫对比明快",
-      "colors": [
-        {
-          "hex": "#2A6EBB"
-        },
-        {
-          "hex": "#F0AB00"
-        },
-        {
-          "hex": "#C50084"
-        },
-        {
-          "hex": "#7D5CC6"
-        },
-        {
-          "hex": "#E37222"
-        },
-        {
-          "hex": "#69BE28"
-        },
-        {
-          "hex": "#00B2A9"
-        },
-        {
-          "hex": "#CD202C"
-        },
-        {
-          "hex": "#747678"
-        }
-      ]
-    },
-    {
-      "id": "frontiers",
-      "name": "Frontiers 风格",
-      "source": "ggsci · frontiers",
-      "type": "categorical",
-      "group": "期刊分类配色",
-      "note": "Frontiers 出版社全系列期刊图表用色，10 色，明度高适合屏幕展示",
-      "colors": [
-        {
-          "hex": "#D51317"
-        },
-        {
-          "hex": "#F39200"
-        },
-        {
-          "hex": "#EFD500"
-        },
-        {
-          "hex": "#95C11F"
-        },
-        {
-          "hex": "#007B3D"
-        },
-        {
-          "hex": "#31B7BC"
-        },
-        {
-          "hex": "#0094CD"
-        },
-        {
-          "hex": "#164194"
-        },
-        {
-          "hex": "#6F286A"
-        },
-        {
-          "hex": "#706F6F"
-        }
-      ]
-    },
-    {
-      "id": "okabe-ito",
-      "name": "Okabe-Ito 色盲友好",
-      "source": "Okabe & Ito（Wong, Nature Methods 推荐）",
-      "type": "categorical",
-      "group": "分类型配色",
-      "note": "色盲友好 8 色，各类色觉障碍下均可区分；Bang Wong 在 Nature Methods 推广，是期刊最常推荐的分类色板",
-      "colors": [
-        {
-          "hex": "#E69F00"
-        },
-        {
-          "hex": "#56B4E9"
-        },
-        {
-          "hex": "#009E73"
-        },
-        {
-          "hex": "#F0E442"
-        },
-        {
-          "hex": "#0072B2"
-        },
-        {
-          "hex": "#D55E00"
-        },
-        {
-          "hex": "#CC79A7"
-        },
-        {
-          "hex": "#000000"
-        }
-      ]
-    },
-    {
       "id": "cosmic-hallmarks",
       "name": "COSMIC Hallmarks",
       "source": "ggsci · cosmic（Wellcome Sanger）",
       "type": "categorical",
-      "group": "分类型配色",
+      "group": "通用分类配色",
       "note": "COSMIC 肿瘤基因组「十大标志」官方配色，基因组/肿瘤学图表常用",
       "colors": [
         {
@@ -971,110 +6969,973 @@
       ]
     },
     {
-      "id": "crameri-batlow",
-      "name": "Batlow（Crameri）",
-      "source": "Crameri 科学色标 · batlow",
-      "type": "sequential",
-      "group": "期刊推荐色标",
-      "note": "Crameri 默认通用色标，感知均匀且色盲友好，可替代 jet/rainbow",
+      "id": "d3-category20",
+      "name": "D3 Category20",
+      "source": "D3 · d3-scale-chromatic Category20",
+      "type": "categorical",
+      "group": "通用分类配色",
+      "note": "20 色经典分类板，类别多时仍能保持色相区分",
       "colors": [
         {
-          "hex": "#011959"
+          "hex": "#1F77B4"
         },
         {
-          "hex": "#114360"
+          "hex": "#FF7F0E"
         },
         {
-          "hex": "#226061"
+          "hex": "#2CA02C"
         },
         {
-          "hex": "#4D734D"
+          "hex": "#D62728"
         },
         {
-          "hex": "#828231"
+          "hex": "#9467BD"
         },
         {
-          "hex": "#BE9035"
+          "hex": "#8C564B"
         },
         {
-          "hex": "#F19D6B"
+          "hex": "#E377C2"
         },
         {
-          "hex": "#FDB4B4"
+          "hex": "#7F7F7F"
         },
         {
-          "hex": "#FACCFA"
+          "hex": "#BCBD22"
+        },
+        {
+          "hex": "#17BECF"
+        },
+        {
+          "hex": "#AEC7E8"
+        },
+        {
+          "hex": "#FFBB78"
+        },
+        {
+          "hex": "#98DF8A"
+        },
+        {
+          "hex": "#FF9896"
+        },
+        {
+          "hex": "#C5B0D5"
+        },
+        {
+          "hex": "#C49C94"
+        },
+        {
+          "hex": "#F7B6D2"
+        },
+        {
+          "hex": "#C7C7C7"
+        },
+        {
+          "hex": "#DBDB8D"
+        },
+        {
+          "hex": "#9EDAE5"
         }
       ]
     },
     {
-      "id": "crameri-lajolla",
-      "name": "La Jolla（Crameri）",
-      "source": "Crameri 科学色标 · lajolla",
-      "type": "sequential",
-      "group": "期刊推荐色标",
-      "note": "低亮度端不刺眼，浅色底印刷与投影表现好",
+      "id": "d3-category20b",
+      "name": "D3 Category20b",
+      "source": "D3 · d3-scale-chromatic Category20b",
+      "type": "categorical",
+      "group": "通用分类配色",
+      "note": "20 色偏冷分类板，蓝紫青为主，适合冷色系主题图表",
       "colors": [
         {
-          "hex": "#191900"
+          "hex": "#393B79"
         },
         {
-          "hex": "#372411"
+          "hex": "#637939"
         },
         {
-          "hex": "#67342A"
+          "hex": "#8C6D31"
         },
         {
-          "hex": "#A64644"
+          "hex": "#843C39"
         },
         {
-          "hex": "#D9604E"
+          "hex": "#7B4173"
         },
         {
-          "hex": "#E58751"
+          "hex": "#5254A3"
         },
         {
-          "hex": "#ECAC54"
+          "hex": "#8CA252"
         },
         {
-          "hex": "#F7D971"
+          "hex": "#BD9E39"
         },
         {
-          "hex": "#FFFECB"
+          "hex": "#AD494A"
+        },
+        {
+          "hex": "#A55194"
+        },
+        {
+          "hex": "#6B6ECF"
+        },
+        {
+          "hex": "#B5CF6B"
+        },
+        {
+          "hex": "#E7BA52"
+        },
+        {
+          "hex": "#D6616B"
+        },
+        {
+          "hex": "#CE6DBD"
+        },
+        {
+          "hex": "#9C9EDE"
+        },
+        {
+          "hex": "#CEDB9C"
+        },
+        {
+          "hex": "#E7CB94"
+        },
+        {
+          "hex": "#E7969C"
+        },
+        {
+          "hex": "#DE9ED6"
         }
       ]
     },
     {
-      "id": "crameri-oslo",
-      "name": "Oslo（Crameri）",
-      "source": "Crameri 科学色标 · oslo",
-      "type": "sequential",
-      "group": "期刊推荐色标",
-      "note": "冷色调单向色阶，适合温度梯度、深度一类变量",
+      "id": "observable10",
+      "name": "Observable 10",
+      "source": "ggsci · observable（Observable Plot 默认色板）",
+      "type": "categorical",
+      "group": "通用分类配色",
+      "note": "Observable Plot 默认 10 色，明快均衡、屏幕显示友好",
       "colors": [
         {
-          "hex": "#010101"
+          "hex": "#4269D0"
         },
         {
-          "hex": "#0E1E2E"
+          "hex": "#EFB118"
         },
         {
-          "hex": "#15395B"
+          "hex": "#FF725C"
         },
         {
-          "hex": "#26578C"
+          "hex": "#6CC5B0"
         },
         {
-          "hex": "#507BBC"
+          "hex": "#3CA951"
         },
         {
-          "hex": "#7B98CA"
+          "hex": "#FF8AB7"
         },
         {
-          "hex": "#A2B0CA"
+          "hex": "#A463F2"
         },
         {
-          "hex": "#CED1D7"
+          "hex": "#97BBF5"
+        },
+        {
+          "hex": "#9C6B4E"
+        },
+        {
+          "hex": "#9498A0"
+        }
+      ]
+    },
+    {
+      "id": "ucscgb",
+      "name": "UCSC Genome Browser",
+      "source": "ggsci · ucscgb（UCSC 基因组浏览器配色）",
+      "type": "categorical",
+      "group": "通用分类配色",
+      "note": "UCSC 基因组浏览器官方配色，生物信息类多轨图常用",
+      "colors": [
+        {
+          "hex": "#FF0000"
+        },
+        {
+          "hex": "#FF9900"
+        },
+        {
+          "hex": "#FFCC00"
+        },
+        {
+          "hex": "#00FF00"
+        },
+        {
+          "hex": "#6699FF"
+        },
+        {
+          "hex": "#CC33FF"
+        },
+        {
+          "hex": "#99991E"
+        },
+        {
+          "hex": "#999999"
+        },
+        {
+          "hex": "#FF00CC"
+        },
+        {
+          "hex": "#CC0000"
+        },
+        {
+          "hex": "#FFCCCC"
+        },
+        {
+          "hex": "#FFFF00"
+        },
+        {
+          "hex": "#CCFF00"
+        },
+        {
+          "hex": "#358000"
+        },
+        {
+          "hex": "#0000CC"
+        },
+        {
+          "hex": "#99CCFF"
+        },
+        {
+          "hex": "#00FFFF"
+        },
+        {
+          "hex": "#CCFFFF"
+        },
+        {
+          "hex": "#9900CC"
+        },
+        {
+          "hex": "#CC99FF"
+        },
+        {
+          "hex": "#996600"
+        },
+        {
+          "hex": "#666600"
+        },
+        {
+          "hex": "#666666"
+        },
+        {
+          "hex": "#CCCCCC"
+        },
+        {
+          "hex": "#79CC3D"
+        },
+        {
+          "hex": "#CCCC99"
+        }
+      ]
+    },
+    {
+      "id": "d3-category20c",
+      "name": "D3 Category20c",
+      "source": "D3 · d3-scale-chromatic Category20c",
+      "type": "categorical",
+      "group": "通用分类配色",
+      "note": "20 色偏暖分类板，红橙黄棕为主，与 20b 互补",
+      "colors": [
+        {
+          "hex": "#3182BD"
+        },
+        {
+          "hex": "#E6550D"
+        },
+        {
+          "hex": "#31A354"
+        },
+        {
+          "hex": "#756BB1"
+        },
+        {
+          "hex": "#636363"
+        },
+        {
+          "hex": "#6BAED6"
+        },
+        {
+          "hex": "#FD8D3C"
+        },
+        {
+          "hex": "#74C476"
+        },
+        {
+          "hex": "#9E9AC8"
+        },
+        {
+          "hex": "#969696"
+        },
+        {
+          "hex": "#9ECAE1"
+        },
+        {
+          "hex": "#FDAE6B"
+        },
+        {
+          "hex": "#A1D99B"
+        },
+        {
+          "hex": "#BCBDDC"
+        },
+        {
+          "hex": "#BDBDBD"
+        },
+        {
+          "hex": "#C6DBEF"
+        },
+        {
+          "hex": "#FDD0A2"
+        },
+        {
+          "hex": "#C7E9C0"
+        },
+        {
+          "hex": "#DADAEB"
+        },
+        {
+          "hex": "#D9D9D9"
+        }
+      ]
+    },
+    {
+      "id": "primer",
+      "name": "GitHub Primer",
+      "source": "ggsci · primer（GitHub Primer 设计系统）",
+      "type": "categorical",
+      "group": "通用分类配色",
+      "note": "GitHub Primer design system 的 17 色分类板（mark17），界面与图示统一",
+      "colors": [
+        {
+          "hex": "#006EDB"
+        },
+        {
+          "hex": "#EB670F"
+        },
+        {
+          "hex": "#DF0C24"
+        },
+        {
+          "hex": "#179B9B"
+        },
+        {
+          "hex": "#30A147"
+        },
+        {
+          "hex": "#894CEB"
+        },
+        {
+          "hex": "#B88700"
+        },
+        {
+          "hex": "#CE2C85"
+        },
+        {
+          "hex": "#856D4C"
+        },
+        {
+          "hex": "#527A29"
+        },
+        {
+          "hex": "#D43511"
+        },
+        {
+          "hex": "#167E53"
+        },
+        {
+          "hex": "#9D615C"
+        },
+        {
+          "hex": "#64762D"
+        },
+        {
+          "hex": "#A830E8"
+        },
+        {
+          "hex": "#866E04"
+        },
+        {
+          "hex": "#808FA3"
+        }
+      ]
+    },
+    {
+      "id": "atlassian",
+      "name": "Atlassian",
+      "source": "ggsci · atlassian（Atlassian 设计系统）",
+      "type": "categorical",
+      "group": "通用分类配色",
+      "note": "Atlassian 品牌配色（categorical8），蓝绿紫为主、对比克制",
+      "colors": [
+        {
+          "hex": "#4688EC"
+        },
+        {
+          "hex": "#94C748"
+        },
+        {
+          "hex": "#C97CF4"
+        },
+        {
+          "hex": "#FCA700"
+        },
+        {
+          "hex": "#1558BC"
+        },
+        {
+          "hex": "#964AC0"
+        },
+        {
+          "hex": "#42B2D7"
+        },
+        {
+          "hex": "#E06C00"
+        }
+      ]
+    },
+    {
+      "id": "igv",
+      "name": "IGV 基因组浏览器",
+      "source": "ggsci · igv（Integrative Genomics Viewer）",
+      "type": "categorical",
+      "group": "通用分类配色",
+      "note": "IGV 基因组浏览器配色，多轨基因结构图辨识度高",
+      "colors": [
+        {
+          "hex": "#5050FF"
+        },
+        {
+          "hex": "#CE3D32"
+        },
+        {
+          "hex": "#749B58"
+        },
+        {
+          "hex": "#F0E685"
+        },
+        {
+          "hex": "#466983"
+        },
+        {
+          "hex": "#BA6338"
+        },
+        {
+          "hex": "#5DB1DD"
+        },
+        {
+          "hex": "#802268"
+        },
+        {
+          "hex": "#6BD76B"
+        },
+        {
+          "hex": "#D595A7"
+        },
+        {
+          "hex": "#924822"
+        },
+        {
+          "hex": "#837B8D"
+        },
+        {
+          "hex": "#C75127"
+        },
+        {
+          "hex": "#D58F5C"
+        },
+        {
+          "hex": "#7A65A5"
+        },
+        {
+          "hex": "#E4AF69"
+        },
+        {
+          "hex": "#3B1B53"
+        },
+        {
+          "hex": "#CDDEB7"
+        },
+        {
+          "hex": "#612A79"
+        },
+        {
+          "hex": "#AE1F63"
+        },
+        {
+          "hex": "#E7C76F"
+        },
+        {
+          "hex": "#5A655E"
+        },
+        {
+          "hex": "#CC9900"
+        },
+        {
+          "hex": "#99CC00"
+        },
+        {
+          "hex": "#A9A9A9"
+        },
+        {
+          "hex": "#CC9900"
+        },
+        {
+          "hex": "#99CC00"
+        },
+        {
+          "hex": "#33CC00"
+        },
+        {
+          "hex": "#00CC33"
+        },
+        {
+          "hex": "#00CC99"
+        },
+        {
+          "hex": "#0099CC"
+        },
+        {
+          "hex": "#0A47FF"
+        },
+        {
+          "hex": "#4775FF"
+        },
+        {
+          "hex": "#FFC20A"
+        },
+        {
+          "hex": "#FFD147"
+        },
+        {
+          "hex": "#990033"
+        },
+        {
+          "hex": "#991A00"
+        },
+        {
+          "hex": "#996600"
+        },
+        {
+          "hex": "#809900"
+        },
+        {
+          "hex": "#339900"
+        },
+        {
+          "hex": "#00991A"
+        },
+        {
+          "hex": "#009966"
+        },
+        {
+          "hex": "#008099"
+        },
+        {
+          "hex": "#003399"
+        },
+        {
+          "hex": "#1A0099"
+        },
+        {
+          "hex": "#660099"
+        },
+        {
+          "hex": "#990080"
+        },
+        {
+          "hex": "#D60047"
+        },
+        {
+          "hex": "#FF1463"
+        },
+        {
+          "hex": "#00D68F"
+        },
+        {
+          "hex": "#14FFB1"
+        }
+      ]
+    },
+    {
+      "id": "gsea",
+      "name": "GSEA 富集分析",
+      "source": "ggsci · gsea（GSEA 软件配色）",
+      "type": "categorical",
+      "group": "通用分类配色",
+      "note": "GSEA 富集分析默认分类色，红绿蓝对比明确",
+      "colors": [
+        {
+          "hex": "#4500AD"
+        },
+        {
+          "hex": "#2700D1"
+        },
+        {
+          "hex": "#6B58EF"
+        },
+        {
+          "hex": "#8888FF"
+        },
+        {
+          "hex": "#C7C1FF"
+        },
+        {
+          "hex": "#D5D5FF"
+        },
+        {
+          "hex": "#FFC0E5"
+        },
+        {
+          "hex": "#FF8989"
+        },
+        {
+          "hex": "#FF7080"
+        },
+        {
+          "hex": "#FF5A5A"
+        },
+        {
+          "hex": "#EF4040"
+        },
+        {
+          "hex": "#D60C00"
+        }
+      ]
+    },
+    {
+      "id": "flatui",
+      "name": "Flat UI 扁平化",
+      "source": "ggsci · flatui（Flat UI 设计色板）",
+      "type": "categorical",
+      "group": "通用分类配色",
+      "note": "Flat UI 扁平化设计色板，明快、适合幻灯片与网页图表",
+      "colors": [
+        {
+          "hex": "#C0392B"
+        },
+        {
+          "hex": "#D35400"
+        },
+        {
+          "hex": "#F39C12"
+        },
+        {
+          "hex": "#27AE60"
+        },
+        {
+          "hex": "#16A085"
+        },
+        {
+          "hex": "#2980B9"
+        },
+        {
+          "hex": "#8E44AD"
+        },
+        {
+          "hex": "#2C3E50"
+        },
+        {
+          "hex": "#7F8C8D"
+        },
+        {
+          "hex": "#BDC3C7"
+        }
+      ]
+    },
+    {
+      "id": "gmt-relief",
+      "name": "Relief 全球地形（GMT）",
+      "source": "GMT 官方色标 · gmt/relief（Wessel & Martinez）",
+      "type": "sequential",
+      "group": "地形与地球物理",
+      "note": "GMT 经典全球地形色标，海洋蓝、陆地棕黄，是地学制图软件的地形默认配色",
+      "colors": [
+        {
+          "hex": "#000826"
+        },
+        {
+          "hex": "#0073A2"
+        },
+        {
+          "hex": "#2BAEC0"
+        },
+        {
+          "hex": "#81DDB0"
+        },
+        {
+          "hex": "#E6FCE9"
+        },
+        {
+          "hex": "#857137"
+        },
+        {
+          "hex": "#AC9846"
+        },
+        {
+          "hex": "#E0CC5A"
+        },
+        {
+          "hex": "#FBEC8B"
+        },
+        {
+          "hex": "#FCF6C4"
+        },
+        {
+          "hex": "#FEFCEC"
+        }
+      ]
+    },
+    {
+      "id": "gmt-topo",
+      "name": "Topo 构造图地形（GMT）",
+      "source": "GMT 官方色标 · gmt/topo（Anderson, Sandwell & Wessel）",
+      "type": "sequential",
+      "group": "地形与地球物理",
+      "note": "板块构造图常用的地形色标，配合重力、地震数据叠图效果好",
+      "colors": [
+        {
+          "hex": "#9D8AE6"
+        },
+        {
+          "hex": "#8AB8E6"
+        },
+        {
+          "hex": "#8BF2D3"
+        },
+        {
+          "hex": "#85F2A5"
+        },
+        {
+          "hex": "#C1F285"
+        },
+        {
+          "hex": "#F2CA85"
+        },
+        {
+          "hex": "#D29E9E"
+        },
+        {
+          "hex": "#66B282"
+        },
+        {
+          "hex": "#79BF6C"
+        },
+        {
+          "hex": "#CED282"
+        },
+        {
+          "hex": "#FFFCF8"
+        }
+      ]
+    },
+    {
+      "id": "gmt-earth",
+      "name": "Earth 海陆地形（GMT）",
+      "source": "GMT 官方色标 · gmt/earth（Wessel）",
+      "type": "sequential",
+      "group": "地形与地球物理",
+      "note": "海底与陆地同一色阶无缝衔接，适合全球或区域综合地质图",
+      "colors": [
+        {
+          "hex": "#1F284F"
+        },
+        {
+          "hex": "#2A4678"
+        },
+        {
+          "hex": "#3563A0"
+        },
+        {
+          "hex": "#66CDAA"
+        },
+        {
+          "hex": "#8DD2EF"
+        },
+        {
+          "hex": "#BCF7B2"
+        },
+        {
+          "hex": "#159730"
+        },
+        {
+          "hex": "#F5AA03"
+        },
+        {
+          "hex": "#741604"
+        },
+        {
+          "hex": "#936E59"
+        },
+        {
+          "hex": "#EBEAE9"
+        }
+      ]
+    },
+    {
+      "id": "gmt-etopo1",
+      "name": "ETOPO1 全球地形（GMT）",
+      "source": "GMT 官方色标 · gmt/etopo1（ETOPO1 全球 relief 图）",
+      "type": "sequential",
+      "group": "地形与地球物理",
+      "note": "深海蓝→陆地灰白的 ETOPO1 色标，全球构造图、地形底图常用",
+      "colors": [
+        {
+          "hex": "#1A0089"
+        },
+        {
+          "hex": "#030BC4"
+        },
+        {
+          "hex": "#0739E4"
+        },
+        {
+          "hex": "#149CFC"
+        },
+        {
+          "hex": "#44CAFF"
+        },
+        {
+          "hex": "#BBE492"
+        },
+        {
+          "hex": "#DDAB35"
+        },
+        {
+          "hex": "#A28613"
+        },
+        {
+          "hex": "#9C6120"
+        },
+        {
+          "hex": "#BEA7A7"
+        },
+        {
+          "hex": "#FFFEFD"
+        }
+      ]
+    },
+    {
+      "id": "gmt-seis",
+      "name": "Seis 地震层析（GMT）",
+      "source": "GMT 官方色标 · gmt/seis（Suzan van der Lee）",
+      "type": "sequential",
+      "group": "地形与地球物理",
+      "note": "地震层析成像经典色标，红-黄-绿-蓝表示波速异常，深部结构剖面常用",
+      "colors": [
+        {
+          "hex": "#D40000"
+        },
+        {
+          "hex": "#FF2A00"
+        },
+        {
+          "hex": "#FF8000"
+        },
+        {
+          "hex": "#FFD500"
+        },
+        {
+          "hex": "#FFFF00"
+        },
+        {
+          "hex": "#ADFF0F"
+        },
+        {
+          "hex": "#2DF846"
+        },
+        {
+          "hex": "#00A0B7"
+        },
+        {
+          "hex": "#0028E6"
+        }
+      ]
+    },
+    {
+      "id": "gmt-mag",
+      "name": "Mag 磁异常（GMT）",
+      "source": "GMT 官方色标 · gmt/mag（IPGP）",
+      "type": "diverging",
+      "group": "地形与地球物理",
+      "note": "IPGP 磁异常色标，蓝-黄-红双极配色，磁异常与重磁异常图常用",
+      "colors": [
+        {
+          "hex": "#0099FF"
+        },
+        {
+          "hex": "#00CCFF"
+        },
+        {
+          "hex": "#00CC00"
+        },
+        {
+          "hex": "#66FF00"
+        },
+        {
+          "hex": "#FFFF26"
+        },
+        {
+          "hex": "#FFFF4D"
+        },
+        {
+          "hex": "#E6E600"
+        },
+        {
+          "hex": "#FF9900"
+        },
+        {
+          "hex": "#FF6600"
+        },
+        {
+          "hex": "#CC0000"
+        },
+        {
+          "hex": "#B40000"
+        }
+      ]
+    },
+    {
+      "id": "gmt-globe",
+      "name": "Globe 全球地形（GMT）",
+      "source": "GMT 官方色标 · gmt/globe",
+      "type": "sequential",
+      "group": "地形与地球物理",
+      "note": "GMT 老牌全球地形色标，海洋紫蓝、陆地棕黄，出版图件辨识度高",
+      "colors": [
+        {
+          "hex": "#9900FF"
+        },
+        {
+          "hex": "#7722FF"
+        },
+        {
+          "hex": "#3366FF"
+        },
+        {
+          "hex": "#1BA4FF"
+        },
+        {
+          "hex": "#86D0FF"
+        },
+        {
+          "hex": "#C6E399"
+        },
+        {
+          "hex": "#C5A124"
+        },
+        {
+          "hex": "#9E780B"
+        },
+        {
+          "hex": "#B37C7C"
         },
         {
           "hex": "#FFFFFF"
@@ -1082,236 +7943,125 @@
       ]
     },
     {
-      "id": "crameri-devon",
-      "name": "Devon（Crameri）",
-      "source": "Crameri 科学色标 · devon",
+      "id": "gmt-haxby",
+      "name": "Haxby 海底地形（GMT）",
+      "source": "GMT 官方色标 · gmt/haxby（Lamont-Doherty）",
       "type": "sequential",
-      "group": "期刊推荐色标",
-      "note": "柔和单向色阶，大面积填色时不易产生虚假边界",
+      "group": "地形与地球物理",
+      "note": "Haxby 海底地形经典色标，蓝→青→黄→红，洋底地貌与海底年龄图常用",
       "colors": [
         {
-          "hex": "#2C1A4C"
+          "hex": "#0A0079"
         },
         {
-          "hex": "#29386A"
+          "hex": "#000CC9"
         },
         {
-          "hex": "#29588F"
+          "hex": "#176BF2"
         },
         {
-          "hex": "#4272BC"
+          "hex": "#37C2FF"
         },
         {
-          "hex": "#7E8FDD"
+          "hex": "#71EBD7"
         },
         {
-          "hex": "#AFAAEE"
+          "hex": "#BDFAA5"
         },
         {
-          "hex": "#CAC6F4"
+          "hex": "#F4DF6F"
         },
         {
-          "hex": "#E4E2FA"
+          "hex": "#F78249"
         },
         {
-          "hex": "#FFFFFF"
+          "hex": "#FF7575"
+        },
+        {
+          "hex": "#FEC2C2"
+        },
+        {
+          "hex": "#FFFEFD"
         }
       ]
     },
     {
-      "id": "crameri-roma",
-      "name": "Roma（Crameri 发散）",
-      "source": "Crameri 科学色标 · roma",
-      "type": "diverging",
-      "group": "期刊推荐色标",
-      "note": "双向发散，感知均匀，是 RdBu 的改良替代",
-      "colors": [
-        {
-          "hex": "#7E1700"
-        },
-        {
-          "hex": "#984E14"
-        },
-        {
-          "hex": "#AC7726"
-        },
-        {
-          "hex": "#C1A343"
-        },
-        {
-          "hex": "#D2D484"
-        },
-        {
-          "hex": "#C0EAC3"
-        },
-        {
-          "hex": "#89DAD7"
-        },
-        {
-          "hex": "#4DB3CF"
-        },
-        {
-          "hex": "#2D88BE"
-        },
-        {
-          "hex": "#1E5FAC"
-        },
-        {
-          "hex": "#033198"
-        }
-      ]
-    },
-    {
-      "id": "crameri-vik",
-      "name": "Vik（Crameri 发散）",
-      "source": "Crameri 科学色标 · vik",
-      "type": "diverging",
-      "group": "期刊推荐色标",
-      "note": "冷暖双向发散，跨度大，适合异常场与差值图",
-      "colors": [
-        {
-          "hex": "#001261"
-        },
-        {
-          "hex": "#023A7B"
-        },
-        {
-          "hex": "#116496"
-        },
-        {
-          "hex": "#5496B7"
-        },
-        {
-          "hex": "#A7C9DA"
-        },
-        {
-          "hex": "#ECE5E0"
-        },
-        {
-          "hex": "#E1B8A0"
-        },
-        {
-          "hex": "#CD8961"
-        },
-        {
-          "hex": "#B75A26"
-        },
-        {
-          "hex": "#852206"
-        },
-        {
-          "hex": "#590008"
-        }
-      ]
-    },
-    {
-      "id": "cmocean-thermal",
-      "name": "Thermal 温度场",
-      "source": "cmocean · thermal（Oceanography 2016）",
+      "id": "gmt-seafloor",
+      "name": "Seafloor 海底地形（GMT）",
+      "source": "GMT 官方色标 · gmt/seafloor",
       "type": "sequential",
-      "group": "地学专属配色",
-      "note": "海洋/地学温度场标准色标，热流、地温梯度首选",
+      "group": "地形与地球物理",
+      "note": "紫→蓝→白的海底地形色标，适合洋底水深、沉积厚度一类变量",
       "colors": [
         {
-          "hex": "#042333"
+          "hex": "#6C00B9"
         },
         {
-          "hex": "#19337C"
+          "hex": "#7600C5"
         },
         {
-          "hex": "#563B9C"
+          "hex": "#6715CE"
         },
         {
-          "hex": "#83508F"
+          "hex": "#4E32D4"
         },
         {
-          "hex": "#B15F82"
+          "hex": "#3350DA"
         },
         {
-          "hex": "#DE7065"
+          "hex": "#1770E0"
         },
         {
-          "hex": "#F99242"
+          "hex": "#0C90E8"
         },
         {
-          "hex": "#F9C441"
+          "hex": "#3FA8EE"
         },
         {
-          "hex": "#E8FA5B"
+          "hex": "#74C2F4"
+        },
+        {
+          "hex": "#ACDCFA"
+        },
+        {
+          "hex": "#E4F6FF"
         }
       ]
     },
     {
-      "id": "cmocean-haline",
-      "name": "Haline 盐度",
-      "source": "cmocean · haline（Oceanography 2016）",
+      "id": "gmt-gebco",
+      "name": "GEBCO 海底地形（GMT）",
+      "source": "GMT 官方色标 · gmt/gebco（Andrew Goodwillie）",
       "type": "sequential",
-      "group": "地学专属配色",
-      "note": "盐度/卤水浓度专用，也可用于孔隙水化学指标",
+      "group": "地形与地球物理",
+      "note": "GEBCO 海图风格海底地形色标，青绿→浅蓝，海洋地质与水深图适用",
       "colors": [
         {
-          "hex": "#2A186C"
+          "hex": "#00F0FF"
         },
         {
-          "hex": "#2034A2"
+          "hex": "#23FFFF"
         },
         {
-          "hex": "#0F5B90"
+          "hex": "#5AFFFF"
         },
         {
-          "hex": "#297789"
+          "hex": "#8CFFE6"
         },
         {
-          "hex": "#3C9387"
+          "hex": "#A5FFD7"
         },
         {
-          "hex": "#4FAF7E"
+          "hex": "#C3FFD7"
         },
         {
-          "hex": "#78CB68"
+          "hex": "#D2FFD7"
         },
         {
-          "hex": "#C1DD64"
+          "hex": "#E6FFF0"
         },
         {
-          "hex": "#FDEF9A"
-        }
-      ]
-    },
-    {
-      "id": "cmocean-oxy",
-      "name": "Oxy 溶解氧",
-      "source": "cmocean · oxy（Oceanography 2016）",
-      "type": "sequential",
-      "group": "地学专属配色",
-      "note": "氧化还原/含氧量专用色标，地球化学Redox 剖面适用",
-      "colors": [
-        {
-          "hex": "#400505"
-        },
-        {
-          "hex": "#76050F"
-        },
-        {
-          "hex": "#5C5B5B"
-        },
-        {
-          "hex": "#7A7A79"
-        },
-        {
-          "hex": "#9B9A9A"
-        },
-        {
-          "hex": "#BDBDBC"
-        },
-        {
-          "hex": "#E4E4E3"
-        },
-        {
-          "hex": "#E9E334"
-        },
-        {
-          "hex": "#DDAF19"
+          "hex": "#EBFFFF"
         }
       ]
     },
@@ -1320,7 +8070,7 @@
       "name": "Topo 地形水深",
       "source": "cmocean · topo（Oceanography 2016）",
       "type": "sequential",
-      "group": "地学专属配色",
+      "group": "地形与地球物理",
       "note": "海陆一体化地形色标，陆地与海底用同一套色阶无缝衔接",
       "colors": [
         {
@@ -1353,82 +8103,785 @@
       ]
     },
     {
-      "id": "cmocean-delta",
-      "name": "Delta 发散",
-      "source": "cmocean · delta（Oceanography 2016）",
-      "type": "diverging",
-      "group": "地学专属配色",
-      "note": "正负异常发散色标，重力异常、磁异常、同位素偏差适用",
+      "id": "cmap-terrain",
+      "name": "地形高程色阶",
+      "source": "matplotlib · terrain",
+      "type": "sequential",
+      "group": "地形与地球物理",
+      "note": "DEM / 高程图常用，低海拔绿→高海拔褐白，适合地形晕渲与等高线填色",
       "colors": [
         {
-          "hex": "#112040"
+          "hex": "#333399"
         },
         {
-          "hex": "#234397"
+          "hex": "#0888EE"
         },
         {
-          "hex": "#2378A3"
+          "hex": "#01CC66"
         },
         {
-          "hex": "#4EA8AF"
+          "hex": "#81E680"
         },
         {
-          "hex": "#ACCEC6"
+          "hex": "#FEFE98"
         },
         {
-          "hex": "#FFFDCD"
+          "hex": "#BEAC76"
         },
         {
-          "hex": "#D8C55F"
+          "hex": "#815E56"
         },
         {
-          "hex": "#8EA20B"
+          "hex": "#C1B0AC"
         },
         {
-          "hex": "#32801F"
-        },
-        {
-          "hex": "#10542C"
-        },
-        {
-          "hex": "#172313"
+          "hex": "#FFFFFF"
         }
       ]
     },
     {
-      "id": "turbo",
-      "name": "Turbo（彩虹改良）",
-      "source": "Google Turbo · matplotlib",
+      "id": "cmocean-deep",
+      "name": "Deep 深海地形（cmocean）",
+      "source": "cmocean · deep（Oceanography 2016）",
       "type": "sequential",
-      "group": "连续色阶",
-      "note": "Google 对 jet 的改良版：保留彩虹辨识度，去掉虚假条带；需要彩虹色时的推荐替代，但单向变量仍优先 viridis",
+      "group": "地形与地球物理",
+      "note": "深海测深专用，深水端为暗蓝，浅水与陆架层次清楚",
       "colors": [
         {
-          "hex": "#30123B"
+          "hex": "#FDFECC"
         },
         {
-          "hex": "#466BE3"
+          "hex": "#BBE6AC"
         },
         {
-          "hex": "#28BCEB"
+          "hex": "#78CEA3"
         },
         {
-          "hex": "#32F298"
+          "hex": "#55AEA3"
         },
         {
-          "hex": "#A4FC3C"
+          "hex": "#488E9E"
         },
         {
-          "hex": "#EECF3A"
+          "hex": "#3F6F97"
         },
         {
-          "hex": "#FB7E21"
+          "hex": "#404D8C"
         },
         {
-          "hex": "#D02F05"
+          "hex": "#3B325C"
         },
         {
-          "hex": "#7A0403"
+          "hex": "#281A2C"
+        }
+      ]
+    },
+    {
+      "id": "mpl-gist-earth",
+      "name": "Gist Earth 地形",
+      "source": "matplotlib · gist_earth",
+      "type": "sequential",
+      "group": "地形与地球物理",
+      "note": "经典海陆地形配色，深海蓝-陆地绿棕-高山灰白",
+      "colors": [
+        {
+          "hex": "#000000"
+        },
+        {
+          "hex": "#153978"
+        },
+        {
+          "hex": "#2B737E"
+        },
+        {
+          "hex": "#3B8E62"
+        },
+        {
+          "hex": "#5EA04B"
+        },
+        {
+          "hex": "#99AF58"
+        },
+        {
+          "hex": "#BDAB62"
+        },
+        {
+          "hex": "#DAB7A0"
+        },
+        {
+          "hex": "#FDFBFB"
+        }
+      ]
+    },
+    {
+      "id": "mpl-terrain",
+      "name": "Terrain 地形",
+      "source": "matplotlib · terrain",
+      "type": "sequential",
+      "group": "地形与地球物理",
+      "note": "低地蓝绿到高地棕白，快速出地形底图时常用",
+      "colors": [
+        {
+          "hex": "#333399"
+        },
+        {
+          "hex": "#0888EE"
+        },
+        {
+          "hex": "#01CC66"
+        },
+        {
+          "hex": "#81E680"
+        },
+        {
+          "hex": "#FEFE98"
+        },
+        {
+          "hex": "#BEAC76"
+        },
+        {
+          "hex": "#815E56"
+        },
+        {
+          "hex": "#C1B0AC"
+        },
+        {
+          "hex": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "id": "mpl-gist-stern",
+      "name": "Gist Stern 灰阶地形",
+      "source": "matplotlib · gist_stern",
+      "type": "sequential",
+      "group": "地形与地球物理",
+      "note": "偏灰的地形色阶，适合叠加阴影、重力或磁异常做底图",
+      "colors": [
+        {
+          "hex": "#000000"
+        },
+        {
+          "hex": "#A52040"
+        },
+        {
+          "hex": "#404080"
+        },
+        {
+          "hex": "#6060C0"
+        },
+        {
+          "hex": "#8080FD"
+        },
+        {
+          "hex": "#A0A075"
+        },
+        {
+          "hex": "#C0C011"
+        },
+        {
+          "hex": "#E0E08A"
+        },
+        {
+          "hex": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "id": "cmocean-gray",
+      "name": "Gray 测深灰度（cmocean）",
+      "source": "cmocean · gray（Oceanography 2016）",
+      "type": "sequential",
+      "group": "地形与地球物理",
+      "note": "中性灰度色标，适合测深阴影、晕渲与多图层叠加底图",
+      "colors": [
+        {
+          "hex": "#000000"
+        },
+        {
+          "hex": "#1A1919"
+        },
+        {
+          "hex": "#373737"
+        },
+        {
+          "hex": "#545453"
+        },
+        {
+          "hex": "#727171"
+        },
+        {
+          "hex": "#908F8F"
+        },
+        {
+          "hex": "#B1B1B0"
+        },
+        {
+          "hex": "#D6D6D4"
+        },
+        {
+          "hex": "#FFFFFD"
+        }
+      ]
+    },
+    {
+      "id": "mpl-ocean",
+      "name": "Ocean 海洋地形",
+      "source": "matplotlib · ocean",
+      "type": "sequential",
+      "group": "地形与地球物理",
+      "note": "绿-蓝-白海洋色阶，快速做水深与海陆过渡图",
+      "colors": [
+        {
+          "hex": "#008000"
+        },
+        {
+          "hex": "#005020"
+        },
+        {
+          "hex": "#002040"
+        },
+        {
+          "hex": "#001060"
+        },
+        {
+          "hex": "#004080"
+        },
+        {
+          "hex": "#0070A0"
+        },
+        {
+          "hex": "#42A0C0"
+        },
+        {
+          "hex": "#A2D0E0"
+        },
+        {
+          "hex": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "id": "mpl-gist-gray",
+      "name": "Gist Gray 灰度地形",
+      "source": "matplotlib · gist_gray",
+      "type": "sequential",
+      "group": "地形与地球物理",
+      "note": "纯灰度渐变，适合晕渲、阴影与二值叠加",
+      "colors": [
+        {
+          "hex": "#000000"
+        },
+        {
+          "hex": "#202020"
+        },
+        {
+          "hex": "#404040"
+        },
+        {
+          "hex": "#606060"
+        },
+        {
+          "hex": "#808080"
+        },
+        {
+          "hex": "#A0A0A0"
+        },
+        {
+          "hex": "#C0C0C0"
+        },
+        {
+          "hex": "#E0E0E0"
+        },
+        {
+          "hex": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "id": "mpl-bone",
+      "name": "Bone 灰蓝地形",
+      "source": "matplotlib · bone",
+      "type": "sequential",
+      "group": "地形与地球物理",
+      "note": "带冷调的灰度色阶，适合与彩色异常图叠放",
+      "colors": [
+        {
+          "hex": "#000000"
+        },
+        {
+          "hex": "#1C1C27"
+        },
+        {
+          "hex": "#38384E"
+        },
+        {
+          "hex": "#545574"
+        },
+        {
+          "hex": "#707B90"
+        },
+        {
+          "hex": "#8CA2AC"
+        },
+        {
+          "hex": "#A9C8C8"
+        },
+        {
+          "hex": "#D5E4E4"
+        },
+        {
+          "hex": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "id": "mpl-nipy-spectral",
+      "name": "Nipy Spectral 多场合成",
+      "source": "matplotlib · nipy_spectral",
+      "type": "sequential",
+      "group": "地形与地球物理",
+      "note": "高饱和多色阶，遥感与多物理场合成的老牌选择",
+      "colors": [
+        {
+          "hex": "#000000"
+        },
+        {
+          "hex": "#4300A2"
+        },
+        {
+          "hex": "#0078DD"
+        },
+        {
+          "hex": "#00AA98"
+        },
+        {
+          "hex": "#00BC00"
+        },
+        {
+          "hex": "#67FF00"
+        },
+        {
+          "hex": "#FFC900"
+        },
+        {
+          "hex": "#EC0000"
+        },
+        {
+          "hex": "#CCCCCC"
+        }
+      ]
+    },
+    {
+      "id": "mpl-gist-ncar",
+      "name": "Gist Ncar 地球物理",
+      "source": "matplotlib · gist_ncar",
+      "type": "sequential",
+      "group": "地形与地球物理",
+      "note": "气象/地球物理常用高饱和色阶，雷达与卫星产品图适用",
+      "colors": [
+        {
+          "hex": "#000080"
+        },
+        {
+          "hex": "#0047FF"
+        },
+        {
+          "hex": "#00FBB0"
+        },
+        {
+          "hex": "#68D500"
+        },
+        {
+          "hex": "#DBFF20"
+        },
+        {
+          "hex": "#FFBC0D"
+        },
+        {
+          "hex": "#FF0047"
+        },
+        {
+          "hex": "#CE62F4"
+        },
+        {
+          "hex": "#FEF8FE"
+        }
+      ]
+    },
+    {
+      "id": "npg",
+      "name": "Nature 风格",
+      "source": "ggsci · npg",
+      "type": "categorical",
+      "group": "期刊出版配色",
+      "note": "源自 Nature Publishing Group 系列期刊图表用色，10 色分类循环",
+      "colors": [
+        {
+          "hex": "#E64B35"
+        },
+        {
+          "hex": "#4DBBD5"
+        },
+        {
+          "hex": "#00A087"
+        },
+        {
+          "hex": "#3C5488"
+        },
+        {
+          "hex": "#F39B7F"
+        },
+        {
+          "hex": "#8491B4"
+        },
+        {
+          "hex": "#91D1C2"
+        },
+        {
+          "hex": "#DC0000"
+        },
+        {
+          "hex": "#7E6148"
+        },
+        {
+          "hex": "#B09C85"
+        }
+      ]
+    },
+    {
+      "id": "aaas",
+      "name": "Science 风格",
+      "source": "ggsci · aaas",
+      "type": "categorical",
+      "group": "期刊出版配色",
+      "note": "源自 AAAS / Science 系列期刊图表用色，10 色分类循环",
+      "colors": [
+        {
+          "hex": "#3B4992"
+        },
+        {
+          "hex": "#EE0000"
+        },
+        {
+          "hex": "#008B45"
+        },
+        {
+          "hex": "#631879"
+        },
+        {
+          "hex": "#008280"
+        },
+        {
+          "hex": "#BB0021"
+        },
+        {
+          "hex": "#5F559B"
+        },
+        {
+          "hex": "#A20056"
+        },
+        {
+          "hex": "#808180"
+        },
+        {
+          "hex": "#1B1919"
+        }
+      ]
+    },
+    {
+      "id": "frontiers",
+      "name": "Frontiers 风格",
+      "source": "ggsci · frontiers",
+      "type": "categorical",
+      "group": "期刊出版配色",
+      "note": "Frontiers 出版社全系列期刊图表用色，10 色，明度高适合屏幕展示",
+      "colors": [
+        {
+          "hex": "#D51317"
+        },
+        {
+          "hex": "#F39200"
+        },
+        {
+          "hex": "#EFD500"
+        },
+        {
+          "hex": "#95C11F"
+        },
+        {
+          "hex": "#007B3D"
+        },
+        {
+          "hex": "#31B7BC"
+        },
+        {
+          "hex": "#0094CD"
+        },
+        {
+          "hex": "#164194"
+        },
+        {
+          "hex": "#6F286A"
+        },
+        {
+          "hex": "#706F6F"
+        }
+      ]
+    },
+    {
+      "id": "bmj",
+      "name": "BMJ 风格",
+      "source": "ggsci · bmj",
+      "type": "categorical",
+      "group": "期刊出版配色",
+      "note": "英国医学杂志 BMJ 系列期刊图表用色，9 色，蓝黄紫对比明快",
+      "colors": [
+        {
+          "hex": "#2A6EBB"
+        },
+        {
+          "hex": "#F0AB00"
+        },
+        {
+          "hex": "#C50084"
+        },
+        {
+          "hex": "#7D5CC6"
+        },
+        {
+          "hex": "#E37222"
+        },
+        {
+          "hex": "#69BE28"
+        },
+        {
+          "hex": "#00B2A9"
+        },
+        {
+          "hex": "#CD202C"
+        },
+        {
+          "hex": "#747678"
+        }
+      ]
+    },
+    {
+      "id": "lancet",
+      "name": "Lancet 风格",
+      "source": "ggsci · lancet",
+      "type": "categorical",
+      "group": "期刊出版配色",
+      "note": "柳叶刀杂志风格，9 色，深蓝+正红对比鲜明",
+      "colors": [
+        {
+          "hex": "#00468B"
+        },
+        {
+          "hex": "#ED0000"
+        },
+        {
+          "hex": "#42B540"
+        },
+        {
+          "hex": "#0099B4"
+        },
+        {
+          "hex": "#925E9F"
+        },
+        {
+          "hex": "#FDAF91"
+        },
+        {
+          "hex": "#AD002A"
+        },
+        {
+          "hex": "#ADB6B6"
+        },
+        {
+          "hex": "#1B1919"
+        }
+      ]
+    },
+    {
+      "id": "jama",
+      "name": "JAMA 风格",
+      "source": "ggsci · jama",
+      "type": "categorical",
+      "group": "期刊出版配色",
+      "note": "美国医学会杂志风格，7 色低饱和，稳重耐看",
+      "colors": [
+        {
+          "hex": "#374E55"
+        },
+        {
+          "hex": "#DF8F44"
+        },
+        {
+          "hex": "#00A1D5"
+        },
+        {
+          "hex": "#B24745"
+        },
+        {
+          "hex": "#79AF97"
+        },
+        {
+          "hex": "#6A6599"
+        },
+        {
+          "hex": "#80796B"
+        }
+      ]
+    },
+    {
+      "id": "nejm",
+      "name": "NEJM 风格",
+      "source": "ggsci · nejm",
+      "type": "categorical",
+      "group": "期刊出版配色",
+      "note": "新英格兰医学杂志风格，8 色，医疗/临床图表常用",
+      "colors": [
+        {
+          "hex": "#BC3C29"
+        },
+        {
+          "hex": "#0072B5"
+        },
+        {
+          "hex": "#E18727"
+        },
+        {
+          "hex": "#20854E"
+        },
+        {
+          "hex": "#7876B1"
+        },
+        {
+          "hex": "#6F99AD"
+        },
+        {
+          "hex": "#FFDC91"
+        },
+        {
+          "hex": "#EE4C97"
+        }
+      ]
+    },
+    {
+      "id": "jco",
+      "name": "JCO 风格",
+      "source": "ggsci · jco",
+      "type": "categorical",
+      "group": "期刊出版配色",
+      "note": "临床肿瘤学杂志风格，10 色，明暗层次分明",
+      "colors": [
+        {
+          "hex": "#0073C2"
+        },
+        {
+          "hex": "#EFC000"
+        },
+        {
+          "hex": "#868686"
+        },
+        {
+          "hex": "#CD534C"
+        },
+        {
+          "hex": "#7AA6DC"
+        },
+        {
+          "hex": "#003C67"
+        },
+        {
+          "hex": "#8F7700"
+        },
+        {
+          "hex": "#3B3B3B"
+        },
+        {
+          "hex": "#A73030"
+        },
+        {
+          "hex": "#4A6990"
+        }
+      ]
+    },
+    {
+      "id": "npg-nrc",
+      "name": "Nature Reviews 风格",
+      "source": "ggsci · npg/nrc（Nature Reviews 配色）",
+      "type": "categorical",
+      "group": "期刊出版配色",
+      "note": "Nature Reviews 系列图表配色，冷色为主、与 NPG 主色系区分",
+      "colors": [
+        {
+          "hex": "#E64B35"
+        },
+        {
+          "hex": "#4DBBD5"
+        },
+        {
+          "hex": "#00A087"
+        },
+        {
+          "hex": "#3C5488"
+        },
+        {
+          "hex": "#F39B7F"
+        },
+        {
+          "hex": "#8491B4"
+        },
+        {
+          "hex": "#91D1C2"
+        },
+        {
+          "hex": "#DC0000"
+        },
+        {
+          "hex": "#7E6148"
+        },
+        {
+          "hex": "#B09C85"
+        }
+      ]
+    },
+    {
+      "id": "lancet-lanonc",
+      "name": "Lancet Oncology 风格",
+      "source": "ggsci · lancet/lanonc（Lancet Oncology 配色）",
+      "type": "categorical",
+      "group": "期刊出版配色",
+      "note": "Lancet Oncology 图表配色，暖色系、适合肿瘤/医学类图示",
+      "colors": [
+        {
+          "hex": "#00468B"
+        },
+        {
+          "hex": "#ED0000"
+        },
+        {
+          "hex": "#42B540"
+        },
+        {
+          "hex": "#0099B4"
+        },
+        {
+          "hex": "#925E9F"
+        },
+        {
+          "hex": "#FDAF91"
+        },
+        {
+          "hex": "#AD002A"
+        },
+        {
+          "hex": "#ADB6B6"
+        },
+        {
+          "hex": "#1B1919"
         }
       ]
     }

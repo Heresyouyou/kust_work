@@ -34,6 +34,9 @@
   --kp-paper: #ffffff;                         /* 纸面：刻意永不变色 */
   --kp-hit: rgba(255, 196, 0, .42);            /* 检索命中 */
   --kp-select: rgba(0, 90, 255, .28);          /* 选中文字 */
+  /* 悬停整句的色带：配合 multiply 用，越淡越不伤字；想更明显就调高 alpha */
+  --kp-hover: rgba(52, 199, 89, .15);
+  --kp-hover-line: rgba(52, 199, 89, .16);
   --kp-toolbar-h: 38px;
   --kp-status-h: 24px;
 }
@@ -51,6 +54,12 @@
 .kp-body { flex: 1; display: flex; min-height: 0; position: relative; }
 .kp-views { flex: 1; display: flex; min-width: 0; --kp-split: 50%; }
 .kp-views:has(> .kp-divider) > .kp-pane:first-of-type { flex: 0 0 calc(var(--kp-split) - 3px); }
+
+/* 只显示一版时（工具栏「显示哪一版」）：隐藏另一栏，可见栏占满宽度。
+ * 必须用 !important 压过上面那条 :has() 的固定宽度，否则「只看原文」只占半屏。 */
+.kp-views[data-panes="1"] > .kp-divider { display: none; }
+.kp-views[data-panes="1"] > .kp-pane { flex: 1 1 100% !important; }
+.kp-pane[hidden] { display: none !important; }
 
 .kp-pane { flex: 1 1 0; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
 .kp-paneHead {
@@ -214,6 +223,19 @@
   background: var(--kp-hit); border-radius: 2px;
   margin: -1px; padding: 1px;
 }
+/* 导读「P.x」跳过来时命中的那段：比普通检索命中更显眼，并且留住不闪 */
+.kp-textLayer span.kp-hit-current {
+  background: rgba(255, 196, 0, .62);
+  box-shadow: 0 0 0 1px rgba(255, 196, 0, .55);
+}
+html.kp-light .kp-textLayer span.kp-hit-current { background: rgba(255, 176, 0, .55); }
+
+/* 划词镜像：另一侧对应段落的位置提示（比命中色淡，不抢原文的注意力） */
+.kp-textLayer span.kp-mirror {
+  background: rgba(96, 165, 250, .5);
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, .6);
+  border-radius: 2px;
+}
 
 /* ═══════════ 链接层 ═══════════ */
 .kp-linkLayer { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
@@ -345,4 +367,39 @@
   .kp-divider { width: 100%; height: 6px; flex: 0 0 6px; cursor: row-resize; }
   .kp-sidebar { flex-basis: 156px; }
   .kp-thumbGrid { grid-template-columns: repeat(1, 1fr); }
+}
+
+/* ═══════════ 嵌入分屏（iframe 内）═══════════
+ * 宿主导读页左侧还有导读栏，iframe 往往只有 900–1000px：
+ * 标题收窄、次要按钮隐藏、工具栏可横向滚动兜底，保证翻页/缩放/同步/版本都在视野内。 */
+.kp-embed .kp-title { max-width: 150px; }
+.kp-embed .kp-toolbar { overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+.kp-embed .kp-toolbar::-webkit-scrollbar { display: none; }
+.kp-embed .kp-btn[data-opt] { display: none; }
+
+/* 划词镜像的字符级高亮（CSS Custom Highlight API）：
+   只染色命中句子的那些字，不再整行变色 */
+::highlight(kpdf-mirror) {
+  background-color: rgba(96, 165, 250, .55);
+  color: inherit;
+}
+
+/* 悬停整句高亮（绿色）：鼠标不按下，停在哪句就把这句和译文里的对应句一起标出。
+   高亮不是选区 —— 选区跟字形走、逐字拼，边缘坑坑洼洼；高亮要的是一条条齐整色带，
+   所以由 kpdf 自己画一层绝对定位的矩形（一行一个，高度取该行最高字框），
+   这里只管长相。
+
+   颜色规则（2026-10-28）：**不许压暗黑字**。
+   色带用极淡的绿 + `mix-blend-mode: multiply`：纸面被染成浅薄荷，
+   黑字乘以任何颜色还是黑字，字形边缘（抗锯齿灰）也只会更实不会更糊。
+   不支持 multiply 的老浏览器退回 10% 透明度的纯覆盖，仍然看得清字。 */
+.kp-hoverLayer { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.kp-hoverRect {
+  position: absolute; border-radius: 2px;
+  background: var(--kp-hover, rgba(52, 199, 89, .15));
+  box-shadow: inset 0 0 0 1px var(--kp-hover-line, rgba(52, 199, 89, .16));
+  mix-blend-mode: multiply;
+}
+@supports not (mix-blend-mode: multiply) {
+  .kp-hoverRect { background: rgba(52, 199, 89, .10); box-shadow: none; }
 }

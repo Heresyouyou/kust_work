@@ -148,6 +148,8 @@ def main():
     ap.add_argument('--status', action='store_true', help='只看状态，不执行回收')
     ap.add_argument('--json', action='store_true', help='输出 JSON（供自动化解析）')
     ap.add_argument('--force', action='store_true', help='忽略运行锁强制执行')
+    ap.add_argument('--legacy', action='store_true',
+                    help='强制走旧逻辑（搬去 NAS/translated 再删；默认已被 tr 仓库接管）')
     ap.add_argument('--no-log', action='store_true', help='不写入 logs/nas_reaper.log')
     args = ap.parse_args()
 
@@ -156,6 +158,28 @@ def main():
         if args.json:
             print(json.dumps(s, ensure_ascii=False, indent=2))
         return 0
+
+    # ★ 2026-10-29：内容寻址仓库接管本地缓存回收。
+    #   旧逻辑是「把本地译文搬去 NAS/translated/ 再删本地」，而新仓库的 blobs/ 里
+    #   已经有同一份，搬家等于重复存储；而且它只认 48h、不看 20GB 容量上限。
+    #   检测到 tr.db 就转调新逻辑，**计划任务不用改**；真要跑旧逻辑加 --legacy。
+    _tr_db = Path(__file__).resolve().parent.parent / 'modules' / 'tr' / 'data' / 'tr.db'
+    if _tr_db.exists() and not getattr(args, 'legacy', False):
+        try:
+            from modules.tr import blob as _blob, store as _store
+            _r = _store.heal(fix=True, deep=False)
+            _w = _blob.sweep(dry=bool(args.dry_run or args.no_delete))
+            line = ('已由 tr 仓库接管：对账 ok=%d missing=%d ｜ 清理 trash=%d local=%d (%.1f MB)'
+                    % (_r.get('ok', 0), _r.get('missing', 0),
+                       _w.get('trash_removed', 0), _w.get('local_removed', 0),
+                       _w.get('local_freed_mb', 0)))
+            print(line)
+            if args.json:
+                print(json.dumps({'tr_heal': _r, 'sweep': _w}, ensure_ascii=False))
+            _write_log(line + '\n')
+            return 0
+        except Exception as e:
+            print('tr 接管失败，回退旧逻辑: %s' % e)
 
     out = []
 

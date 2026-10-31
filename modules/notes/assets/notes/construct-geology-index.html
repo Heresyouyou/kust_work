@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>构造地质学 · 实验总目录</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%23a0522d'/><text x='50' y='62' font-size='40' text-anchor='middle' fill='%23fdfbf6' font-family='serif'>构</text></svg>">
+<style>
+  :root {
+    --bg: #f5f1e8;
+    --paper: #fdfbf6;
+    --ink: #2e2a24;
+    --ink-soft: #5c554a;
+    --accent: #a0522d;
+    --accent-light: #c8956d;
+    --green: #5f7a6b;
+    --line: #d9d2c3;
+    --highlight: #f0e6d2;
+    --red: #9e3b2e;
+    --blue: #2f5d8a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Songti SC", "SimSun", Georgia, serif;
+    font-size: 15.5px;
+    line-height: 1.9;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: 940px; margin: 0 auto; padding: 36px 32px 90px; }
+
+  .cover { text-align: center; padding: 46px 0 30px; border-bottom: 3px double var(--accent); margin-bottom: 34px; }
+  .cover .sub { font-family: "Helvetica Neue", sans-serif; font-size: 12px; letter-spacing: 4px; color: var(--accent); margin-bottom: 14px; }
+  .cover h1 { font-size: 30px; font-weight: 700; letter-spacing: 2px; margin-bottom: 10px; }
+  .cover .meta { font-size: 13.5px; color: var(--ink-soft); margin-top: 16px; line-height: 1.95; }
+
+  h2 {
+    font-size: 21px; color: var(--accent); border-left: 5px solid var(--accent);
+    padding-left: 12px; margin: 46px 0 8px; letter-spacing: 1px;
+  }
+  h2 small { font-size: 13px; color: var(--ink-soft); font-weight: 400; letter-spacing: 0; margin-left: 8px; }
+  h3 { font-size: 16.5px; margin: 26px 0 10px; padding-bottom: 5px; border-bottom: 1px solid var(--line); }
+  h4 { font-size: 15px; color: var(--green); margin: 16px 0 6px; }
+  p { margin-bottom: 9px; text-align: justify; }
+  ul, ol { margin: 6px 0 10px 24px; }
+  li { margin-bottom: 5px; }
+
+  .qbox {
+    background: #fffdf8; border: 1px solid var(--accent-light); border-left: 5px solid var(--accent);
+    padding: 14px 18px; margin: 14px 0 18px; font-size: 15px;
+  }
+  .qbox .lab { display: inline-block; background: var(--accent); color: #fff; font-size: 12px;
+    padding: 1px 9px; border-radius: 2px; margin-right: 8px; letter-spacing: 1px; font-family: sans-serif; }
+  .qbox .src { display: block; font-size: 12.5px; color: var(--ink-soft); margin-top: 6px; }
+
+  .step { margin: 14px 0; padding-left: 14px; border-left: 2px solid var(--line); }
+  .step .t { font-weight: 700; color: var(--accent); }
+  .calc {
+    background: #f3efe3; border: 1px dashed var(--accent-light);
+    padding: 12px 16px; margin: 10px 0; font-family: "Consolas", "Courier New", monospace;
+    font-size: 14px; line-height: 1.85;
+  }
+  .calc .r { color: var(--red); font-weight: 700; }
+  .answer { background: #f0f3ee; border-left: 4px solid var(--green); padding: 12px 16px; margin: 12px 0; }
+  .answer .tag { display: inline-block; background: var(--green); color: #fff; font-size: 12px;
+    padding: 1px 10px; border-radius: 2px; margin-right: 8px; letter-spacing: 1px; font-family: sans-serif; }
+  .note { font-size: 13.5px; color: var(--ink-soft); background: var(--highlight); padding: 10px 14px; margin: 10px 0; border-radius: 3px; }
+  .note b { color: var(--ink); }
+
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; background: var(--paper); }
+  th, td { border: 1px solid var(--line); padding: 8px 10px; text-align: center; vertical-align: top; }
+  th { background: var(--highlight); font-weight: 700; color: var(--accent); }
+  td.l { text-align: left; }
+
+  figure { margin: 18px 0; background: var(--paper); border: 1px solid var(--line); padding: 10px; }
+  figure img { display: block; width: 100%; height: auto; }
+  figcaption { font-size: 13px; color: var(--ink-soft); margin-top: 8px; text-align: center; line-height: 1.7; }
+  figure svg { display: block; width: 100%; height: auto; }
+
+  .toc { background: var(--paper); border: 1px solid var(--line); padding: 14px 20px; margin: 22px 0; font-size: 14px; }
+  .toc b { color: var(--accent); }
+  @media print {
+    body { background: #fff; }
+    .page { max-width: 100%; padding: 16px; }
+    h2 { page-break-after: avoid; }
+    figure { page-break-inside: avoid; }
+  }
+</style>
+<style>
+  .lab-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 24px 0 8px; }
+  .lab-card { display: block; text-decoration: none; color: var(--ink); background: var(--paper);
+    border: 1px solid var(--line); border-left: 5px solid var(--accent); padding: 16px 18px 14px;
+    transition: box-shadow .16s ease, transform .16s ease, border-color .16s ease; }
+  .lab-card:hover { box-shadow: 0 4px 14px rgba(160,82,45,.14); transform: translateY(-2px); border-color: var(--accent); }
+  .lab-card .no { font-family: "Helvetica Neue", sans-serif; font-size: 12px; letter-spacing: 2px; color: var(--accent); }
+  .lab-card .name { font-size: 17px; font-weight: 700; margin: 4px 0 6px; letter-spacing: .5px; }
+  .lab-card .desc { font-size: 13.5px; color: var(--ink-soft); line-height: 1.7; }
+  .lab-card .meta { font-size: 12px; color: var(--accent-light); margin-top: 8px; font-family: sans-serif; letter-spacing: .5px; }
+  @media (max-width: 700px) { .lab-grid { grid-template-columns: 1fr; } }
+</style>
+
+</head>
+<body>
+<div class="page">
+
+<div class="cover">
+  <div class="sub">STRUCTURAL GEOLOGY · LABORATORY INDEX</div>
+  <h1>构造地质学 · 实验总目录</h1>
+  <p style="font-size:15px;color:var(--ink-soft);">六个实验独立成页：题目原文 → 完整解答 → 附图／作图</p>
+  <div class="meta">教材：李忠权、刘顺《构造地质学（第三版）》，地质出版社 2010<br>课程实验一~三对应教材实习一、二、四；实验四~六对应教材实习七、八、十一<br>点击任一卡片进入该实验的完整解答页</div>
+</div>
+
+<div class="lab-grid">
+  <a class="lab-card" href="construct-geology-p1-horizontal.html">
+    <div class="no">实验一</div>
+    <div class="name">判别水平岩层、求 K₁ 层厚度</div>
+    <div class="desc">水平岩层判读、K₁ 层真厚度计算、接触关系与构造演化史。</div>
+    <div class="meta">教材实习一 · 书 P321 · 附图1 凌河 1:10000</div>
+  </a>
+  <a class="lab-card" href="construct-geology-p2-attitude.html">
+    <div class="no">实验二</div>
+    <div class="name">用间接方法确定岩层产状要素</div>
+    <div class="desc">题1 求 C₁ 产状；题2 松溪三点法求矿层产状与 ZK9 见矿深度。</div>
+    <div class="meta">教材实习二 · 书 P322 · 附图3 松溪 1:2000</div>
+  </a>
+  <a class="lab-card" href="construct-geology-p3-unconformity.html">
+    <div class="no">实验三</div>
+    <div class="name">倾斜岩层与不整合：作 A—B 剖面图</div>
+    <div class="desc">V 字形法则、平行／角度不整合判据、A—B 剖面与演化史。</div>
+    <div class="meta">教材实习四 · 书 P325 · 附图1 凌河</div>
+  </a>
+  <a class="lab-card" href="construct-geology-p7-foldmap.html">
+    <div class="no">实验四</div>
+    <div class="name">读褶皱区地质图</div>
+    <div class="desc">读图六步、三褶判别、轴面与枢纽、隔槽式组合与形成时代。</div>
+    <div class="meta">教材实习七 · 书 P329—331 · 附图6 暮云岭 1:25000</div>
+  </a>
+  <a class="lab-card" href="construct-geology-p8-section.html">
+    <div class="no">实验五</div>
+    <div class="name">绘制褶皱地区剖面图</div>
+    <div class="desc">铅直剖面六步、视倾角换算、A—B 剖面、图Ⅱ-21 横截面。</div>
+    <div class="meta">教材实习八 · 书 P332—336 · 附图6、图Ⅱ-21</div>
+  </a>
+  <a class="lab-card" href="construct-geology-p11-rose.html">
+    <div class="no">实验六</div>
+    <div class="name">编制和分析节理玫瑰花图</div>
+    <div class="desc">102 条节理资料整理、走向／倾向玫瑰图与共轭剪节理 σ₁ 反演。</div>
+    <div class="meta">教材实习十一 · 书 P340—342 · 表Ⅱ-3、Ⅱ-4</div>
+  </a>
+</div>
+
+<div class="note"><b>使用说明：</b>本页只作入口，各实验正文为独立页面，可单独打开、单独打印；页内顶部与底部均设「实验导航」，可在六页之间跳转。</div>
+
+</div>
+</body>
+</html>

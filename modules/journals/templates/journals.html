@@ -152,6 +152,64 @@
   /* 本地获取日期（MM-DD / 跨年 YYYY-MM-DD） */
   .art .ob { color: var(--dim); font-size: 10px; flex-shrink: 0; padding-top: 3px;
     font-family: ui-monospace, Consolas, monospace; }
+  /* ── 标题右侧三按钮：下载 / 阅读 / 翻译（2026-10-17）──────────
+     与知识库搜索页（geokb_public/base.html 的 .btn / .tr-btn）同款组件词汇：
+     同色值变量、同尺寸节奏、同状态机；行为见页底脚本与 geokb_translate.js。 */
+  .btn { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px;
+    border-radius: 5px; border: 1px solid var(--border); background: var(--surface-2);
+    color: var(--text); font-size: 11px; cursor: pointer; text-decoration: none;
+    font-family: inherit; line-height: 1.6; flex-shrink: 0; vertical-align: middle; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .btn-primary:hover { background: var(--accent-dim); border-color: var(--accent-dim); color: #fff; }
+  .btn svg { width: 11px; height: 11px; flex-shrink: 0; }
+  .btn.is-off { opacity: .5; cursor: default; }
+  .btn.is-off:hover { border-color: var(--border); color: var(--text); }
+  .art-btns { display: inline-flex; gap: 4px; margin-left: 7px; }
+  /* 已归档可下载 → 加下拉箭头暗示可展开版本菜单 */
+  .j-dl-ready::after { content: '\25BE'; font-size: 9px; line-height: 1;
+    opacity: .8; }
+  /* 未归档 → 「在线抓取」用中性色，避免与「下载 PDF」同款醒目色混淆语义 */
+  .j-dl-grab { background: var(--surface-2); border-color: var(--border);
+    color: var(--muted); }
+  .j-dl-grab:hover { border-color: var(--accent); color: var(--accent);
+    background: var(--surface-2); }
+  .j-spin { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0;
+    border: 2px solid var(--stage-track); border-top-color: var(--accent);
+    animation: j-rot .7s linear infinite; }
+  @keyframes j-rot { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .j-spin { animation-duration: 3s; } }
+  /* 翻译按钮状态机（与搜索页 tr-btn 同款，行为在 geokb_translate.js） */
+  .tr-btn[disabled] { opacity: .55; cursor: not-allowed; }
+  .tr-btn[disabled]:hover { border-color: var(--border); color: inherit; }
+  .tr-btn.tr-busy { border-color: var(--warn); color: var(--warn); }
+  .tr-btn.tr-done { color: var(--muted); }
+  .tr-btn.tr-failed { border-color: var(--err); color: var(--err); }
+  .tr-spin { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0;
+    border: 2px solid var(--stage-track); border-top-color: var(--warn);
+    animation: j-rot .7s linear infinite; }
+  @media (prefers-reduced-motion: reduce) { .tr-spin { animation-duration: 3s; } }
+  /* ── 下载版本选择菜单（原文 / 中文版 / 双语对照版）──────────────
+     下载成功后 .j-dl 保持可点（不再是死灰钮），点击弹出 .j-ver 浮层；
+     译文尚未就绪时，译文两项置灰并标注「翻译后可下」。 */
+  .j-ver { position: absolute; z-index: 60; min-width: 176px; padding: 4px;
+    border-radius: 7px; border: 1px solid var(--border);
+    background: var(--surface); box-shadow: 0 6px 22px rgba(0, 0, 0, .16); }
+  .j-ver[hidden] { display: none; }
+  .j-ver-hd { padding: 5px 8px 4px; font-size: 10.5px; color: var(--dim);
+    border-bottom: 1px solid var(--border); }
+  .j-ver-i { display: flex; align-items: center; gap: 6px; width: 100%;
+    padding: 5px 8px; border: 0; border-radius: 5px; background: transparent;
+    color: var(--text); font-size: 11.5px; font-family: inherit;
+    text-align: left; cursor: pointer; }
+  .j-ver-i:hover { background: var(--surface-2); color: var(--accent); }
+  .j-ver-i[disabled] { opacity: .45; cursor: not-allowed; }
+  .j-ver-i[disabled]:hover { background: transparent; color: var(--text); }
+  .j-ver-i svg { width: 11px; height: 11px; flex-shrink: 0; }
+  .j-ver-i .sz { margin-left: auto; font-size: 10px; color: var(--dim);
+    font-family: ui-monospace, Consolas, monospace; }
+  .j-ver-i .tag { font-size: 9.5px; padding: 1px 4px; border-radius: 3px;
+    border: 1px solid var(--border); color: var(--dim); }
   /* 「展开其余 N 篇 / 收起」 */
   .more { display: block; font-size: 11px; color: var(--accent); margin-top: 6px;
     padding: 3px 0; cursor: pointer; }
@@ -217,6 +275,9 @@
 <!-- 主题引擎：必须同步加载（勿加 defer/async），否则会先闪深色再变浅色。
      由它在右上角挂出「自动 / 浅色 / 深色」三态切换按钮。 -->
 <script src="/theme.js"></script>
+<!-- GeoKB 一键翻译按钮（与知识库搜索页同源）：journals 页的翻译钮在下载成功后才挂
+     data-eid，geokb_translate.js 用 document 级事件委托，动态插入的按钮同样生效。 -->
+<script src="/geokb/static/js/geokb_translate.js"></script>
 </head>
 <body data-page-node-id="2pMaEMTdaD0hcUkgLfMZ0i">
 
@@ -286,6 +347,74 @@
   }
   function safeUrl(u) { return /^https?:\/\//i.test(u || '') ? u : ''; }
 
+  // ── 标题右侧三按钮：下载 PDF / 在线阅读 / 一键翻译（2026-10-17）──
+  // 与知识库搜索页（geokb_public 的 _translate_macros.html）同款图标与状态机，
+  // 色值走本页 CSS 变量（--accent/--border/--surface-2/--warn/--err/--muted）。
+  // ★ 语义（用户确认）：「下载 PDF」= **NAS → 用户本地**。
+  //   网站 → NAS 由 daily_archive_papers.py 在期刊列表更新后自动完成，
+  //   后端给每篇注入 archived / pdf_rel / eid：
+  //     已归档 → 「下载 PDF ▾」点开选版本（原文 / 中文版 / 双语对照版）
+  //     未归档 → 「在线抓取」补抓通道（抓完自动转可下载）
+  //   阅读/翻译仅在有 eid（已归档并建档）时可用。
+  var ICON_DL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2 2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+  var ICON_DLOK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  var ICON_EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+  var ICON_TRANS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1"/><path d="M14 21l5-5 4 4-5 5-4-4z"/><path d="M17 14l-1.5-1.5"/><path d="M13 19h8v2h-8zM19 15l3 3"/></svg>';
+
+  var ICON_GRAB = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2 2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/><path d="M2 6h4M4 4v4" stroke-width="1.5"/></svg>';
+
+  // 阅读 / 翻译的共享属性（已归档才有 eid / pdf_rel）
+  function readAttrs(a) {
+    if (!a.eid) {
+      return ' href="javascript:void(0)" aria-disabled="true" class="btn is-off j-read"'
+        + ' title="尚未归档到 NAS：每日管线会在列表更新后自动抓取，抓到即可阅读"';
+    }
+    var single = '/PDFreader?file='
+      + encodeURIComponent('/api/journals/pdf/' + (a.pdf_rel || ''))
+      + '&title=' + encodeURIComponent(a.title || '');
+    var pair = single + '&peer=' + encodeURIComponent('/geokb/pdf/' + a.eid + '/mono')
+      + '&layout=continuous&sync=1';
+    return ' href="' + esc(single) + '" class="btn j-read"'
+      + ' data-read-link data-read-eid="' + esc(a.eid) + '"'
+      + ' data-read-single="' + esc(single) + '"'
+      + ' data-read-pair="' + esc(pair) + '"'
+      + ' title="自研 canvas 阅读器打开；译文就绪后自动切双语对照"';
+  }
+
+  function trAttrs(a) {
+    if (!a.eid) {
+      return ' disabled data-state="idle"'
+        + ' title="尚未归档到 NAS：抓到 PDF 后才能提交翻译"';
+    }
+    return ' data-eid="' + esc(a.eid) + '" data-state="idle"'
+      + ' title="提交 NAS 原文到翻译队列，完成后译文归档到原文同目录"';
+  }
+
+  // 无 http(s) 链接的条目不渲染按钮（在线抓取接口必须要有源地址）。
+  function artBtns(a) {
+    if (!safeUrl(a.url)) return '';
+    var meta = ' data-journal="' + esc(a.journal || '') + '"'
+      + ' data-title="' + esc(a.title || '') + '"'
+      + ' data-url="' + esc(a.url) + '"';
+    var dl;
+    if (a.archived && a.pdf_rel) {
+      dl = '<button type="button" class="btn btn-primary j-dl j-dl-ready"' + meta
+        + ' data-eid="' + esc(a.eid || '') + '"'
+        + ' data-pdf-rel="' + esc(a.pdf_rel) + '"'
+        + ' title="从 NAS 论文仓库下载到本地（点击选择版本：原文 / 中文版 / 双语对照版）">'
+        + ICON_DL + '<span>下载 PDF</span></button>';
+    } else {
+      dl = '<button type="button" class="btn btn-primary j-dl j-dl-grab"' + meta
+        + ' title="此篇尚未归档：点击立即从期刊官网抓取 PDF 到 NAS（正常由每日管线自动完成）">'
+        + ICON_GRAB + '<span>在线抓取</span></button>';
+    }
+    return '<span class="art-btns">' + dl
+      + '<a' + readAttrs(a) + '>' + ICON_EYE + '<span>在线阅读</span></a>'
+      + '<button type="button" class="btn tr-btn j-tr" data-tr-btn' + trAttrs(a) + '>'
+      + ICON_TRANS + '<span>一键翻译</span></button>'
+      + '</span>';
+  }
+
   // 全站搜索：按查询过滤某卡片的文章列表（标题 + 中文小字 + 主题命中词）。
   // 返回卡片的「过滤副本」，并打 _force 标记让卡片铺开全部匹配项（不再折叠预览）。
   function applyQuery(j) {
@@ -336,7 +465,7 @@
       : '';
     // 英文条目下方挂中文小字（离线预翻译，没有就不显示，绝不占位）
     var zh = a.title_zh ? '<div class="tzh">' + esc(a.title_zh) + '</div>' : '';
-    return '<div class="art"><span class="mk">▸</span><div class="t">' + t + zh + '</div>'
+    return '<div class="art"><span class="mk">▸</span><div class="t">' + t + artBtns(a) + zh + '</div>'
       + ob + vi + '</div>';
   }
 
@@ -354,7 +483,7 @@
         + esc(a.obtained_hm) + '</span>'
       : '';
     var zh = a.title_zh ? '<div class="tzh">' + esc(a.title_zh) + '</div>' : '';
-    return '<div class="art">' + hm + '<span class="mk">▸</span><div class="t">' + t + zh + '</div>'
+    return '<div class="art">' + hm + '<span class="mk">▸</span><div class="t">' + t + artBtns(a) + zh + '</div>'
       + vi + '</div>';
   }
 
@@ -378,7 +507,8 @@
     var zh = a.title_zh ? '<div class="tzh">' + esc(a.title_zh) + '</div>' : '';
     return '<div class="art-w"><span class="sc">' + esc(a.score) + '</span>'
       + '<div class="body"><div>' + t
-      + '<span class="t-badge t-' + esc(a.tier) + '">' + esc(tier) + '</span></div>' + zh
+      + '<span class="t-badge t-' + esc(a.tier) + '">' + esc(tier) + '</span>'
+      + artBtns(a) + '</div>' + zh
       + '<div class="meta">' + meta.join('') + '</div>' + kws + '</div></div>';
   }
 
@@ -755,6 +885,257 @@
     body.innerHTML = '<div class="loading">加载中…</div>';
     draw();
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+})();
+</script>
+
+<!-- 三按钮交互（2026-10-17）
+     语义分工（用户确认）：
+       · 「下载 PDF」= NAS → 用户本地。已归档的条目后端注入 archived/pdf_rel/eid，
+         按钮点开版本菜单（原文 / 中文版 / 双语对照版），走 <a download> 直落本地。
+       · 「在线抓取」= 网站 → NAS 补抓通道，仅在每日管线尚未归档该篇时出现：
+         POST /api/journals/fetch-pdf → handler 集下载 → NAS 落盘
+         → 题录条目（extraction: manual）→ index_one_entry.py 增量索引（5556 秒级可查）
+         成功后按钮就地转为「下载 PDF ▾」，阅读/翻译同时解锁。
+     幂等：重复抓取后端返回 existed=true，前端同样解锁、不重复写盘。 -->
+<script>
+(function () {
+  'use strict';
+  var ICON_DL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2 2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+
+  // 事件委托：卡片整体会被重渲染（搜索/切视图/展开），逐元素绑定会漏。
+  // 源站状态码 → 人话（handler 已精确区分，别再一律显示"下载失败"）。
+  var ERR_HINT = {
+    no_fulltext: '源站暂未上传全文（非下载问题），可稍后再试或到期刊官网手动下载',
+    not_pdf: '源站返回内容不是 PDF（可能触发反爬限制），可稍后再试',
+    not_pdf_office: '源站仅提供 Office 排版稿，没有 PDF 版',
+    err_parse: '未能解析出 PDF 直链（页面结构可能已变化）',
+    err_network: '网络错误，请稍后重试'
+  };
+
+  document.addEventListener('click', function (e) {
+    if (!e.target || !e.target.closest) return;
+    // 点菜单外部 / 按 Esc → 关闭版本浮层
+    var open = document.querySelector('.j-ver:not([hidden])');
+    if (open && !e.target.closest('.j-ver') && !e.target.closest('.j-dl')) closeVer();
+    var item = e.target.closest('.j-ver-i');
+    if (item) { e.preventDefault(); closeVer(); saveFile(item); return; }
+    var dl = e.target.closest('.j-dl');
+    if (dl) {
+      if (dl.disabled) return;
+      // j-dl-ready（已归档）→ 弹版本菜单：NAS → 用户本地
+      // j-dl-grab（未归档）→ 走补抓通道：网站 → NAS
+      if (dl.classList.contains('j-dl-ready')
+          || dl.classList.contains('j-dl-done')) openVer(dl);
+      else onGrab(dl);
+      return;
+    }
+    var rd = e.target.closest('.j-read');
+    if (rd && rd.classList.contains('is-off')) {
+      e.preventDefault();
+      alert('请先点击「下载 PDF」：原文保存到 NAS 论文仓库后即可在线阅读。');
+    }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeVer();
+  });
+  window.addEventListener('resize', closeVer);
+
+  // ── 版本选择浮层 ───────────────────────────────────────────
+  // 原文（始终可下）+ 中文版/双语对照版（译文就绪才可下）。
+  // 译文地址走 5556 代理 /geokb/pdf/<eid>/<variant>，由后端读 SQLite 定位 NAS 文件。
+  var VER_ICON = {
+    orig: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+    mono: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 10h10M4 15h13M4 20h8"/></svg>',
+    dual:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="18"/><rect x="13" y="3" width="8" height="18"/></svg>'
+  };
+
+  function fmtSize(n) {
+    if (!n) return '';
+    return n >= 1048576 ? (n / 1048576).toFixed(1) + 'M'
+                       : Math.round(n / 1024) + 'K';
+  }
+
+  // 从后端查译文状态（has_mono / has_dual），供菜单决定哪些项可下
+  function fetchTrans(eid) {
+    if (!eid) return Promise.resolve({});
+    return fetch('/geokb/api/entry/' + encodeURIComponent(eid) + '/translation',
+                 { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) { return (d && d.ok) ? d : {}; })
+      .catch(function () { return {}; });
+  }
+
+  // Windows 文件名非法字符（含全角冒号「：」——论文标题里真实出现过）
+  function safeName(s, max) {
+    return String(s == null ? '' : s)
+      .replace(/[\\/:*?"<>|]/g, '_')
+      .replace(/[：]/g, '_')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, max || 100);
+  }
+
+  function openVer(btn) {
+    closeVer();
+    var eid = btn.getAttribute('data-eid') || '';
+    // 原文地址：优先后端注入的 pdf_rel（回源 NAS），兼容补抓后写上的 pdf-url
+    var rel = btn.getAttribute('data-pdf-rel') || '';
+    var origUrl = rel
+      ? '/api/journals/pdf/' + rel.split('/').map(encodeURIComponent).join('/')
+      : (btn.getAttribute('data-pdf-url') || '');
+    var origName = safeName(decodeURIComponent(
+      (origUrl.split('/').pop() || 'paper.pdf').replace(/%[0-9A-Fa-f]{2}/g,
+        function (h) { try { return decodeURIComponent(h); } catch (e) { return h; } })));
+    var monoUrl = eid ? '/geokb/pdf/' + encodeURIComponent(eid) + '/mono' : '';
+    var dualUrl = eid ? '/geokb/pdf/' + encodeURIComponent(eid) + '/dual' : '';
+    var base = origName.replace(/\.pdf$/i, '');
+
+    var menu = document.createElement('div');
+    menu.className = 'j-ver';
+    menu.innerHTML = '<div class="j-ver-hd">从 NAS 下载到本地</div>'
+      + verItem('orig', '原文 PDF', origUrl, origName, !!origUrl)
+      + verItem('mono', '中文版', monoUrl, base + '.zh.mono.pdf', false)
+      + verItem('dual', '双语对照版', dualUrl, base + '.zh.dual.pdf', false);
+    document.body.appendChild(menu);
+
+    // 定位到按钮下方右对齐；越界则翻到上方
+    var r = btn.getBoundingClientRect();
+    var mw = menu.offsetWidth, mh = menu.offsetHeight;
+    var left = Math.min(r.right - mw, window.innerWidth - mw - 8);
+    left = Math.max(8, left);
+    var top = r.bottom + 4;
+    if (top + mh > window.innerHeight - 8) top = Math.max(8, r.top - mh - 4);
+    menu.style.left = (left + window.scrollX) + 'px';
+    menu.style.top = (top + window.scrollY) + 'px';
+
+    // 译文就绪才解禁对应项（tag 也从「翻译后可下」切成「PDF」）
+    fetchTrans(eid).then(function (info) {
+      var items = menu.querySelectorAll('.j-ver-i');
+      [[items[1], info.has_mono], [items[2], info.has_dual || info.has_mono]]
+        .forEach(function (pair) {
+          var it = pair[0], ok = !!pair[1];
+          it.disabled = !ok;
+          if (ok) {
+            var t = it.querySelector('.tag');
+            if (t) t.textContent = 'PDF';
+          }
+        });
+    });
+  }
+
+  // 本 IIFE 独立作用域，esc 定义在页面主 IIFE 里，用不了，这里就地转义
+  function escAttr(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  function verItem(key, label, url, filename, ready) {
+    return '<button type="button" class="j-ver-i" data-key="' + key + '"'
+      + ' data-url="' + escAttr(url) + '" data-name="' + escAttr(filename) + '"'
+      + (ready ? '' : ' disabled') + '>'
+      + VER_ICON[key] + '<span>' + label + '</span>'
+      + '<span class="tag">' + (ready ? 'PDF' : '翻译后可下') + '</span>'
+      + '</button>';
+  }
+
+  function closeVer() {
+    var m = document.querySelector('.j-ver');
+    if (m) m.remove();
+  }
+
+  // 走同源地址下载（浏览器按 Content-Disposition 落盘），不用 fetch 攒 blob
+  function saveFile(item) {
+    var url = item.getAttribute('data-url') || '';
+    var name = item.getAttribute('data-name') || 'paper.pdf';
+    if (!url) return;
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    a.rel = 'noopener';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  // 「在线抓取」：网站 → NAS 补抓通道（正常由每日管线自动完成，此处仅兜底）。
+  function onGrab(btn) {
+    if (btn.disabled) return;
+    var orig = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="j-spin"></span><span>抓取中…</span>';
+    fetch('/api/journals/fetch-pdf', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        journal: btn.getAttribute('data-journal') || '',
+        title: btn.getAttribute('data-title') || '',
+        url: btn.getAttribute('data-url') || ''
+      })
+    })
+      .then(function (r) {
+        return r.json().then(function (d) { return { code: r.status, body: d }; });
+      })
+      .then(function (res) {
+        var d = res.body || {};
+        if (res.code === 200 && d.ok) {
+          unlock(btn, d);
+        } else {
+          btn.disabled = false;
+          btn.innerHTML = orig;
+          alert((ERR_HINT[d.error] || d.message || '抓取失败')
+                + '（HTTP ' + res.code + '）');
+        }
+      })
+      .catch(function (err) {
+        btn.disabled = false;
+        btn.innerHTML = orig;
+        alert('网络错误：' + err);
+      });
+  }
+
+  function unlock(btn, d) {
+    // ① 抓取钮 → 「下载 PDF ▾」（NAS→用户，点开选版本）
+    btn.classList.remove('j-dl-grab');
+    btn.classList.add('j-dl-ready');
+    btn.innerHTML = ICON_DL + '<span>下载 PDF</span>';
+    btn.title = 'PDF 已存 NAS 论文仓库'
+      + (d.existed ? '（此前已归档）' : '')
+      + (d.entry_created ? '，已建档题录条目' : '')
+      + (d.indexed ? '，已入检索索引' : '，索引未完成（不影响阅读）')
+      + '；点击选择下载版本';
+    btn.setAttribute('data-eid', d.eid || '');
+    btn.setAttribute('data-pdf-rel', d.pdf_rel || '');
+    btn.disabled = false;            // 恢复可点：用于打开版本选择菜单
+
+    // ② 阅读钮 → 解锁（原文；译文就绪后 geokb_translate.js 自动切双语对照）
+    var row = btn.closest('.art') || btn.closest('.art-w');
+    var title = btn.getAttribute('data-title') || '';
+    var rd = row && row.querySelector('.j-read');
+    if (rd) {
+      var single = '/PDFreader?file=' + encodeURIComponent(d.pdf_url || '')
+        + '&title=' + encodeURIComponent(title);
+      var pair = single + '&peer='
+        + encodeURIComponent('/geokb/pdf/' + (d.eid || '') + '/mono')
+        + '&layout=continuous&sync=1';
+      rd.classList.remove('is-off');
+      rd.removeAttribute('aria-disabled');
+      rd.setAttribute('href', single);
+      rd.setAttribute('data-read-link', '');
+      rd.setAttribute('data-read-eid', d.eid || '');
+      rd.setAttribute('data-read-single', single);
+      rd.setAttribute('data-read-pair', pair);
+      rd.title = '自研 canvas 阅读器打开：不依赖浏览器 PDF 插件';
+    }
+
+    // ③ 翻译钮 → 解锁并挂 eid（提交 / 轮询 / 状态机在 geokb_translate.js）
+    var tr = row && row.querySelector('.j-tr');
+    if (tr) {
+      tr.removeAttribute('disabled');
+      tr.setAttribute('data-eid', d.eid || '');
+      tr.title = '提交 NAS 原文到翻译队列，完成后译文归档到原文同目录';
+    }
   }
 })();
 </script>

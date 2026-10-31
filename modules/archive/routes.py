@@ -115,23 +115,65 @@ def _clean_title(name, suffix=None):
     return t or name
 
 
+def _tr_meta(name):
+    """新仓库文件名（<sha32>.xxx.pdf）→ {sha,title,work_id}。旧文件名返回 {}。"""
+    try:
+        from modules.tr import store as _trs
+        return _trs.meta_by_filename(name)
+    except Exception:
+        return {}
+
+
+def _can_dual(sha):
+    try:
+        from modules.tr import store as _trs
+        return _trs.has(sha, 'zh.dual')
+    except Exception:
+        return False
+
+
 def _scan_variant(variant):
-    """扫描单个版本，返回窗口内的文件列表（按修改时间倒序）。"""
-    _, _, dirkey, suffix, url_prefix = variant
+    """扫描单个版本，返回窗口内的文件列表（按修改时间倒序）。
+
+    ★ 2026-10-29：适配内容寻址仓库
+      ① 文件名是 `<sha32>.zh.mono.pdf`，人看不懂 → 用索引里的标题替换显示名；
+      ② 双语版改成「下载时现拼」，目录里没有实体文件 → 对每个可派生的 mono
+         虚拟补一条 dual，URL 指向 `/api/tr/file/<sha>/zh.dual`。
+         否则归档页的「双语」分类会凭空少掉 50 多篇。
+    """
+    kind, _, dirkey, suffix, url_prefix = variant
     root = _dirs.get(dirkey)
     if not root or not root.exists():
         return []
 
+    is_dual = (kind == 'dual')
     cutoff = time.time() - ARCHIVE_WINDOW_HOURS * 3600
+
+    # 先记下哪些篇目已经有实体 dual —— 它们不该再被虚拟补一条（否则同篇出现两次）
+    real_dual_sha = set()
+    if is_dual:
+        try:
+            for p in root.iterdir():
+                if p.is_file() and p.name.lower().endswith('.zh.dual.pdf'):
+                    _m = _tr_meta(p.name)
+                    if _m.get('sha'):
+                        real_dual_sha.add(_m['sha'])
+        except OSError:
+            pass
+
     items = []
     try:
         for p in root.iterdir():
             if not p.is_file():
                 continue
             low = p.name.lower()
+            virtual = False
             if suffix:
                 if not low.endswith(suffix):
-                    continue
+                    # 双语版没有实体文件：用 mono 顶上，但只在「可派生」时列
+                    if not (is_dual and low.endswith('.zh.mono.pdf')):
+                        continue
+                    virtual = True
             elif not low.endswith('.pdf'):
                 continue
             try:
@@ -140,9 +182,27 @@ def _scan_variant(variant):
                 continue
             if st.st_mtime < cutoff:
                 continue
+
+            meta = _tr_meta(p.name)
+            title = (meta.get('title') or '').strip() or _clean_title(p.name, suffix)
+            if virtual:
+                sha = meta.get('sha') or ''
+                if not sha or sha in real_dual_sha or not _can_dual(sha):
+                    continue
+                items.append({
+                    'name': sha[:12] + '.zh.dual.pdf',
+                    'title': title,
+                    'size': 0,                      # 还没拼，大小未知
+                    'mtime': st.st_mtime,
+                    'url': '/api/tr/file/%s/zh.dual' % sha,
+                    'dl_url': _dl_url('/api/tr/file/%s/zh.dual?dl=1' % sha),
+                    'virtual': True,                # 前端可据此标「生成后下载」
+                })
+                continue
+
             items.append({
                 'name': p.name,
-                'title': _clean_title(p.name, suffix),
+                'title': title,
                 'size': st.st_size,
                 'mtime': st.st_mtime,
                 'url': '%s/%s' % (url_prefix, quote(p.name)),

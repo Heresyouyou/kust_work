@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>实习十一 · 编制和分析节理玫瑰花图</title>
+<style>
+  :root {
+    --bg: #FFFFFF; --bg2: #F5F8F9; --rule: #D8E2E4;
+    --ink: #1D2B30; --muted: #64787F; --text-secondary: #3D5158;
+    --accent: #2C6E75; --accent-hover: #235A60; --accent-soft: #EAF3F3;
+    --brand-text: #1A464B; --border: #D8E2E4; --brand: #2C6E75;
+    --brand-soft: #EAF3F3; --brand-soft-strong: #D8E9EA;
+    --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg2); color: var(--ink);
+    font-family: "Source Han Serif SC", "Noto Serif CJK SC", "SimSun", serif;
+    font-size: 15px; line-height: 1.75; }
+  .page { max-width: 920px; margin: 0 auto; background: var(--bg); padding: 40px 46px 56px; box-shadow: 0 0 18px rgba(29,43,48,.07); }
+  header { border-bottom: 3px solid var(--brand); padding-bottom: var(--s4); margin-bottom: var(--s5); }
+  .kicker { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; font-size: 12.5px; letter-spacing: 3px; color: var(--accent); font-weight: 700; }
+  h1 { font-size: 26px; margin: 6px 0 8px; color: var(--brand-text); }
+  .sub { color: var(--muted); font-size: 13.5px; }
+  h2 { font-size: 19px; color: var(--brand-text); border-left: 4px solid var(--brand); padding-left: 10px; margin: 38px 0 10px; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
+  h2 .step-tag { display: inline-block; font-size: 12px; background: var(--brand); color: #fff; border-radius: 4px; padding: 1px 8px; vertical-align: 3px; margin-right: 8px; letter-spacing: 1px; }
+  h3 { font-size: 15.5px; color: var(--brand-text); margin: 18px 0 6px; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
+  p { margin: 8px 0; }
+  .req { background: var(--brand-soft); border: 1px solid var(--brand-soft-strong); border-radius: 8px; padding: 10px 14px; font-size: 13.5px; color: var(--brand-text); }
+  .tbl-title { font-size: 12.5px; color: var(--muted); margin: 0 0 4px; font-family: "Microsoft YaHei", sans-serif; }
+  .table-wrap { width: 100%; overflow-x: auto; margin: 10px 0 14px; }
+  table.rwd-card { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  table.rwd-card th, table.rwd-card td { border: 1px solid var(--border); padding: 7px 10px; vertical-align: top; text-align: left; }
+  table.rwd-card th[scope="row"] { background: var(--brand-soft); color: var(--brand-text); font-family: "Microsoft YaHei", sans-serif; font-weight: 600; white-space: nowrap; }
+  table.rwd-card thead th { background: var(--brand-soft-strong); color: var(--brand-text); font-family: "Microsoft YaHei", sans-serif; }
+  .mini table.rwd-card { font-size: 12.5px; }
+  .mini table.rwd-card th, .mini table.rwd-card td { padding: 4px 6px; }
+  .c { text-align: center !important; }
+  .op { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; font-size: 12px; color: #fff; background: #4E8A8F; border-radius: 3px; padding: 0 6px; margin-right: 4px; white-space: nowrap; }
+  .why { font-weight: 700; color: var(--brand-text); }
+  .thus { font-weight: 700; color: #8A5A00; }
+  .fig { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px 8px; margin: 14px 0 18px; }
+  .fig-title { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; font-size: 13.5px; font-weight: 700; color: var(--brand-text); margin-bottom: 4px; }
+  .fig svg { width: 100%; height: auto; display: block; }
+  .fig-cap { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+  .concl { background: #FBF6E9; border: 1px solid #E8D9A8; border-radius: 8px; padding: 10px 14px; font-size: 13.5px; }
+  .concl strong { color: #8A5A00; }
+  .note { font-size: 12.5px; color: var(--muted); border-top: 1px dashed var(--border); padding-top: 8px; margin-top: 12px; }
+  .sum-final { background: var(--brand-soft); border: 2px solid var(--brand); border-radius: 10px; padding: 14px 18px; text-align: center; font-size: 16px; }
+  .sum-final strong { color: var(--brand-text); }
+  footer { border-top: 1px solid var(--rule); margin-top: 40px; padding-top: 14px; font-size: 12.5px; color: var(--muted); }
+  ul, ol { margin: 6px 0; padding-left: 22px; }
+  li { margin: 3px 0; }
+  @media (max-width: 640px) { .page { padding: 20px 16px 32px; } h1 { font-size: 21px; } }
+  @media print { body { background: #fff; } .page { box-shadow: none; padding: 10mm 12mm; max-width: none; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="kicker">构造地质学实习 · 实习十一</div>
+  <h1>编制和分析节理玫瑰花图</h1>
+  <p class="sub">教材《构造地质学》（第三版）实习十一 · P340—342 · 天平山 8 号观测点 102 条节理实测资料</p>
+  <div class="req"><strong>作业原文：</strong>表Ⅱ-3 是将表Ⅱ-4 的天平山 8 号观测点的节理测量资料按方位间隔加以整理的结果，对其中尚未统计整理的，应补充整理填入表Ⅱ-3，然后根据整理后的表Ⅱ-3 节理资料作节理走向玫瑰花图。<br>
+  <strong>目的要求：</strong>（1）学会整理节理资料和绘制节理玫瑰花图；（2）分析节理玫瑰花图并了解其构造意义。</div>
+</header>
+
+<h2><span class="step-tag">资料</span>一、原始测量资料（表Ⅱ-4）</h2>
+<p>表Ⅱ-4 共 4 组、每行 4 条，除末两格外共 <strong>102 条</strong>节理记录，记法为「走向／倾向∠倾角」。核对可见每条记录都满足 <strong>倾向 = 走向 ± 90°</strong>，说明原始记录自洽（例：走向 3°、倾向 93°，差 90°；走向 281°、倾向 11°，281°－270°＝11°）。</p>
+<div class="table-wrap mini">
+  <p class="tbl-title">表Ⅱ-4&nbsp;天平山 8 号观测点节理测量记录（原表 4 组并列，此处按 4 组×26 行重排）</p>
+  <table class="rwd-card"><thead><tr><th class="c">走向</th><th class="c">倾角及倾向</th><th class="c">走向</th><th class="c">倾角及倾向</th><th class="c">走向</th><th class="c">倾角及倾向</th><th class="c">走向</th><th class="c">倾角及倾向</th></tr></thead><tbody><tr><td class="c">3°</td><td class="c">93°∠75°</td><td class="c">34°</td><td class="c">124°∠72°</td><td class="c">47°</td><td class="c">317°∠76°</td><td class="c">314°</td><td class="c">44°∠79°</td></tr><tr><td class="c">4°</td><td class="c">94°∠73°</td><td class="c">35°</td><td class="c">125°∠75°</td><td class="c">45°</td><td class="c">315°∠78°</td><td class="c">315°</td><td class="c">45°∠83°</td></tr><tr><td class="c">5°</td><td class="c">95°∠72°</td><td class="c">36°</td><td class="c">126°∠72°</td><td class="c">45°</td><td class="c">315°∠80°</td><td class="c">315°</td><td class="c">45°∠87°</td></tr><tr><td class="c">6°</td><td class="c">96°∠71°</td><td class="c">34°</td><td class="c">304°∠72°</td><td class="c">46°</td><td class="c">316°∠76°</td><td class="c">315°</td><td class="c">45°∠80°</td></tr><tr><td class="c">3°</td><td class="c">273°∠76°</td><td class="c">34°</td><td class="c">304°∠72°</td><td class="c">46°</td><td class="c">316°∠74°</td><td class="c">316°</td><td class="c">46°∠86°</td></tr><tr><td class="c">5°</td><td class="c">275°∠85°</td><td class="c">35°</td><td class="c">305°∠72°</td><td class="c">281°</td><td class="c">11°∠72°</td><td class="c">319°</td><td class="c">49°∠80°</td></tr><tr><td class="c">5°</td><td class="c">275°∠87°</td><td class="c">35°</td><td class="c">305°∠74°</td><td class="c">282°</td><td class="c">12°∠73°</td><td class="c">312°</td><td class="c">222°∠73°</td></tr><tr><td class="c">5°</td><td class="c">275°∠75°</td><td class="c">35°</td><td class="c">305°∠72°</td><td class="c">285°</td><td class="c">195°∠75°</td><td class="c">314°</td><td class="c">224°∠80°</td></tr><tr><td class="c">5°</td><td class="c">275°∠79°</td><td class="c">36°</td><td class="c">306°∠74°</td><td class="c">292°</td><td class="c">22°∠70°</td><td class="c">314°</td><td class="c">224°∠75°</td></tr><tr><td class="c">6°</td><td class="c">276°∠78°</td><td class="c">36°</td><td class="c">126°∠74°</td><td class="c">293°</td><td class="c">23°∠70°</td><td class="c">314°</td><td class="c">224°∠78°</td></tr><tr><td class="c">6°</td><td class="c">276°∠84°</td><td class="c">44°</td><td class="c">134°∠75°</td><td class="c">294°</td><td class="c">24°∠79°</td><td class="c">314°</td><td class="c">224°∠78°</td></tr><tr><td class="c">7°</td><td class="c">277°∠80°</td><td class="c">44°</td><td class="c">134°∠84°</td><td class="c">295°</td><td class="c">25°∠75°</td><td class="c">316°</td><td class="c">226°∠78°</td></tr><tr><td class="c">16°</td><td class="c">106°∠71°</td><td class="c">45°</td><td class="c">135°∠80°</td><td class="c">294°</td><td class="c">204°∠75°</td><td class="c">316°</td><td class="c">226°∠79°</td></tr><tr><td class="c">14°</td><td class="c">284°∠71°</td><td class="c">45°</td><td class="c">135°∠85°</td><td class="c">296°</td><td class="c">206°∠72°</td><td class="c">317°</td><td class="c">227°∠75°</td></tr><tr><td class="c">14°</td><td class="c">284°∠71°</td><td class="c">46°</td><td class="c">136°∠85°</td><td class="c">306°</td><td class="c">36°∠74°</td><td class="c">321°</td><td class="c">51°∠71°</td></tr><tr><td class="c">14°</td><td class="c">104°∠75°</td><td class="c">46°</td><td class="c">136°∠83°</td><td class="c">307°</td><td class="c">37°∠71°</td><td class="c">324°</td><td class="c">54°∠71°</td></tr><tr><td class="c">16°</td><td class="c">286°∠75°</td><td class="c">46°</td><td class="c">136°∠83°</td><td class="c">305°</td><td class="c">35°∠75°</td><td class="c">325°</td><td class="c">55°∠73°</td></tr><tr><td class="c">21°</td><td class="c">111°∠73°</td><td class="c">46°</td><td class="c">136°∠86°</td><td class="c">304°</td><td class="c">214°∠78°</td><td class="c">325°</td><td class="c">55°∠75°</td></tr><tr><td class="c">21°</td><td class="c">111°∠74°</td><td class="c">46°</td><td class="c">136°∠81°</td><td class="c">305°</td><td class="c">215°∠78°</td><td class="c">325°</td><td class="c">55°∠75°</td></tr><tr><td class="c">22°</td><td class="c">112°∠75°</td><td class="c">46°</td><td class="c">136°∠82°</td><td class="c">306°</td><td class="c">216°∠80°</td><td class="c">325°</td><td class="c">55°∠78°</td></tr><tr><td class="c">23°</td><td class="c">113°∠80°</td><td class="c">46°</td><td class="c">136°∠78°</td><td class="c">301°</td><td class="c">211°∠77°</td><td class="c">326°</td><td class="c">56°∠77°</td></tr><tr><td class="c">23°</td><td class="c">113°∠78°</td><td class="c">46°</td><td class="c">136°∠82°</td><td class="c">302°</td><td class="c">212°∠73°</td><td class="c">329°</td><td class="c">59°∠74°</td></tr><tr><td class="c">23°</td><td class="c">113°∠74°</td><td class="c">47°</td><td class="c">137°∠84°</td><td class="c">302°</td><td class="c">212°∠70°</td><td class="c">327°</td><td class="c">57°∠75°</td></tr><tr><td class="c">33°</td><td class="c">123°∠75°</td><td class="c">47°</td><td class="c">137°∠80°</td><td class="c">304°</td><td class="c">214°∠80°</td><td class="c">329°</td><td class="c">59°∠74°</td></tr><tr><td class="c">34°</td><td class="c">124°∠74°</td><td class="c">47°</td><td class="c">137°∠85°</td><td class="c">313°</td><td class="c">43°∠75°</td><td class="c">&nbsp;</td><td class="c">&nbsp;</td></tr><tr><td class="c">34°</td><td class="c">124°∠73°</td><td class="c">48°</td><td class="c">138°∠76°</td><td class="c">313°</td><td class="c">43°∠74°</td><td class="c">&nbsp;</td><td class="c">&nbsp;</td></tr></tbody></table>
+</div>
+
+<h2><span class="step-tag">整理</span>二、按方位间隔分组统计（表Ⅱ-3）</h2>
+<p>分组间隔按图面大小与资料情况取 5° 或 10°，本例取 <strong>10°</strong>。走向是双向的，一条走向 281° 的节理与走向 101° 是同一条线，因此教材把 18 个区间排成两栏：左栏 <strong>0°～89°</strong>，右栏 <strong>270°～359°</strong>（右栏减去 180° 即左栏的 90°～179°，两栏合起来正好覆盖 0°～180° 的 18 个方位区间）。</p>
+<h3>1. 平均走向的算法</h3>
+<p>把落在同一区间的各条走向取算术平均。以 0°～9° 组为例，12 条为 3、4、5、6、3、5、5、5、5、6、6、7：</p>
+<div class="concl">Σ = 3+4+5+6+3+5+5+5+5+6+6+7 = 60&nbsp;&nbsp;→&nbsp;&nbsp;<strong>平均走向 = 60 ÷ 12 = 5.0°</strong></div>
+<p>其余各组同法，结果见下表（教材已给出 0°～9°、10°～19°、30°～39°、40°～49°、280°～289°、290°～299°、320°～329° 七组，本表补全其余 11 组）：</p>
+<div class="table-wrap">
+  <p class="tbl-title">表Ⅱ-3&nbsp;天平山 8 号观测点节理统计资料（补全后）</p>
+  <table class="rwd-card"><thead><tr><th>方位间隔</th><th class="c">节理数目</th><th class="c">平均走向</th><th>方位间隔</th><th class="c">节理数目</th><th class="c">平均走向</th></tr></thead><tbody><tr><th scope="row">0°～9°</th><td class="c">12</td><td class="c">5.0°</td><th scope="row">270°～279°</th><td class="c">&nbsp;</td><td class="c">&nbsp;</td></tr><tr><th scope="row">10°～19°</th><td class="c">5</td><td class="c">14.8°</td><th scope="row">280°～289°</th><td class="c">3</td><td class="c">282.7°</td></tr><tr><th scope="row">20°～29°</th><td class="c">6</td><td class="c">22.2°</td><th scope="row">290°～299°</th><td class="c">6</td><td class="c">294.0°</td></tr><tr><th scope="row">30°～39°</th><td class="c">13</td><td class="c">34.7°</td><th scope="row">300°～309°</th><td class="c">10</td><td class="c">304.2°</td></tr><tr><th scope="row">40°～49°</th><td class="c">21</td><td class="c">45.9°</td><th scope="row">310°～319°</th><td class="c">16</td><td class="c">314.8°</td></tr><tr><th scope="row">50°～59°</th><td class="c">&nbsp;</td><td class="c">&nbsp;</td><th scope="row">320°～329°</th><td class="c">10</td><td class="c">325.6°</td></tr><tr><th scope="row">60°～69°</th><td class="c">&nbsp;</td><td class="c">&nbsp;</td><th scope="row">330°～339°</th><td class="c">&nbsp;</td><td class="c">&nbsp;</td></tr><tr><th scope="row">70°～79°</th><td class="c">&nbsp;</td><td class="c">&nbsp;</td><th scope="row">340°～349°</th><td class="c">&nbsp;</td><td class="c">&nbsp;</td></tr><tr><th scope="row">80°～89°</th><td class="c">&nbsp;</td><td class="c">&nbsp;</td><th scope="row">350°～359°</th><td class="c">&nbsp;</td><td class="c">&nbsp;</td></tr><tr><th scope="row">合计</th><td class="c"><strong>57</strong></td><td class="c">—</td><th scope="row">合计</th><td class="c"><strong>45</strong></td><td class="c">—</td></tr></tbody></table>
+</div>
+<p><span class="why">校核：</span>左栏合计 57 条、右栏合计 45 条，总计 <strong>102 条</strong>，与表Ⅱ-4 的记录条数完全一致；且 0°～9°＝12、10°～19°＝5、30°～39°＝13、40°～49°＝21、280°～289°＝3（282.7°）、290°～299°＝6（294.0°）、320°～329°＝10（325.6°）与教材已给数值逐一吻合，说明整理无误。</p>
+
+<h2><span class="step-tag">作图</span>三、绘制节理走向玫瑰花图</h2>
+<div class="table-wrap">
+  <p class="tbl-title">表&nbsp;走向玫瑰花图作图五步</p>
+  <table class="rwd-card">
+    <tbody>
+      <tr><th scope="row">① 定比例尺</th><td><span class="op">操作</span>取数目最多的一组（40°～49°，21 条）的线段长度为半径，其余各组按条数比例缩短。<br><span class="op">本例</span>1 条 = 5 px（图半径 ≈ 21×5 = 105 px），相当于"20 条"的圆半径。</td></tr>
+      <tr><th scope="row">② 作半圆与刻度</th><td><span class="op">操作</span>以圆心为测点，作<strong>半圆</strong>（走向只占 0°～180°）；过圆心作南—北、东—西两条直线，在圆周上自正北起顺时针每 10° 标一个方位角，0°（N）在上、90°（E）在右、180°（S）在下。</td></tr>
+      <tr><th scope="row">③ 找点连线</th><td><span class="op">操作</span>自 0°～9° 组开始，按该组<strong>平均走向</strong>的方位、以该组<strong>条数</strong>为半径定出一点；各组依次定点后顺次连线。<br><span class="op">关键</span>某组为零时必须<strong>连线回到圆心</strong>，再由圆心引出与下一组相连，这样才形成图Ⅱ-30 中的两个"缺口"（本图 50°～89°、90°～179° 共 10 个空组）。</td></tr>
+      <tr><th scope="row">④ 注记</th><td><span class="op">操作</span>写图名"天平山 8 号观测点节理走向玫瑰花图"，并注明比例尺（0—10—20 条）与方位。</td></tr>
+      <tr><th scope="row">⑤ 检查</th><td><span class="op">操作</span>核对图形是否首尾闭合、主轴方位是否与密集区一致；必要时用 5° 间隔重作一次作对比。</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="fig">
+  <div class="fig-title">图 1&nbsp;天平山 8 号观测点节理走向玫瑰花图（据表Ⅱ-3）</div>
+  <svg viewBox="0 0 420 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="天平山8号观测点节理走向玫瑰花图">
+<rect x="0" y="0" width="420" height="300" fill="#FFFFFF"/>
+<circle cx="210" cy="205" r="26.7" fill="none" stroke="#D8E2E4" stroke-width="0.6" stroke-dasharray="3 3"/>
+<circle cx="210" cy="205" r="53.3" fill="none" stroke="#D8E2E4" stroke-width="0.6" stroke-dasharray="3 3"/>
+<circle cx="210" cy="205" r="80.0" fill="none" stroke="#D8E2E4" stroke-width="0.6" stroke-dasharray="3 3"/>
+<circle cx="210" cy="205" r="106.7" fill="none" stroke="#D8E2E4" stroke-width="0.6" stroke-dasharray="3 3"/>
+<line x1="92" y1="205" x2="328" y2="205" stroke="#1D2B30" stroke-width="1.1"/>
+<line x1="210" y1="211" x2="210" y2="87" stroke="#1D2B30" stroke-width="1.1"/>
+<line x1="210.0" y1="93.0" x2="210.0" y2="86.0" stroke="#64787F" stroke-width="0.7"/>
+<line x1="229.4" y1="94.7" x2="230.7" y2="87.8" stroke="#64787F" stroke-width="0.7"/>
+<line x1="248.3" y1="99.8" x2="250.7" y2="93.2" stroke="#64787F" stroke-width="0.7"/>
+<line x1="266.0" y1="108.0" x2="269.5" y2="101.9" stroke="#64787F" stroke-width="0.7"/>
+<line x1="282.0" y1="119.2" x2="286.5" y2="113.8" stroke="#64787F" stroke-width="0.7"/>
+<line x1="295.8" y1="133.0" x2="301.2" y2="128.5" stroke="#64787F" stroke-width="0.7"/>
+<line x1="307.0" y1="149.0" x2="313.1" y2="145.5" stroke="#64787F" stroke-width="0.7"/>
+<line x1="315.2" y1="166.7" x2="321.8" y2="164.3" stroke="#64787F" stroke-width="0.7"/>
+<line x1="320.3" y1="185.6" x2="327.2" y2="184.3" stroke="#64787F" stroke-width="0.7"/>
+<line x1="322.0" y1="205.0" x2="329.0" y2="205.0" stroke="#64787F" stroke-width="0.7"/>
+<line x1="320.3" y1="224.4" x2="327.2" y2="225.7" stroke="#64787F" stroke-width="0.7"/>
+<line x1="315.2" y1="243.3" x2="321.8" y2="245.7" stroke="#64787F" stroke-width="0.7"/>
+<line x1="307.0" y1="261.0" x2="313.1" y2="264.5" stroke="#64787F" stroke-width="0.7"/>
+<line x1="295.8" y1="277.0" x2="301.2" y2="281.5" stroke="#64787F" stroke-width="0.7"/>
+<line x1="282.0" y1="290.8" x2="286.5" y2="296.2" stroke="#64787F" stroke-width="0.7"/>
+<line x1="266.0" y1="302.0" x2="269.5" y2="308.1" stroke="#64787F" stroke-width="0.7"/>
+<line x1="248.3" y1="310.2" x2="250.7" y2="316.8" stroke="#64787F" stroke-width="0.7"/>
+<line x1="229.4" y1="315.3" x2="230.7" y2="322.2" stroke="#64787F" stroke-width="0.7"/>
+<line x1="210.0" y1="317.0" x2="210.0" y2="324.0" stroke="#64787F" stroke-width="0.7"/>
+<text x="210.0" y="73.0" font-size="11" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">0°</text>
+<text x="276.0" y="90.7" font-size="11" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">30°</text>
+<text x="324.3" y="139.0" font-size="11" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">60°</text>
+<text x="342.0" y="205.0" font-size="11" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">90°</text>
+<text x="324.3" y="271.0" font-size="11" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">120°</text>
+<text x="276.0" y="319.3" font-size="11" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">150°</text>
+<text x="210.0" y="337.0" font-size="11" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">180°</text>
+<path d="M 210.0 205.0 L 215.0 141.2 L 216.7 179.2 L 223.3 175.9 L 249.3 147.9 L 288.5 125.1 L 210.0 205.0 L 210.0 205.0 L 210.0 205.0 L 210.0 205.0 L 210.0 205.0 L 225.5 209.0 L 239.1 218.3 L 254.0 235.2 L 270.9 264.8 L 241.0 248.4 L 210.0 205.0 L 210.0 205.0 L 210.0 205.0 Z" fill="#B3402E" fill-opacity="0.30" stroke="#B3402E" stroke-width="1.8"/>
+<text x="216.0" y="129.2" font-size="10.5" fill="#9A3526" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">12</text>
+<text x="256.1" y="138.0" font-size="10.5" fill="#9A3526" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">13</text>
+<text x="296.9" y="116.6" font-size="10.5" fill="#9A3526" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">21</text>
+<text x="263.8" y="242.0" font-size="10.5" fill="#9A3526" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">10</text>
+<text x="279.4" y="273.2" font-size="10.5" fill="#9A3526" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">16</text>
+<text x="247.9" y="258.2" font-size="10.5" fill="#9A3526" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">10</text>
+<text x="210" y="63" font-size="11" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">0°（N）</text>
+<text x="356" y="209" font-size="11" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">90°（E）</text>
+<text x="360" y="227" font-size="11" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">180°（S）</text>
+<text x="94" y="245" font-size="10.5" fill="#64787F" font-family="Microsoft YaHei, sans-serif">比例：半径 1 格 = 5 条</text>
+<text x="94" y="261" font-size="10.5" fill="#64787F" font-family="Microsoft YaHei, sans-serif">（同心虚线圆为 5 条/圈）</text>
+</svg>
+  <div class="fig-cap">半圆方位刻度：0°（N）在上、90°（E）在右、180°（S）在下；半径方向长度代表该组节理条数（1 条 = 5 px，同心虚线圆每圈 5 条）。图上三个花瓣分别指向 5°、45°、315°（＝135°）三个优势方位。</div>
+</div>
+
+<h2><span class="step-tag">扩展</span>四、倾向与倾角玫瑰花图</h2>
+<p>教材指出：<strong>走向</strong>玫瑰花图多用于节理产状<strong>较陡</strong>的情况，<strong>倾向、倾角</strong>玫瑰花图多用于产状<strong>变化较大</strong>的情况。本测点倾角 70°～87°（平均 76.6°），绝大多数近直立，理应作走向玫瑰花图为主图；为便于对比，下面仍按 10° 间隔补作倾向玫瑰花图。</p>
+<div class="table-wrap mini" style="max-width:520px">
+  <p class="tbl-title">表&nbsp;倾向方位统计（仅列非空组）</p>
+  <table class="rwd-card"><thead><tr><th>倾向间隔</th><th class="c">节理数目</th><th class="c">平均倾向</th></tr></thead><tbody><tr><th scope="row">10°～19°</th><td class="c">2</td><td class="c">11.5°</td></tr><tr><th scope="row">20°～29°</th><td class="c">4</td><td class="c">23.5°</td></tr><tr><th scope="row">30°～39°</th><td class="c">3</td><td class="c">36.0°</td></tr><tr><th scope="row">40°～49°</th><td class="c">8</td><td class="c">45.0°</td></tr><tr><th scope="row">50°～59°</th><td class="c">10</td><td class="c">55.6°</td></tr><tr><th scope="row">90°～99°</th><td class="c">4</td><td class="c">94.5°</td></tr><tr><th scope="row">100°～109°</th><td class="c">2</td><td class="c">105.0°</td></tr><tr><th scope="row">110°～119°</th><td class="c">6</td><td class="c">112.2°</td></tr><tr><th scope="row">120°～129°</th><td class="c">7</td><td class="c">124.6°</td></tr><tr><th scope="row">130°～139°</th><td class="c">16</td><td class="c">135.9°</td></tr><tr><th scope="row">190°～199°</th><td class="c">1</td><td class="c">195.0°</td></tr><tr><th scope="row">200°～209°</th><td class="c">2</td><td class="c">205.0°</td></tr><tr><th scope="row">210°～219°</th><td class="c">7</td><td class="c">213.4°</td></tr><tr><th scope="row">220°～229°</th><td class="c">8</td><td class="c">224.6°</td></tr><tr><th scope="row">270°～279°</th><td class="c">8</td><td class="c">275.2°</td></tr><tr><th scope="row">280°～289°</th><td class="c">3</td><td class="c">284.7°</td></tr><tr><th scope="row">300°～309°</th><td class="c">6</td><td class="c">304.8°</td></tr><tr><th scope="row">310°～319°</th><td class="c">5</td><td class="c">315.8°</td></tr></tbody></table>
+</div>
+<div class="fig" style="max-width:420px">
+  <div class="fig-title">图 2&nbsp;倾角及倾向玫瑰花图（整圆，1 条 = 5 px）</div>
+  <svg viewBox="0 0 400 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="节理倾向玫瑰花图（整圆）">
+<rect x="0" y="0" width="400" height="380" fill="#FFFFFF"/>
+<circle cx="200" cy="190" r="25.0" fill="none" stroke="#D8E2E4" stroke-width="0.6" stroke-dasharray="3 3"/>
+<circle cx="200" cy="190" r="50.0" fill="none" stroke="#D8E2E4" stroke-width="0.6" stroke-dasharray="3 3"/>
+<circle cx="200" cy="190" r="75.0" fill="none" stroke="#D8E2E4" stroke-width="0.6" stroke-dasharray="3 3"/>
+<circle cx="200" cy="190" r="100.0" fill="none" stroke="#D8E2E4" stroke-width="0.6" stroke-dasharray="3 3"/>
+<circle cx="200" cy="190" r="106" fill="none" stroke="#1D2B30" stroke-width="1.1"/>
+<line x1="200.0" y1="90.0" x2="200.0" y2="83.0" stroke="#64787F" stroke-width="0.7"/>
+<line x1="217.4" y1="91.5" x2="218.6" y2="84.6" stroke="#64787F" stroke-width="0.7"/>
+<line x1="234.2" y1="96.0" x2="236.6" y2="89.5" stroke="#64787F" stroke-width="0.7"/>
+<line x1="250.0" y1="103.4" x2="253.5" y2="97.3" stroke="#64787F" stroke-width="0.7"/>
+<line x1="264.3" y1="113.4" x2="268.8" y2="108.0" stroke="#64787F" stroke-width="0.7"/>
+<line x1="276.6" y1="125.7" x2="282.0" y2="121.2" stroke="#64787F" stroke-width="0.7"/>
+<line x1="286.6" y1="140.0" x2="292.7" y2="136.5" stroke="#64787F" stroke-width="0.7"/>
+<line x1="294.0" y1="155.8" x2="300.5" y2="153.4" stroke="#64787F" stroke-width="0.7"/>
+<line x1="298.5" y1="172.6" x2="305.4" y2="171.4" stroke="#64787F" stroke-width="0.7"/>
+<line x1="300.0" y1="190.0" x2="307.0" y2="190.0" stroke="#64787F" stroke-width="0.7"/>
+<line x1="298.5" y1="207.4" x2="305.4" y2="208.6" stroke="#64787F" stroke-width="0.7"/>
+<line x1="294.0" y1="224.2" x2="300.5" y2="226.6" stroke="#64787F" stroke-width="0.7"/>
+<line x1="286.6" y1="240.0" x2="292.7" y2="243.5" stroke="#64787F" stroke-width="0.7"/>
+<line x1="276.6" y1="254.3" x2="282.0" y2="258.8" stroke="#64787F" stroke-width="0.7"/>
+<line x1="264.3" y1="266.6" x2="268.8" y2="272.0" stroke="#64787F" stroke-width="0.7"/>
+<line x1="250.0" y1="276.6" x2="253.5" y2="282.7" stroke="#64787F" stroke-width="0.7"/>
+<line x1="234.2" y1="284.0" x2="236.6" y2="290.5" stroke="#64787F" stroke-width="0.7"/>
+<line x1="217.4" y1="288.5" x2="218.6" y2="295.4" stroke="#64787F" stroke-width="0.7"/>
+<line x1="200.0" y1="290.0" x2="200.0" y2="297.0" stroke="#64787F" stroke-width="0.7"/>
+<line x1="182.6" y1="288.5" x2="181.4" y2="295.4" stroke="#64787F" stroke-width="0.7"/>
+<line x1="165.8" y1="284.0" x2="163.4" y2="290.5" stroke="#64787F" stroke-width="0.7"/>
+<line x1="150.0" y1="276.6" x2="146.5" y2="282.7" stroke="#64787F" stroke-width="0.7"/>
+<line x1="135.7" y1="266.6" x2="131.2" y2="272.0" stroke="#64787F" stroke-width="0.7"/>
+<line x1="123.4" y1="254.3" x2="118.0" y2="258.8" stroke="#64787F" stroke-width="0.7"/>
+<line x1="113.4" y1="240.0" x2="107.3" y2="243.5" stroke="#64787F" stroke-width="0.7"/>
+<line x1="106.0" y1="224.2" x2="99.5" y2="226.6" stroke="#64787F" stroke-width="0.7"/>
+<line x1="101.5" y1="207.4" x2="94.6" y2="208.6" stroke="#64787F" stroke-width="0.7"/>
+<line x1="100.0" y1="190.0" x2="93.0" y2="190.0" stroke="#64787F" stroke-width="0.7"/>
+<line x1="101.5" y1="172.6" x2="94.6" y2="171.4" stroke="#64787F" stroke-width="0.7"/>
+<line x1="106.0" y1="155.8" x2="99.5" y2="153.4" stroke="#64787F" stroke-width="0.7"/>
+<line x1="113.4" y1="140.0" x2="107.3" y2="136.5" stroke="#64787F" stroke-width="0.7"/>
+<line x1="123.4" y1="125.7" x2="118.0" y2="121.2" stroke="#64787F" stroke-width="0.7"/>
+<line x1="135.7" y1="113.4" x2="131.2" y2="108.0" stroke="#64787F" stroke-width="0.7"/>
+<line x1="150.0" y1="103.4" x2="146.5" y2="97.3" stroke="#64787F" stroke-width="0.7"/>
+<line x1="165.8" y1="96.0" x2="163.4" y2="89.5" stroke="#64787F" stroke-width="0.7"/>
+<line x1="182.6" y1="91.5" x2="181.4" y2="84.6" stroke="#64787F" stroke-width="0.7"/>
+<text x="200.0" y="70.0" font-size="11" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">0°</text>
+<text x="320.0" y="190.0" font-size="11" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">90°</text>
+<text x="200.0" y="310.0" font-size="11" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">180°</text>
+<text x="80.0" y="190.0" font-size="11" fill="#3D5158" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">270°</text>
+<path d="M 200.0 190.0 L 200.0 190.0 L 203.1 177.9 L 210.4 167.3 L 210.6 174.5 L 235.0 154.3 L 250.9 153.7 L 200.0 190.0 L 200.0 190.0 L 200.0 190.0 L 224.9 192.0 L 212.1 193.1 L 234.1 205.6 L 236.1 214.8 L 271.3 260.1 L 200.0 190.0 L 200.0 190.0 L 200.0 190.0 L 200.0 190.0 L 200.0 190.0 L 198.4 196.1 L 194.8 201.4 L 175.2 226.1 L 165.0 225.7 L 200.0 190.0 L 200.0 190.0 L 200.0 190.0 L 200.0 190.0 L 150.2 186.1 L 181.8 185.3 L 200.0 190.0 L 169.1 168.8 L 177.7 168.1 L 200.0 190.0 L 200.0 190.0 L 200.0 190.0 L 200.0 190.0 Z" fill="#3E7CB1" fill-opacity="0.28" stroke="#2B5F8E" stroke-width="1.8"/>
+<text x="243.5" y="145.8" font-size="10.5" fill="#2B5F8E" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">8</text>
+<text x="260.7" y="146.7" font-size="10.5" fill="#2B5F8E" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">10</text>
+<text x="279.9" y="268.5" font-size="10.5" fill="#2B5F8E" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">16</text>
+<text x="156.5" y="234.2" font-size="10.5" fill="#2B5F8E" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">8</text>
+<text x="138.2" y="185.1" font-size="10.5" fill="#2B5F8E" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">8</text>
+<text x="20" y="324" font-size="10.5" fill="#64787F" font-family="Microsoft YaHei, sans-serif">整圆：0°在正上方，顺时针计</text>
+</svg>
+  <div class="fig-cap">整圆 0° 在正上方、顺时针计方位。倾向呈明显双峰：130°～139°（16 条，为最密）、50°～59°（10 条）、275°～279°（8 条）、220°～229°（8 条），说明节理面主要向 SSE 与 NE、W 向倾斜，与走向图的 5°、45°、315° 三组走向一一对应（倾向 ≈ 走向 + 90°）。</div>
+</div>
+<div class="concl">倾角统计：70°～79° 共 <strong>75 条</strong>（组平均 74.5°）；80°～89° 共 <strong>27 条</strong>（组平均 82.7°）；全测点倾角 <strong>70°～87°，平均 76.6°</strong>。→ 该点节理为<strong>陡倾—近直立节理</strong>，故以走向玫瑰花图为主要图件。</div>
+
+<h2><span class="step-tag">分析</span>五、玫瑰花图的构造意义</h2>
+<h3>1. 优势方位与分组（表Ⅱ-3 数据）</h3>
+<div class="table-wrap">
+  <p class="tbl-title">表&nbsp;三组优势走向</p>
+  <table class="rwd-card">
+    <thead><tr><th>组别</th><th class="c">走向区间</th><th class="c">条数</th><th class="c">占比</th><th>力学性质判别</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Ⅰ</th><td class="c">0°～19°（主峰 5°）</td><td class="c">17</td><td class="c">16.7%</td><td>近 N—S 向；与共轭剪节理的锐角平分线一致，为<strong>张节理</strong>（面内含 σ<sub>1</sub>、垂直 σ<sub>3</sub>）</td></tr>
+      <tr><th scope="row">Ⅱ</th><td class="c">30°～49°（主峰 45.9°）</td><td class="c">34</td><td class="c">33.3%</td><td>NE 向，最发育；与区域褶皱轴近平行，为<strong>纵节理</strong>（走向节理）</td></tr>
+      <tr><th scope="row">Ⅲ</th><td class="c">300°～329°（主峰 314.8°）</td><td class="c">26</td><td class="c">25.5%</td><td>NW 向；与 Ⅱ 组走向相差约 90°，二者构成<strong>共轭"X"型剪节理</strong></td></tr>
+    </tbody>
+  </table>
+</div>
+<h3>2. 由共轭节理反演主应力方位</h3>
+<p>Ⅱ 组（约 45°）与 Ⅲ 组（约 315°）走向相差 90°，两组剪节理面近直立，其交线近铅直，为典型的共轭剪节理。共轭剪节理的<strong>锐角平分线</strong>平行于最大主压应力 σ<sub>1</sub>，<strong>钝角平分线</strong>平行于 σ<sub>3</sub>：</p>
+<div class="concl">Ⅱ 组 45° 与 Ⅲ 组 315° 的锐角平分线为 <strong>0°（N—S）</strong>，钝角平分线为 <strong>90°（E—W）</strong><br>→ σ<sub>1</sub> ≈ N—S 向（近水平）、σ<sub>3</sub> ≈ E—W 向；这与 Ⅰ 组（近 N—S 向张节理）恰好处处吻合：<strong>张节理面垂直 σ<sub>3</sub>，故走向 N—S</strong>。</div>
+<h3>3. 与区域构造的配套</h3>
+<p>天平山位于四川峨眉（教材图Ⅱ-32 峨眉挖断山地质构造略图），区域褶皱轴为 NE—SW 向。据此：Ⅱ 组（NE 向）节理与褶皱轴近平行 → <strong>纵节理（走向节理）</strong>；Ⅲ 组（NW 向）与轴近垂直 → <strong>横节理</strong>；Ⅰ 组（N—S 向）与轴斜交，属共轭剪节理系的另一支或晚期张节理。三组节理的方位关系与"NE 向褶皱 + 近 N—S 向挤压"的构造格局基本协调。</p>
+
+<h2><span class="step-tag">讨论</span>六、成果与误差讨论</h2>
+<div class="table-wrap">
+  <p class="tbl-title">表&nbsp;作图与分析要点自查</p>
+  <table class="rwd-card">
+    <tbody>
+      <tr><th scope="row">分组间隔的影响</th><td>10° 间隔图形平缓、峰值低；5° 间隔峰值更高、形态更"尖"，但零值组增多、缺口更多。同一资料用两种间隔作图，<strong>主轴方位不变</strong>，仅峰形不同——故比较不同测点时必须用<strong>同一间隔</strong>。</td></tr>
+      <tr><th scope="row">跨 0°/180° 的处理</th><td>走向 350° 与 10° 相差仅 20°，若按数值直接分组会分入首、末两组，图形被"劈开"。正确做法：先归一到 0°～180°（350°－180°＝170°），再分组。</td></tr>
+      <tr><th scope="row">玫瑰图的局限</th><td>玫瑰花图只反映<strong>方位密度</strong>，不反映节理的力学性质与先后次序；判別张/剪节理须结合面面擦痕、充填物、羽饰、共轭关系与切穿关系。</td></tr>
+      <tr><th scope="row">测点数的要求</th><td>一个测点一般需 50～100 条以上才具统计意义；本点 102 条，满足要求。</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="sum-final">整理结果：<strong>102 条 → 18 个方位区间</strong>；主图 <strong>走向玫瑰花图</strong>三个花瓣指向 <strong>5°／45°／315°</strong>；<strong>σ<sub>1</sub> ≈ N—S、σ<sub>3</sub> ≈ E—W</strong>，与区域 NE 向褶皱协调。</div>
+
+<footer>
+  依据：《构造地质学》（第三版），李忠权、刘顺，地质出版社，2010，实习十一（P340—342），表Ⅱ-3、表Ⅱ-4、图Ⅱ-30、图Ⅱ-31。<br>
+  数据处理：102 条记录按 10° 间隔统计，平均走向、倾向、倾角均由原始记录逐条核算；玫瑰图按"半径 = 条数×比例"绘制的多边形，零值组回圆心形成缺口。
+</footer>
+</div>
+</body>
+</html>

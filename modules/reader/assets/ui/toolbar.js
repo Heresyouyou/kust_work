@@ -89,6 +89,45 @@ export function mountToolbar(reader, host) {
     syncSelect.blur();
   });
 
+  // ── 右：显示哪一版（原文 / 中文版 / 对照）──
+  const panePanes = reader.panes.filter((p) => p.doc);
+  const paneSelect = el('select.kp-select', {
+    title: '显示哪一版：对照 / 只看原文 / 只看译文', 'aria-label': '显示哪一版',
+  }, panePanes.length >= 2 ? [
+    { value: 'both', label: `对照 · ${panePanes[0].label} + ${panePanes[1].label}` },
+    { value: 'a', label: `只看${panePanes[0].label}` },
+    { value: 'b', label: `只看${panePanes[1].label}` },
+  ].map((c) => el('option', { value: c.value, text: c.label })) : []);
+  paneSelect.hidden = panePanes.length < 2;
+  paneSelect.addEventListener('change', () => {
+    reader.setPaneMode(paneSelect.value);
+    paneSelect.blur();
+  });
+
+  // ── 右：缩放联动锁（2026-10-30）──
+  // 默认锁定：两侧一起缩放，中英对照时保持同一阅读尺度。
+  // 解锁后滚动仍然同步，只有缩放各调各的 —— 留给「左边原文太小、单独放大」。
+  const btnScaleLock = mkBtn('🔒', '缩放联动：已锁定（两侧一起缩放）。点击解锁，可单独放大一侧',
+                             () => setScaleLock(btnScaleLock.dataset.on !== '1'));
+  btnScaleLock.dataset.on = '1';
+  btnScaleLock.setAttribute('aria-pressed', 'true');
+  btnScaleLock.hidden = panePanes.length < 2;
+
+  function setScaleLock(on) {
+    btnScaleLock.dataset.on = on ? '1' : '0';
+    btnScaleLock.textContent = on ? '🔒' : '🔓';
+    btnScaleLock.setAttribute('aria-pressed', String(on));
+    btnScaleLock.title = on
+      ? '缩放联动：已锁定（两侧一起缩放）。点击解锁，可单独放大一侧'
+      : '缩放联动：已解锁（各调各的）。点击锁定，恢复两侧同步缩放';
+    try { reader.setScaleSync(on); } catch (e) { /* 单栏时没有同步组 */ }
+    try { localStorage.setItem('kpdf:scaleSync', on ? '1' : '0'); } catch (e) {}
+  }
+  // 记住上次选择（跨会话）：解锁后关掉再开，仍按解锁
+  try {
+    if (localStorage.getItem('kpdf:scaleSync') === '0') setScaleLock(false);
+  } catch (e) { /* 隐私模式忽略 */ }
+
   // ── 右：其他 ──
   const btnRotate = mkBtn('⟳', '旋转 90°', () => reader.setRotation((reader.store.get('rotation') || 0) + 90));
   const btnText = mkBtn('A', '切换可选中文字层', (b) => {
@@ -104,6 +143,8 @@ export function mountToolbar(reader, host) {
     window.__kpdfLastStats = s;
     return s;
   });
+  // 嵌入分屏时空间紧张：这几个按钮在工具栏 CSS 里会被隐藏
+  [btnRotate, btnDownload, btnSelfTest].forEach((x) => x.setAttribute('data-opt', '1'));
 
   // 进度条（加载文档 / 预热尺寸时可见）
   const progress = el('div.kp-progress');
@@ -121,6 +162,7 @@ export function mountToolbar(reader, host) {
     btnZoomOut, zoomLabel, btnZoomIn, zoomSelect, sep(),
     modeSelect, sep(),
     syncSelect, sep(),
+    paneSelect, btnScaleLock, sep(),
     btnRotate, btnText, btnFind, btnDownload, btnSelfTest,
   );
   host.append(root);
@@ -141,7 +183,11 @@ export function mountToolbar(reader, host) {
 
     modeSelect.value = s.mode;
     syncSelect.value = s.syncOn ? s.syncMode : 'off';
-    syncSelect.disabled = reader.views.length < 2;
+    // 单栏时同步没有意义：既不能下拉，也不该点
+    const single = (s.paneMode || 'both') !== 'both' && reader.views.length > 1;
+    syncSelect.disabled = reader.views.length < 2 || single;
+    if (paneSelect.options.length) paneSelect.value = s.paneMode || 'both';
+    syncSelect.title = single ? '只看一版时无需同步' : '左右对照同步策略';
     modeSelect.value = s.mode;
     btnText.classList.toggle('on', Boolean(s.textLayer));
     btnThumb.classList.toggle('on', reader._sidebarOpen === 'thumbnails');

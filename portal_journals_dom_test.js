@@ -18,6 +18,10 @@ const fs = require('fs');
 const vm = require('vm');
 
 const [pagePath, apiPath] = process.argv.slice(2);
+// NaN 判定必须带边界：文献标题里的 NaNbO3 / NaNb2O6 等铌酸盐化学式
+// 会让 /NaN/ 误报（2026-10-25 实测，全天 84 条断言里唯一一次红就是这个）。
+const LEAK = /undefined|\bNaN(?![A-Za-z0-9])/;
+
 const html = fs.readFileSync(pagePath, 'utf8');
 const api = JSON.parse(fs.readFileSync(apiPath, 'utf8'));
 
@@ -136,7 +140,7 @@ const countArt = h => (h.match(/class="art"/g) || []).length;
   console.log('\n【视图一 · 近 60 天获取】');
   let h = els.body._html;
   ok(h.length > 1000, '渲染出内容', 'len=' + h.length);
-  ok(!/undefined|NaN/.test(h), '无 undefined / NaN 泄漏');
+  ok(!LEAK.test(h), '无 undefined / NaN 泄漏');
 
   // ★ 回归守卫：artRow 曾写成 artRow(a, jname)，而 `shown.map(artRow)` 会把数组**下标**
   //   当第二实参传进去 → 卡片条目右侧凭空冒出 1/2/3/4/5 的灰色标签（实测 70 个）。
@@ -279,7 +283,7 @@ const countArt = h => (h.match(/class="art"/g) || []).length;
   ok(countArt(h) === api.total_articles, `全部展开后已铺满 ${api.total_articles} 条`);
   ok(!h.includes('展开其余'), '全部展开后不再出现「展开其余」');
   ok(/收起全部/.test(ab.textContent), '文案切换为「收起全部」', ab.textContent);
-  ok(!/undefined|NaN/.test(h), '全部展开后无 undefined / NaN 泄漏');
+  ok(!LEAK.test(h), '全部展开后无 undefined / NaN 泄漏');
 
   // 逐卡收起一盏 → 总开关状态应复位为「未全开」
   const stillBig = flat(api).find(j => j.article_total > api.max_per_card);
@@ -304,7 +308,7 @@ const countArt = h => (h.match(/class="art"/g) || []).length;
   await tick(); await tick();
   h = els.body._html;
   ok(topicTab.classes.has('on'), '视图切换按钮置为选中');
-  ok(!/undefined|NaN/.test(h), '无 undefined / NaN 泄漏');
+  ok(!LEAK.test(h), '无 undefined / NaN 泄漏');
   const expectTopic = flat(api).filter(j => j.topic_total > 0).length;
   ok((h.match(/篇命中/g) || []).length === expectTopic,
      `有命中卡片数 = ${expectTopic}`);

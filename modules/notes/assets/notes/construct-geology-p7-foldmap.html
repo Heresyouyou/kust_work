@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>实习七 · 读褶皱区地质图</title>
+<style>
+:root {
+  --bg: #FFFFFF; --bg2: #F5F8F9; --rule: #D8E2E4;
+  --ink: #1D2B30; --muted: #64787F; --text-secondary: #3D5158;
+  --accent: #2C6E75; --accent-hover: #235A60; --accent-soft: #EAF3F3;
+  --brand-text: #1A464B; --border: #D8E2E4; --brand: #2C6E75;
+  --brand-soft: #EAF3F3; --brand-soft-strong: #D8E9EA;
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg2); color: var(--ink);
+  font-family: "Source Han Serif SC", "Noto Serif CJK SC", "SimSun", serif;
+  font-size: 15px; line-height: 1.75; }
+.page { max-width: 920px; margin: 0 auto; background: var(--bg); padding: 40px 46px 56px; box-shadow: 0 0 18px rgba(29,43,48,.07); }
+header { border-bottom: 3px solid var(--brand); padding-bottom: var(--s4); margin-bottom: var(--s5); }
+.kicker { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; font-size: 12.5px; letter-spacing: 3px; color: var(--accent); font-weight: 700; }
+h1 { font-size: 26px; margin: 6px 0 8px; color: var(--brand-text); }
+.sub { color: var(--muted); font-size: 13.5px; }
+h2 { font-size: 19px; color: var(--brand-text); border-left: 4px solid var(--brand); padding-left: 10px; margin: 38px 0 10px; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
+h2 .step-tag { display: inline-block; font-size: 12px; background: var(--brand); color: #fff; border-radius: 4px; padding: 1px 8px; vertical-align: 3px; margin-right: 8px; letter-spacing: 1px; }
+h3 { font-size: 15.5px; color: var(--brand-text); margin: 18px 0 6px; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
+p { margin: 8px 0; }
+.req { background: var(--brand-soft); border: 1px solid var(--brand-soft-strong); border-radius: 8px; padding: 10px 14px; font-size: 13.5px; color: var(--brand-text); }
+.tbl-title { font-size: 12.5px; color: var(--muted); margin: 0 0 4px; font-family: "Microsoft YaHei", sans-serif; }
+.table-wrap { width: 100%; overflow-x: auto; margin: 10px 0 14px; }
+table.rwd-card { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+table.rwd-card th, table.rwd-card td { border: 1px solid var(--border); padding: 7px 10px; vertical-align: top; text-align: left; }
+table.rwd-card th[scope="row"] { background: var(--brand-soft); color: var(--brand-text); font-family: "Microsoft YaHei", sans-serif; font-weight: 600; white-space: nowrap; }
+table.rwd-card thead th { background: var(--brand-soft-strong); color: var(--brand-text); font-family: "Microsoft YaHei", sans-serif; }
+.mini table.rwd-card { font-size: 12.5px; }
+.mini table.rwd-card th, .mini table.rwd-card td { padding: 4px 6px; }
+.c { text-align: center !important; }
+.op { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; font-size: 12px; color: #fff; background: #4E8A8F; border-radius: 3px; padding: 0 6px; margin-right: 4px; white-space: nowrap; }
+.why { font-weight: 700; color: var(--brand-text); }
+.thus { font-weight: 700; color: #8A5A00; }
+.fig { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px 8px; margin: 14px 0 18px; }
+.fig-title { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; font-size: 13.5px; font-weight: 700; color: var(--brand-text); margin-bottom: 4px; }
+.fig svg { width: 100%; height: auto; display: block; }
+.fig-cap { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+.concl { background: #FBF6E9; border: 1px solid #E8D9A8; border-radius: 8px; padding: 10px 14px; font-size: 13.5px; }
+.concl strong { color: #8A5A00; }
+.note { font-size: 12.5px; color: var(--muted); border-top: 1px dashed var(--border); padding-top: 8px; margin-top: 12px; }
+.sum-final { background: var(--brand-soft); border: 2px solid var(--brand); border-radius: 10px; padding: 14px 18px; text-align: center; font-size: 16px; }
+.sum-final strong { color: var(--brand-text); }
+footer { border-top: 1px solid var(--rule); margin-top: 40px; padding-top: 14px; font-size: 12.5px; color: var(--muted); }
+ul, ol { margin: 6px 0; padding-left: 22px; }
+li { margin: 3px 0; }
+@media (max-width: 640px) { .page { padding: 20px 16px 32px; } h1 { font-size: 21px; } }
+@media print { body { background: #fff; } .page { box-shadow: none; padding: 10mm 12mm; max-width: none; } }
+
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="kicker">构造地质学实习 · 实习七</div>
+  <h1>读褶皱区地质图</h1>
+  <p class="sub">教材《构造地质学》（第三版）实习七 · P329—331 · 附图 6「暮云岭地形地质图」1:25000（兼及附图 7「武华镇地质图」1:200000）</p>
+  <div class="req"><strong>目的要求：</strong>（1）初步掌握阅读褶皱地区地质图的步骤和方法；（2）学会从地质图上认识和分析褶皱的形态、组合特征及形成时代。<br>
+  <strong>作业原文：</strong>（1）分析暮云岭地形地质图（附图 6）或武华镇地质图（附图 7）中的褶皱形态特征及形成时代；（2）对图区内一褶皱进行文字描述（可示意附图）。</div>
+</header>
+
+<h2><span class="step-tag">步骤</span>一、读褶皱区地质图的六个步骤</h2>
+<div class="table-wrap">
+  <p class="tbl-title">表 1&nbsp;读图流程与判据</p>
+  <table class="rwd-card">
+    <tbody>
+      <tr><th scope="row">① 读图例与地层柱</th><td><span class="op">做法</span>先看图例中地层代号的新老顺序、岩性与接触关系，再看有无岩浆岩、变质岩及第四系。<br><span class="op">本例</span>自老而新：<strong>O₂ → C₁¹ → C₁² → C₁³ → C₂¹ → C₂² → J₂¹ → Qh</strong>；其中 C₁¹ 底砾岩与 O₂ 之间、J₂¹ 与 C₂² 之间为<strong>角度不整合</strong>，其余组间为整合接触。</td></tr>
+      <tr><th scope="row">② 览地貌</th><td><span class="op">做法</span>概略了解地形起伏、水系与沟谷位置，判断露头分布与<strong>出露宽度</strong>是否受地形影响。<br><span class="op">本例</span>青岩顶（△445 m）为全区最高点，南北向沟谷中充填 Qh；山坡陡、第四系仅沿河谷分布。</td></tr>
+      <tr><th scope="row">③ 找对称重复</th><td><span class="op">做法</span>横过地层总体延伸方向，看地层是否<strong>对称重复</strong>出现：老地层居中、两侧依次变新 → <strong>背斜</strong>；新地层居中、两侧依次变老 → <strong>向斜</strong>。<br><span class="op">本例</span>自 NW 向 SE：C₁¹｜C₁²｜C₁³｜C₂¹｜<u>C₂²</u>｜C₂¹｜C₁³｜C₁²｜C₁¹｜<u>O₂</u>，出现两次"老—新—老"的对称结构。</td></tr>
+      <tr><th scope="row">④ 定两翼产状</th><td><span class="op">做法</span>直接读图上的层产状符号；无符号处依据<strong>同一岩层在两翼露头宽度的差异</strong>定性：宽度窄的一翼倾角大，宽的一翼倾角小。倒转翼则表现为<strong>从翼部向转折端追索时露头宽度突然变窄、并出现产状直立</strong>。<br><span class="op">本例</span>西翼 45°～65°，东翼 50°～85°，东翼更陡，近核部出现 85° 近直立产状。</td></tr>
+      <tr><th scope="row">⑤ 定轴面与枢纽</th><td><span class="op">做法</span>两翼倾向相反、倾角相近 → 轴面近直立；两翼倾向相同 → 轴面倾斜，且<strong>轴面倾向与缓翼倾向一致</strong>，轴面倾角大于缓翼、小于陡翼。枢纽据地层界线在<strong>倾伏端呈"V"形或弧形转折</strong>判断，弧形尖端指向枢纽倾伏方向。</td></tr>
+      <tr><th scope="row">⑥ 定组合与时代</td><td><span class="op">做法</span>由各褶皱轴迹的排列方式定组合型式（雁行式、穹盆构造、隔档式、隔槽式、复背斜/复向斜等）；由<strong>不整合面上下地层</strong>定形成时代：褶皱形成于不整合面以下最新地层之后、不整合面以上最老地层之前。</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2><span class="step-tag">格架</span>二、暮云岭区的地层与构造格架</h2>
+<div class="table-wrap">
+  <p class="tbl-title">表 2&nbsp;暮云岭区地层系统（据附图 6 图例）</p>
+  <table class="rwd-card">
+    <thead><tr><th class="c">代号</th><th>岩性</th><th class="c">厚度特征</th><th>接触关系</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Qh</th><td>泥、砂和砾石（河谷冲积）</td><td class="c">不稳定</td><td>覆盖于一切老地层之上，不整合</td></tr>
+      <tr><th scope="row">J₂¹</th><td>粉砂质页岩，下部为砾岩</td><td class="c">残留零星</td><td>与下伏 C₂² <strong>角度不整合</strong>（底砾岩）</td></tr>
+      <tr><th scope="row">C₂²</th><td>细粒泥质砂岩</td><td class="c">较薄</td><td>整合</td></tr>
+      <tr><th scope="row">C₂¹</th><td>黑色页岩夹砂岩</td><td class="c">中等</td><td>整合</td></tr>
+      <tr><th scope="row">C₁³</th><td>黑色页岩、灰岩互层</td><td class="c">中等</td><td>整合</td></tr>
+      <tr><th scope="row">C₁²</th><td>钙质砂岩及灰岩夹层</td><td class="c">较厚</td><td>整合</td></tr>
+      <tr><th scope="row">C₁¹</th><td>粗中粒砂岩、底砾岩</td><td class="c">厚</td><td>与 O₂ <strong>角度不整合</strong></td></tr>
+      <tr><th scope="row">O₂</th><td>厚层灰岩</td><td class="c">厚</td><td>区内最老地层</td></tr>
+    </tbody>
+  </table>
+</div>
+<p>全区地层总体呈 <strong>NE—SW（约 40°—220°）</strong>走向，带状展布；自 NW 向 SE 依次出露 C₁¹→C₂²→C₁¹→O₂，构成"<strong>背斜—向斜—背斜</strong>"的三褶格局（图 1）。</p>
+
+<div class="fig">
+  <div class="fig-title">图 1&nbsp;暮云岭区构造纲要图（据附图 6 综合简化）</div>
+  
+<svg viewBox="0 0 900 540" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="暮云岭区构造纲要图：三个NE—SW向褶皱及A—B剖面线">
+  <rect x="0" y="0" width="900" height="540" fill="#FFFFFF"/>
+  <defs>
+    <marker id="ar" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L9,5 L0,10 z" fill="#1A464B"/></marker>
+    <marker id="ar2" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L9,5 L0,10 z" fill="#B3402E"/></marker>
+  </defs>
+  <!-- 图框 -->
+  <rect x="40" y="30" width="700" height="450" fill="#FCFDFD" stroke="#1D2B30" stroke-width="1.4"/>
+
+  <!-- 西北背斜：核部 C1^1 宽缓 -->
+  <path d="M60,455 C120,380 150,300 165,215 C178,150 200,90 260,55 L330,55 C300,110 270,170 258,235 C246,300 230,380 200,455 Z"
+        fill="#E8DCC8" stroke="#8A7550" stroke-width="1.2"/>
+  <!-- C1^2 -->
+  <path d="M200,455 C230,380 246,300 258,235 C270,170 300,110 330,55 L392,55 C362,112 334,172 320,238 C306,304 288,384 258,455 Z"
+        fill="#DCE6D2" stroke="#6F8259" stroke-width="1.2"/>
+  <!-- C1^3 -->
+  <path d="M258,455 C288,384 306,304 320,238 C334,172 362,112 392,55 L448,55 C420,114 394,176 380,242 C364,308 344,388 316,455 Z"
+        fill="#CFDDE3" stroke="#4F7583" stroke-width="1.2"/>
+  <!-- C2^1 西翼 -->
+  <path d="M316,455 C344,388 364,308 380,242 C394,176 420,114 448,55 L470,55 C444,116 418,178 404,244 C388,310 366,390 338,455 Z"
+        fill="#D9C6C0" stroke="#8B655B" stroke-width="1.2"/>
+
+  <!-- 青岩顶向斜核部 C2^2（SW 端收敛成鼻状） -->
+  <path d="M338,455 C366,390 388,310 404,244 C418,178 444,116 470,55 L486,55 C462,118 436,180 422,246 C406,312 384,392 356,455 Z"
+        fill="#C9B4AE" stroke="#7A4A40" stroke-width="1.6"/>
+  <path d="M470,55 C444,116 418,178 404,244 C388,310 366,390 338,455 L352,455 C380,392 402,312 418,246 C432,180 458,118 484,55 Z"
+        fill="#D9C6C0" stroke="#8B655B" stroke-width="1.2" transform="translate(14,0)"/>
+
+  <!-- C1^3 东翼 -->
+  <path d="M352,455 C380,392 402,312 418,246 C432,180 458,118 484,55 L540,55 C514,120 490,184 476,250 C460,316 438,394 410,455 Z"
+        fill="#CFDDE3" stroke="#4F7583" stroke-width="1.2"/>
+  <!-- C1^2 东翼 -->
+  <path d="M410,455 C438,394 460,316 476,250 C490,184 514,120 540,55 L592,55 C566,122 542,186 528,252 C512,318 490,396 462,455 Z"
+        fill="#DCE6D2" stroke="#6F8259" stroke-width="1.2"/>
+  <!-- C1^1 东翼 -->
+  <path d="M462,455 C490,396 512,318 528,252 C542,186 566,122 592,55 L634,55 C608,124 584,188 570,254 C554,320 532,398 504,455 Z"
+        fill="#E8DCC8" stroke="#8A7550" stroke-width="1.2"/>
+  <!-- O2 东南背斜核部 -->
+  <path d="M504,455 C532,398 554,320 570,254 C584,188 608,124 634,55 L700,55 L700,455 Z"
+        fill="#EDE7F0" stroke="#6A5A78" stroke-width="1.6"/>
+
+  <!-- 轴向迹线（点划线） -->
+  <line x1="268" y1="470" x2="118" y2="45" stroke="#1A464B" stroke-width="2" stroke-dasharray="12 4 3 4"/>
+  <line x1="404" y1="470" x2="452" y2="45" stroke="#B3402E" stroke-width="2" stroke-dasharray="12 4 3 4"/>
+  <line x1="560" y1="470" x2="668" y2="45" stroke="#1A464B" stroke-width="2" stroke-dasharray="12 4 3 4"/>
+
+  <!-- 枢纽倾伏箭头 -->
+  <line x1="150" y1="120" x2="120" y2="196" stroke="#1A464B" stroke-width="2" marker-end="url(#ar)"/>
+  <line x1="437" y1="130" x2="420" y2="208" stroke="#B3402E" stroke-width="2" marker-end="url(#ar2)"/>
+  <line x1="640" y1="120" x2="606" y2="196" stroke="#1A464B" stroke-width="2" marker-end="url(#ar)"/>
+
+  <!-- 褶皱标注 -->
+  <text x="126" y="300" font-size="15" font-weight="bold" fill="#1A464B" font-family="Microsoft YaHei, sans-serif" transform="rotate(-72 126 300)">暮云岭背斜</text>
+  <text x="446" y="300" font-size="15" font-weight="bold" fill="#9A3526" font-family="Microsoft YaHei, sans-serif" transform="rotate(-80 446 300)">青岩顶向斜</text>
+  <text x="618" y="300" font-size="15" font-weight="bold" fill="#1A464B" font-family="Microsoft YaHei, sans-serif" transform="rotate(-66 618 300)">云岭东背斜</text>
+
+  <!-- 地层代号 -->
+  <text x="86" y="250" font-size="14" fill="#5C4B2E" font-family="Georgia, serif" font-style="italic">C</text><text x="100" y="244" font-size="9" fill="#5C4B2E">1</text><text x="108" y="240" font-size="9" fill="#5C4B2E">1</text>
+  <text x="228" y="200" font-size="14" fill="#3F5132" font-family="Georgia, serif" font-style="italic">C</text><text x="242" y="194" font-size="9" fill="#3F5132">1</text><text x="250" y="190" font-size="9" fill="#3F5132">2</text>
+  <text x="308" y="150" font-size="14" fill="#2E4E5C" font-family="Georgia, serif" font-style="italic">C</text><text x="322" y="144" font-size="9" fill="#2E4E5C">1</text><text x="330" y="140" font-size="9" fill="#2E4E5C">3</text>
+  <text x="356" y="118" font-size="14" fill="#6B4038" font-family="Georgia, serif" font-style="italic">C</text><text x="370" y="112" font-size="9" fill="#6B4038">2</text><text x="378" y="108" font-size="9" fill="#6B4038">2</text>
+  <text x="600" y="150" font-size="14" fill="#5C4B2E" font-family="Georgia, serif" font-style="italic">C</text><text x="614" y="144" font-size="9" fill="#5C4B2E">1</text><text x="622" y="140" font-size="9" fill="#5C4B2E">1</text>
+  <text x="656" y="250" font-size="14" fill="#4A3D5A" font-family="Georgia, serif" font-style="italic">O</text><text x="670" y="244" font-size="9" fill="#4A3D5A">2</text>
+
+  <!-- 产状符号 -->
+  <g stroke="#1D2B30" stroke-width="1.3">
+    <line x1="330" y1="470" x2="344" y2="452"/><line x1="330" y1="470" x2="316" y2="452"/>
+    <line x1="120" y1="430" x2="134" y2="412"/><line x1="120" y1="430" x2="106" y2="412"/>
+    <line x1="560" y1="120" x2="574" y2="102"/><line x1="560" y1="120" x2="546" y2="102"/>
+  </g>
+  <text x="348" y="470" font-size="11" fill="#1D2B30" font-family="Microsoft YaHei, sans-serif">45°</text>
+  <text x="138" y="430" font-size="11" fill="#1D2B30" font-family="Microsoft YaHei, sans-serif">50°</text>
+  <text x="578" y="120" font-size="11" fill="#1D2B30" font-family="Microsoft YaHei, sans-serif">60°</text>
+
+  <!-- A—B 剖面线 -->
+  <line x1="40" y1="215" x2="440" y2="485" stroke="#B3402E" stroke-width="2.2"/>
+  <text x="24" y="212" font-size="15" font-weight="bold" fill="#B3402E" font-family="Georgia, serif">A</text>
+  <text x="446" y="500" font-size="15" font-weight="bold" fill="#B3402E" font-family="Georgia, serif">B</text>
+
+  <!-- 指北针 -->
+  <g transform="translate(760,60)">
+    <line x1="0" y1="30" x2="0" y2="-6" stroke="#1D2B30" stroke-width="1.6" marker-end="url(#ar)"/>
+    <text x="0" y="48" font-size="13" fill="#1D2B30" text-anchor="middle" font-family="Georgia, serif">N</text>
+  </g>
+
+  <!-- 图例 -->
+  <g font-family="Microsoft YaHei, sans-serif" font-size="11.5">
+    <rect x="756" y="130" width="16" height="12" fill="#EDE7F0" stroke="#6A5A78"/><text x="778" y="141" fill="#3D5158">O₂ 厚层灰岩</text>
+    <rect x="756" y="152" width="16" height="12" fill="#E8DCC8" stroke="#8A7550"/><text x="778" y="163" fill="#3D5158">C₁¹ 粗中粒砂岩、底砾岩</text>
+    <rect x="756" y="174" width="16" height="12" fill="#DCE6D2" stroke="#6F8259"/><text x="778" y="185" fill="#3D5158">C₁² 钙质砂岩及灰岩夹层</text>
+    <rect x="756" y="196" width="16" height="12" fill="#CFDDE3" stroke="#4F7583"/><text x="778" y="207" fill="#3D5158">C₁³ 黑色页岩、灰岩互层</text>
+    <rect x="756" y="218" width="16" height="12" fill="#D9C6C0" stroke="#8B655B"/><text x="778" y="229" fill="#3D5158">C₂¹ 黑色页岩夹砂岩</text>
+    <rect x="756" y="240" width="16" height="12" fill="#C9B4AE" stroke="#7A4A40"/><text x="778" y="251" fill="#3D5158">C₂² 细粒泥质砂岩</text>
+    <line x1="756" y1="268" x2="772" y2="268" stroke="#1A464B" stroke-width="2" stroke-dasharray="8 3 2 3"/><text x="778" y="272" fill="#3D5158">背斜轴迹</text>
+    <line x1="756" y1="290" x2="772" y2="290" stroke="#B3402E" stroke-width="2" stroke-dasharray="8 3 2 3"/><text x="778" y="294" fill="#3D5158">向斜轴迹</text>
+  </g>
+  <text x="40" y="520" font-size="11.5" fill="#64787F" font-family="Microsoft YaHei, sans-serif">示意图（据附图 6 暮云岭地形地质图 1:25000 综合，图面已简化；J₂¹ 与 Qh 未绘出）</text>
+</svg>
+  <div class="fig-cap">三个 NE—SW 向褶皱并列：西北暮云岭背斜（核部 C₁¹，宽缓）、中部青岩顶向斜（核部 C₂²，紧闭，两翼 65°—85°）、东南云岭东背斜（核部 O₂）。轴向迹线以点划线表示，红色箭头为枢纽倾伏方向（总体向 SW 倾伏）；A—B 为实习八的剖面线。</div>
+</div>
+
+<h2><span class="step-tag">识别</span>三、褶皱的识别与形态分析</h2>
+<h3>1. 背斜、向斜的判别</h3>
+<div class="table-wrap">
+  <p class="tbl-title">表 3&nbsp;三个褶皱的判别依据</p>
+  <table class="rwd-card">
+    <thead><tr><th>褶皱</th><th>核部地层</th><th>两翼地层</th><th class="c">两翼产状</th><th>判别结论</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">暮云岭背斜（NW）</th><td>C₁¹（最老）</td><td>C₁²、C₁³、C₂¹、C₂²</td><td class="c">NW 40°—50°／SE 30°—40°</td><td>老地层居中、两侧对称变新 → <strong>背斜</strong></td></tr>
+      <tr><th scope="row">青岩顶向斜（中）</th><td>C₂²（最新）</td><td>C₂¹、C₁³、C₁²、C₁¹</td><td class="c">W 65°／E 85°</td><td>新地层居中、两侧对称变老 → <strong>向斜</strong></td></tr>
+      <tr><th scope="row">云岭东背斜（SE）</th><td>O₂（最老）</td><td>C₁¹、C₁²、C₁³</td><td class="c">NW 57°—60°</td><td>老地层居中 → <strong>背斜</strong></td></tr>
+    </tbody>
+  </table>
+</div>
+<h3>2. 轴面与枢纽产状</h3>
+<div class="table-wrap">
+  <table class="rwd-card">
+    <tbody>
+      <tr><th scope="row">轴面</th><td>青岩顶向斜两翼倾向相反（W、E）、倾角相近（65°／85°），<strong>轴面近直立、略向东倾</strong>（轴面倾向与缓翼（西翼）倾向一致）；暮云岭背斜两翼 45°／35°，轴面亦近直立、略向西倾。</td></tr>
+      <tr><th scope="row">枢纽</th><td>各褶皱的地层界线在 SW 端呈"V"形/弧形收敛，弧形尖端指向 SW；核部宽度向 SW 变窄、向 NE 变宽 → <strong>枢纽总体向 SW 倾伏</strong>，倾伏角中等（20°—30°）。</td></tr>
+      <tr><th scope="row">转折端</th><td>青岩顶向斜转折端<strong>尖棱—圆弧过渡</strong>，属<strong>尖棱褶皱</strong>（图 2A）；背斜转折端较圆滑。向斜核部位于地形最高点（△445 m），而背斜核部多位于沟谷——出现<strong>地形倒置</strong>。</td></tr>
+      <tr><th scope="row">次级褶皱</td><td>主褶皱翼部尚见层间小褶皱与波状弯曲，属<strong>次级（寄生）褶皱</strong>，其枢纽与主褶皱枢纽近于平行，指示岩层曾以<strong>层间滑动</strong>方式弯滑褶皱。</td></tr>
+    </tbody>
+  </table>
+</div>
+<div class="fig">
+  <div class="fig-title">图 2&nbsp;地形倒置与褶皱要素</div>
+  
+<svg viewBox="0 0 900 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="褶皱要素与地形倒置示意">
+  <rect x="0" y="0" width="900" height="380" fill="#FFFFFF"/>
+  <!-- 左：地形倒置 -->
+  <text x="215" y="26" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">A. 地形倒置：向斜成山、背斜成谷</text>
+  <path d="M40,300 C90,300 105,120 155,120 C205,120 220,300 270,300 C320,300 335,180 385,180 C430,180 440,300 470,300 L470,330 L40,330 Z"
+        fill="#EDF2F1" stroke="#1D2B30" stroke-width="1.2"/>
+  <path d="M40,330 L40,300 C90,300 105,120 155,120 C205,120 220,300 270,300 C320,300 335,180 385,180 C430,180 440,300 470,300 L470,330 Z" fill="none" stroke="#1D2B30" stroke-width="1.2"/>
+  <path d="M40,330 C110,330 125,165 175,165 C225,165 240,330 300,330 C350,330 362,220 400,220 C440,220 452,330 470,330" fill="none" stroke="#8B655B" stroke-width="1.6" stroke-dasharray="6 3"/>
+  <text x="155" y="108" font-size="12" fill="#9A3526" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">向斜（核部 C₂²）</text>
+  <text x="385" y="168" font-size="12" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">背斜（核部 C₁¹）</text>
+  <text x="255" y="352" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">坚硬砂岩层抗风化 → 向斜核部残留成山脊</text>
+
+  <!-- 右：褶皱要素 -->
+  <text x="690" y="26" font-size="13" font-weight="bold" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">B. 褶皱要素（背斜）</text>
+  <path d="M530,270 C570,270 585,140 640,120 C695,140 710,270 750,270 L750,300 L530,300 Z" fill="#EAF3F3" stroke="#1D2B30" stroke-width="1.2"/>
+  <path d="M530,300 C560,300 578,190 640,170 C702,190 720,300 750,300" fill="none" stroke="#2C6E75" stroke-width="1.4" stroke-dasharray="7 4"/>
+  <line x1="640" y1="120" x2="640" y2="310" stroke="#B3402E" stroke-width="1.6" stroke-dasharray="8 3 2 3"/>
+  <circle cx="640" cy="120" r="3.5" fill="#B3402E"/>
+  <text x="648" y="112" font-size="11" fill="#B3402E" font-family="Microsoft YaHei, sans-serif">枢纽（倾伏端）</text>
+  <text x="646" y="240" font-size="11" fill="#B3402E" font-family="Microsoft YaHei, sans-serif" transform="rotate(-90 646 240)">轴面</text>
+  <text x="556" y="196" font-size="11" fill="#1A464B" font-family="Microsoft YaHei, sans-serif">西翼</text>
+  <text x="716" y="196" font-size="11" fill="#1A464B" font-family="Microsoft YaHei, sans-serif">东翼</text>
+  <text x="640" y="130" font-size="11" fill="#1A464B" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">转折端</text>
+  <text x="640" y="348" font-size="11.5" fill="#64787F" text-anchor="middle" font-family="Microsoft YaHei, sans-serif">两翼倾向相反、倾角相近 → 轴面近直立</text>
+</svg>
+  <div class="fig-cap">A：青岩顶一带坚硬砂岩层抗风化，向斜核部残留为山脊、背斜核部遭侵蚀成谷，即"地形倒置"；B：背斜的核、翼、转折端、轴面与枢纽。</div>
+</div>
+
+<h2><span class="step-tag">组合</span>四、褶皱的组合型式</h2>
+<p>三个褶皱轴迹平行排列、延伸稳定，且<strong>向斜紧闭（两翼 65°—85°）、背斜宽缓（两翼 30°—50°、核部出露宽）</strong>，属于典型的<strong>隔槽式（箱状）褶皱</strong>组合——以宽缓背斜为"槽"、紧闭向斜为"档"，与侏罗山式褶皱的构造样式一致。这类组合是<strong>盖层沿软弱层滑脱、在基底起伏上被动弯滑</strong>的产物。</p>
+<div class="concl">若把相邻褶皱的轴迹再向上（向深处）归并，本区可视为一个<strong>复式（背斜—向斜—背斜）褶皱带</strong>的次级褶皱组合；轴向 NE—SW，与区域构造线方向一致。</div>
+
+<h2><span class="step-tag">时代</span>五、褶皱形成时代的确定</h2>
+<p>图区中 <strong>J₂¹</strong>（粉砂质页岩，底部为砾岩）以<strong>角度不整合</strong>覆于 C₂²、C₂¹ 之上，底砾岩即为不整合的证据；而 J₂¹ 本身<strong>未受褶皱</strong>，产状平缓（10°—25°）。据"不整合面以下最新地层之后、不整合面以上最老地层之前"的准则：</p>
+<div class="concl">褶皱卷入了 <strong>C₂² 及更老地层</strong>（最新卷入地层为晚石炭世 C₂²），又<strong>被中侏罗世 J₂¹ 不整合覆盖</strong> → 褶皱形成于<strong>晚石炭世之后、中侏罗世之前</strong>，即<strong>印支期（三叠纪末）—早燕山期</strong>，主褶皱期定为<strong>印支运动</strong>。Qh 沿河谷堆积，未受褶皱，属最新（第四纪）沉积。</div>
+
+<h2><span class="step-tag">描述</span>六、单个褶皱的文字描述（作业第 2 题）</h2>
+<p>按教材"褶皱形态描述"的七项内容（名称—位置—延伸—核部—两翼—转折端—轴面枢纽—次级褶皱）成文如下，可作范本：</p>
+<div class="concl" style="background:#F7FAFA;border-color:#CFE0E0">
+<strong>青岩顶向斜</strong><br>
+① <strong>名称与位置</strong>：青岩顶向斜，位于图区中南部，轴向北东—南西，纵贯全区，长约 2.5 km。<br>
+② <strong>核部与翼部</strong>：核部为 C₂² 细粒泥质砂岩，出露宽 150—300 m，坐落在青岩顶（△445 m）一带；两翼依次为 C₂¹ 黑色页岩夹砂岩、C₁³ 黑色页岩与灰岩互层、C₁² 钙质砂岩及灰岩夹层、C₁¹ 粗中粒砂岩。<br>
+③ <strong>两翼产状</strong>：西翼倾向 NW（约 300°），倾角 45°—65°，向核部变陡；东翼倾向 SE（约 120°），倾角 60°—85°，近核部出现 85° 近直立产状。两翼倾向相反、倾角相近而东翼更陡。<br>
+④ <strong>转折端</strong>：SW 端呈尖棱—圆弧过渡的闭合弧形，尖端指向 SW；NE 端撒开，未闭合。<br>
+⑤ <strong>轴面与枢纽</strong>：轴面近直立、略向东倾（倾向与缓翼一致）；枢纽向 SW 倾伏，倾伏角约 25°。<br>
+⑥ <strong>形态类型</strong>：属<strong>直立倾伏的尖棱向斜</strong>（紧闭向斜），两翼夹角约 50°—60°，为典型<strong>隔槽式组合</strong>中的"档"。<br>
+⑦ <strong>次级构造</strong>：翼部见层间小褶皱，枢纽与主褶皱近平行，属弯滑作用的寄生褶皱；核部岩层完整，未见断层破坏。
+</div>
+<p class="note">描述要求：名称（地名＋褶皱类型）→ 地理位置与区域构造部位 → 分布延伸 → 核部位置与组成地层 → 两翼产状与转折端形态 → 轴面、枢纽产状 → 次级褶皱及后期改造（断层、侵入体）。</p>
+
+<h2><span class="step-tag">对比</span>七、附图 7「武华镇地质图」的褶皱特征（选做对照）</h2>
+<div class="table-wrap">
+  <p class="tbl-title">表 4&nbsp;暮云岭（附图 6）与武华镇（附图 7）褶皱特征对比</p>
+  <table class="rwd-card">
+    <thead><tr><th>对比项</th><th>暮云岭（1:25000）</th><th>武华镇（1:200000）</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">地层</th><td>O₂—C₁¹—C₂²，J₂¹ 不整合覆于其上</td><td>S₁₂、D₁—D₃、C₁—C₂、P₁—P₃、T₁—T₃、J₁—J₂ 全套古生界—中生界</td></tr>
+      <tr><th scope="row">褶皱形态</th><td>宽缓背斜与紧闭向斜相间（隔槽式）</td><td>极紧闭的<strong>线状褶皱</strong>，两翼陡立甚至倒转，轴迹密集平行排列</td></tr>
+      <tr><th scope="row">轴迹方向</th><td>NE—SW</td><td>NNE—SSW 至 NE—SW，延伸数十公里</td></tr>
+      <tr><th scope="row">伴生构造</th><td>以褶皱为主，次级寄生褶皱发育</td><td>见<strong>逆掩断层</strong>（图例有专列符号）、片理带，褶皱—逆冲断层组合</td></tr>
+      <tr><th scope="row">形成时代</th><td>印支期（J₂¹ 之前）</td><td>卷入 J₂ 以前全部地层，主期为<strong>印支—燕山期</strong>，并遭后期逆冲改造</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="sum-final">结论：暮云岭区为 <strong>NE—SW 向三褶（背斜—向斜—背斜）</strong>组成的<strong>隔槽式</strong>褶皱带；青岩顶向斜紧闭、枢纽 SW 倾伏，向斜成山（地形倒置）；褶皱形成于<strong>晚石炭世之后、中侏罗世之前（印支期）</strong>，被 J₂¹ 角度不整合限定。</div>
+
+<footer>
+  依据：《构造地质学》（第三版），李忠权、刘顺，地质出版社，2010，实习七（P329—331）、附图 6、附图 7、图Ⅱ-12～Ⅱ-15。<br>
+  说明：图 1 为据附图 6 综合简化的构造纲要图，用于表达褶皱格架；具体产状数值取自图面标注，精度符合读图要求。
+</footer>
+</div>
+</body>
+</html>

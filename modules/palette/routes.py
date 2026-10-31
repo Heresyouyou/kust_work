@@ -1,24 +1,36 @@
 # -*- coding: utf-8 -*-
 """科研配色模块
 
-收录权威期刊与地学标准配色，供出图时挑色：
-  · 期刊分类配色 —— Nature(npg) / Science(aaas) / NEJM / Lancet / JAMA / JCO
-                    / BMJ / Frontiers
-  · 期刊推荐色标 —— Crameri 科学色标（batlow / lajolla / oslo / devon / roma / vik）
-                    Nature 系期刊明确推荐的感知均匀色标
-  · 地学专属 —— 国际年代地层表 ICS/CGMW 官方年代色、地形高程色阶、
-                 cmocean 海洋地学色标（thermal / haline / oxy / topo / delta）
-  · 连续色阶 —— viridis / cividis / plasma / magma / inferno / Blues / Turbo
-  · 发散型 —— RdBu / Spectral / PiYG
-  · 分类型 —— D3 category10 / ColorBrewer Set2、Paired / UChicago
-               / Okabe-Ito（色盲友好）/ COSMIC Hallmarks
+收录权威期刊与地学标准配色，供出图时挑色。按「用在哪」分为 7 个大类
+（原「期刊分类 / 分类型 / 期刊推荐 / 地学专属 / 地质图 / 地形」的交叉归类已合并），
+并按矿床学研究的实际使用频率从高到低排列：
+
+  · 地质图填色 —— 岩性·蚀变·地层单元多类别填色：ColorBrewer（Set3·Dark2·Set1
+                  ·Accent·Pastel1·Pastel2）/ Paul Tol（柔和·明亮·浅色·深色·中对比
+                  ·鲜明·地表覆盖）/ CARTO（Safe·Bold·Antique·Pastel·Vivid·Prism）
+                  / Tableau 10
+  · 地质年代标准色 —— 按年代设色：ICS/CGMW 国际年代地层表 2024/12 版（纪、代，
+                    以及按纪拆分的 12 张世色卡）/ USGS 美国地质图年代色系
+                    （American color system，排在组末）
+  · 连续色阶 —— viridis / cmocean（thermal·haline·oxy）/ Crameri（batlow
+                ·lajolla·oslo·devon）/ plasma·magma·inferno·cividis / Blues / Turbo
+  · 发散色阶 —— RdBu / Crameri（vik·roma）/ cmocean delta / Spectral / PiYG
+  · 通用分类配色 —— 跨学科通用离散色板：Okabe-Ito（色盲友好）/ ColorBrewer
+                    Set2·Paired / D3 Category10 / UChicago / COSMIC Hallmarks
+  · 地形与地球物理 —— GMT 官方色标 relief / topo / earth / etopo1 / seis / mag /
+                    globe / haxby / seafloor / gebco，另含 cmocean topo 与地形高程
+  · 期刊出版配色 —— ggsci 期刊社自有配色：Nature(npg) / Science(aaas) / Frontiers
+                    / BMJ / Lancet / JAMA / NEJM / JCO（按投稿期刊换皮用）
 
 色值来源：
   期刊分类色为 ggsci 官方公布定值；
   连续与发散色阶由 matplotlib 按 9~11 点均匀采样得到精确 hex；
   Crameri 色标取自 cmcrameri 官方 256 点 RGB 表；
   cmocean 色标取自 matplotlib/cmocean 官方 RGB 表；
-  年代色取自 ICS/CGMW 年代地层表官方色码。
+  年代色取自 ICS/CGMW 年代地层表官方色码；
+  ICS v2024/12 与 USGS 色值由其官方色卡 PDF 解析；
+  GMT 色标取自 GMT 官方 share/cpt/*.cpt；
+  ColorBrewer / Paul Tol / CARTO / Tableau 取自各自官方发布数据。
   全部为「定值快照」，不依赖运行时绘图库。
 
 ★ 扩充色卡请跑 `D:\PostNews\_build_palettes.py`：色值一律从权威源抓取并存档到

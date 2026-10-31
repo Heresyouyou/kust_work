@@ -3,6 +3,7 @@
 
   GET /                      欢迎主页（服务端渲染卡片）
   GET /api/portal/health     归一化健康状态（供首页状态灯轮询）
+  GET /api/portal/auth-state 当前浏览器是否已通过统一身份认证（跨子域只读）
   GET /theme.js              主题引擎（浅色/深色，按昆明日出日落自动切换）
 
 依赖注入：门户不 import web_app（避免循环引用），
@@ -12,7 +13,7 @@ from html import escape
 from pathlib import Path
 
 import requests
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, session
 
 from .assets import asset_response
 from .registry import get_groups
@@ -22,6 +23,7 @@ portal_bp = Blueprint('portal', __name__)
 
 _TEMPLATE = Path(__file__).parent / 'templates' / 'portal.html'
 _CARDS_SLOT = '<!--PORTAL_CARDS-->'
+_LATEST_SLOT = '<!--LATEST_GUIDES-->'
 
 _LLAMA_HEALTH = 'http://127.0.0.1:8090/health'
 
@@ -105,9 +107,35 @@ def _render_cards():
         '暂无入口', '<p style="color:#8a867f">portal/registry.py 里还没有注册任何模块</p>')
 
 
+
+
+def _latest_guides():
+    """门户首页「最新论文导读」：只列未归类（topic_id IS NULL），最多 6 条。"""
+    try:
+        from modules.papers import store
+        rows = store.all(
+            "SELECT g.guide_id,g.oneline,w.title,w.year FROM guides g "
+            "JOIN works w ON w.work_id=g.work_id "
+            "WHERE g.topic_id IS NULL AND g.status IN ('done','needs_review') "
+            "ORDER BY g.created_at DESC LIMIT 6")
+    except Exception:
+        return ''
+    if not rows:
+        return '<p class="latest-empty">还没有导读。上传论文后自动生成。</p>'
+    out = ['<div class="latest">']
+    for g in rows:
+        out.append('<a class="latest-row" href="/papers/g/%s">'
+                   '<span class="latest-t">%s</span>'
+                   '<span class="latest-m">%s</span></a>' % (
+                       escape(g['guide_id']), escape(g.get('title') or ''),
+                       escape(str(g.get('year') or ''))))
+    out.append('</div>')
+    return '\n'.join(out)
+
 @portal_bp.route('/')
 def portal_home():
-    return render_html(_TEMPLATE, {_CARDS_SLOT: _render_cards()})
+    return render_html(_TEMPLATE, {_CARDS_SLOT: _render_cards(),
+                                   _LATEST_SLOT: _latest_guides()})
 
 
 @portal_bp.route('/theme.js')
@@ -180,3 +208,41 @@ def portal_health():
             active = None
 
     return jsonify({'llama': llama, 'active': active, 'path': _request_path()})
+
+
+def _cors_origin_ok(origin):
+    """只放行 *.kust.work 的跨子域读取；其余 Origin 一律不下发 CORS 头。"""
+    from urllib.parse import urlsplit
+    try:
+        host = (urlsplit(origin).hostname or '').lower()
+    except ValueError:
+        return False
+    return host == 'kust.work' or host.endswith('.kust.work')
+
+
+@portal_bp.route('/api/portal/auth-state')
+def portal_auth_state():
+    """当前浏览器是否已通过统一身份认证（供 sjck.kust.work 的期刊页探测）。
+
+    背景（2026-10-28）：sjck 的期刊页把「在线阅读 / 下载 PDF」跳回
+    open.kust.work，而后者有 CAS 门禁。如果直接跳，未认证用户会被丢到
+    认证页、离开期刊列表；所以页面先来这里问一句，未认证就弹「去认证」
+    提示框，认证后返回本页再点即可。
+
+    为什么读得到凭证：sjck 与 open 同属 kust.work（same-site），会话 cookie
+    会随 credentials:'<redacted-secret>' 一起到达；跨子域读响应需要 CORS 明确放行
+    （ACAO 回显具体 Origin + ACAC=true，不能用 *）。
+    返回体只含布尔量，不泄露任何用户信息、也不下发任何可点击地址
+    （登录入口由前端 CFG.authLogin 固定为 https://open.kust.work/cas_go）。
+    本路由在 cas_gate._ALLOW_EXACT 中免门禁，否则未认证时会被拦成提示页。
+    """
+    authed = bool(session.get('cas_user'))
+    body = {'ok': True, 'authenticated': authed}
+    resp = jsonify(body)
+    origin = request.headers.get('Origin') or ''
+    if _cors_origin_ok(origin):
+        resp.headers['Access-Control-Allow-Origin'] = origin
+        resp.headers['Access-Control-Allow-Credentials'] = 'true'
+        resp.headers['Vary'] = 'Origin'
+    resp.headers['Cache-Control'] = 'no-store'
+    return resp

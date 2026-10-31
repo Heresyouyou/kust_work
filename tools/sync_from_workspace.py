@@ -51,6 +51,15 @@ ITEMS = [
     ('bilingual.py',                    'bilingual.py'),      # 双语对照版拼接
     ('nas_archive.py',                  'nas_archive.py'),    # NAS 文献仓库（归档/检索/回收）
 
+    # ── PostNews 根的共享模块 ──
+    # ★ 这几个文件在 SRC 的**上一级**（运行时工作区是 Translate，共享层放在 PostNews 根）。
+    #   它们在 modules/ 里是被**直接 import** 的（journals/routes.py:58/357、
+    #   papers/*.py 的 `import nas_paths`），不收录的话镜像 clone 下来就是断的。
+    #   `../` 是刻意的：Path 会自行归一，不必为它单独写一套根目录逻辑。
+    ('../journal_feed.py',              'journal_feed.py'),    # 期刊取数共享层
+    ('../journal_page.py',              'journal_page.py'),    # 期刊页渲染/配置共享层
+    ('../nas_paths.py',                 'nas_paths.py'),       # NAS 路径唯一真相（UNC）
+
     # ── 门户框架 ──
     ('portal',                          'portal'),
 

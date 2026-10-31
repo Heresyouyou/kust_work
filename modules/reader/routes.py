@@ -22,6 +22,8 @@
   GET /PDFreader/auto                      自动挑最近一篇（原文+中文→对照；只有原文→单栏；都没有→回到 /PDFreader）
       ?file=<原文URL>&peer=<译文URL>       直接打开（可带 layout/fit/sync/sidebar/title）
       ?src=<URL>                           单栏简写
+      ?embed=1                             分屏嵌入：隐藏「返回工作台」浮条，供 iframe 使用
+      ?page=N                              直接翻到第 N 页（导读页的 P.x 胶囊用这条）
       常见组合：
         file=原文  & peer=中文   → 英文原文 ⟷ 中文版 对照（用户主诉）
         file=原文  & peer=双语   → 英文原文 ⟷ 双语版 对照（次选）
@@ -138,12 +140,20 @@ def reader_auto():
                 continue
             if st.st_mtime < cutoff:
                 continue
-            base = _clean_title(p.name, '.zh.mono.pdf')
-            orig = _find_original_for_base(base)
-            if not orig:
-                continue
-            cand = (st.st_mtime, orig,
-                    '%s/%s' % ('/translated', quote(p.name)), 'mono')
+            # 新仓库文件：原文/译文都能按 sha 直接取，不必在 uploads 里找同名原件
+            _sha = _tr_sha(p.name)
+            if _sha:
+                orig = '/api/tr/file/%s/orig' % _sha
+            else:
+                base = _clean_title(p.name, '.zh.mono.pdf')
+                orig = _find_original_for_base(base)
+                if not orig:
+                    continue
+            # peer 用 /api/tr/file/<sha>/zh.mono：本地缓存 24h 后会被 sweep 清掉，
+            # 直接给 /translated/xxx.pdf 会 404；内容寻址地址则会自动从 NAS 取。
+            peer = ('/api/tr/file/%s/zh.mono' % _sha) if _sha \
+                else ('%s/%s' % ('/translated', quote(p.name)))
+            cand = (st.st_mtime, orig, peer, 'mono')
             if best is None or cand[0] > best[0]:
                 best = cand
 
@@ -158,12 +168,17 @@ def reader_auto():
                     continue
                 if st.st_mtime < cutoff:
                     continue
-                base = _clean_title(p.name, '.zh.dual.pdf')
-                orig = _find_original_for_base(base)
-                if not orig:
-                    continue
-                cand = (st.st_mtime, orig,
-                        '%s/%s' % ('/translated', quote(p.name)), 'dual')
+                _sha = _tr_sha(p.name)
+                if _sha:
+                    orig = '/api/tr/file/%s/orig' % _sha
+                else:
+                    base = _clean_title(p.name, '.zh.dual.pdf')
+                    orig = _find_original_for_base(base)
+                    if not orig:
+                        continue
+                peer = ('/api/tr/file/%s/zh.dual' % _sha) if _sha \
+                    else ('%s/%s' % ('/translated', quote(p.name)))
+                cand = (st.st_mtime, orig, peer, 'dual')
                 if best is None or cand[0] > best[0]:
                     best = cand
 
@@ -215,6 +230,15 @@ def reader_auto():
 
 def _has_reader_params(args) -> bool:
     return any(args.get(k) for k in ('file', 'src'))
+
+
+def _tr_sha(name):
+    """新仓库文件名（<sha32>.xxx.pdf）→ 完整 sha；旧文件名返回 ''。"""
+    try:
+        from modules.tr import store as _trs
+        return (_trs.meta_by_filename(name) or {}).get('sha') or ''
+    except Exception:
+        return ''
 
 
 def _find_original_for_base(base):

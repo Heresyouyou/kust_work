@@ -46,8 +46,10 @@ _APP_SERVICE = 'https://i.kust.edu.cn/'
 
 # 不参与门禁的路径：静态资源与图标，避免登录前 302 造成页面样式/图标 404
 # /cas_go 是提示页「去认证」按钮的落地路由（打标记 + 跳 CAS），不能被门禁再拦一层。
+# /api/portal/auth-state 是认证态探测接口（sjck 期刊页下载前先问它）：
+# 必须免门禁，否则未认证时会被拦成 HTML 提示页，前端无从判断。
 _ALLOW_PREFIXES = ('/static/',)
-_ALLOW_EXACT = {'/favicon.ico', '/theme.js', '/cas_go'}
+_ALLOW_EXACT = {'/favicon.ico', '/theme.js', '/cas_go', '/api/portal/auth-state'}
 
 _USER_RE = re.compile(r'<cas:user>\s*([^<\s]+)\s*</cas:user>', re.I)
 _SUCCESS_RE = re.compile(r'<cas:authenticationSuccess', re.I)

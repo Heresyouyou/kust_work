@@ -7,6 +7,10 @@
 <!-- 主题引擎：必须同步加载（勿加 defer/async），否则会先闪深色再变浅色。
      注意：PDF 纸面、文本层高亮保持原色，不随主题变化。 -->
 <script src="/theme.js"></script>
+<script>
+  /* 分屏嵌入：先加类、再上样式，避免先闪一下「返回工作台」浮条 */
+  if (/[?&]embed=1(?:&|$)/.test(location.search)) document.documentElement.classList.add('kp-embed');
+</script>
 <link rel="stylesheet" href="/api/reader/assets/reader.css">
 <style>
   /* 只有「撑满整屏」这一件事放在页面里：阅读器的骨架尺寸必须由宿主决定 */
@@ -28,6 +32,9 @@
   .kust-back:hover { color: var(--accent); border-color: var(--accent-line); }
   /* 返回条浮在工具栏左上角，给工具栏让出位置，避免压住侧栏/目录按钮 */
   .kp-toolbar { padding-left: 96px; }
+  /* 分屏嵌入：宿主已有导航，这里只保留工具栏本身 */
+  html.kp-embed .kust-back { display: none; }
+  html.kp-embed .kp-toolbar { padding-left: 10px; }
 </style>
 </head>
 <body>

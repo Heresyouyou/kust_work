@@ -22,14 +22,8 @@
 时间解析优先级：
   台账 first_seen > pushed_at > 批次 date > 文件 mtime > 视为近期（计入 undated 统计）
 
-数据来源（只读，按需合并）：
-  journals.json               期刊元数据（国内 6 + 国际 8）
-  journal_ledger.json         ★ 获取台账：每篇首次被本地获取的时间
-  journal_updates.json        最近一轮更新的文章（无时间戳 → 用文件 mtime）
-  journal_batch_pending.json  待批量处理的一轮更新（有批次 date）
-  journal_article_buffer.json 历史累积文章缓存（字段较简，仅 title/url）
-  journal_doc_urls.json       期刊飞书速递文档链接
-  journal_topic_archive.json  近 N 个月主题相关文献回溯归档
+数据来源（只读，按需合并）—— 全部由共享模块 journal_feed 统一读取与整形，
+本页只保留 Flask 路由与 PDF 抓取/回源；取数逻辑见 D:/PostNews/journal_feed.py。
 
 页面：GET /journals
        （页顶「今日更新」板块 = 当天 00:00 之后**获取到**的文章跨刊汇总，
@@ -41,46 +35,42 @@
         其余按最近一次获取时间倒序，见 _build() 里的 rows.sort）
 接口：GET /api/journals/list     （两个视图的数据一次性返回，另含 `today` 切片）
 """
+import hashlib
+import json
 import re
+import subprocess
+import sys
+import threading
 from datetime import datetime, timedelta
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import quote, urlparse
 
-from flask import Blueprint, jsonify
+from flask import Blueprint, Response, jsonify, request, stream_with_context
 
-from portal.templating import render_html
+# ★ 共享取数层（2026-10-17）：/journal 页面同时挂在 5555 门户与 5556 GeoKB，
+#   两端必须显示同一份内容，所以取数逻辑只有一份 —— 本模块负责「读 JSON →
+#   合并去重 → 排序 → 注入 NAS 归档状态」，不含 Flask、不写文件、不联网。
+#   5556 的 /journal 与 /api/journal/list 也 import 它，因此改一处即两端同步生效。
+#   见 D:/PostNews/journal_feed.py 顶部说明。
+_POSTNEWS_ROOT = Path(__file__).resolve().parents[3]
+if str(_POSTNEWS_ROOT) not in sys.path:
+    sys.path.insert(0, str(_POSTNEWS_ROOT))
+import journal_feed  # noqa: E402
 
 journals_bp = Blueprint('journals', __name__)
 
-_TEMPLATE = Path(__file__).parent / 'templates' / 'journals.html'
+# 页面模板不在本模块：唯一真相是 D:/PostNews/Translate/modules/journals/templates/
+# journal_page.html（5555 与 5556 共用），由 journal_page.render_html() 注入各端配置。
 
-# ★ 卡片窗口：只展示「本地近 N 天获取到」的文章链接（以本地日期时间为准）
-WINDOW_DAYS = 60
-# 单张卡片默认展示条数（其余折叠，前端可「展开全部」）
-_MAX_PER_CARD = 6
-# 「展开全部」时单卡最多下发的条数（防载荷过大）
-# 取 200：当前最大单刊 70 篇，留足余量让「全部展开」不会静默截断；
-# 万一某刊真的超过 200，前端会明确提示「另有 N 篇超出单卡展示上限」，不假装已全量。
-_MAX_EXPAND_PER_CARD = 200
-# 主题归档视图单卡片最多展示条数（归档命中多的刊可展开更多）
-_MAX_TOPIC_PER_CARD = 8
-# 「今日更新」板块单日最多展示条数（当天全刊汇总，超出部分明确提示不静默截断）
-_TODAY_MAX = 300
-
-# 相关度分档：标签 / 阈值下限（与 journal_filter.STRONG_RELEVANCE_MIN_SCORE=8 对齐）
-TIERS = [
-    ('strong', '强相关', 19),
-    ('mid', '相关', 12),
-    ('low', '一般', 8),
-]
-
-
-def _tier_of(score):
-    s = score if isinstance(score, (int, float)) else 0
-    for key, _label, floor in TIERS:
-        if s >= floor:
-            return key
-    return 'low'
+# 窗口/裁剪常量与相关度分档统一由共享层提供（此处仅保留旧名别名，
+# 供本模块内既有引用与调试使用；权威值在 journal_feed）
+WINDOW_DAYS = journal_feed.WINDOW_DAYS
+_MAX_PER_CARD = journal_feed.MAX_PER_CARD
+_MAX_EXPAND_PER_CARD = journal_feed.MAX_EXPAND_PER_CARD
+_MAX_TOPIC_PER_CARD = journal_feed.MAX_TOPIC_PER_CARD
+_TODAY_MAX = journal_feed.TODAY_MAX
+TIERS = journal_feed.TIERS
+_tier_of = journal_feed._tier_of
 
 
 _deps = {'data_dir': None}
@@ -96,390 +86,296 @@ def init_journals(app, data_dir=None):
     print('[模块] 期刊列表 → GET /journals')
 
 
-# ── 取数 ──
-def _read_json(name):
-    root = _deps['data_dir']
-    if not root:
-        return None
-    p = root / name
-    try:
-        if p.exists():
-            import json
-            with open(p, 'r', encoding='utf-8') as f:
-                return json.load(f)
-    except Exception:
-        return None
-    return None
+# ── PDF 一键获取 / NAS 回源（2026-10-17）──────────────────────
+# 文章标题右侧三按钮（下载 / 阅读 / 翻译）的后端：
+#   下载 → POST /api/journals/fetch-pdf（强 handler 集，覆盖 14 个目标刊）
+#   阅读 → GET  /api/journals/pdf/<rel>（NAS 回源 + Range，喂自研阅读器）
+#   翻译 → 复用 geokb_public 的 /geokb/api/entry/<eid>/translate 代理（5556）
+#
+# 下载即入库（journal → PDF → 知识库 的按需版）：
+#   PDF 落 NAS papers_repo/by_journal/<刊>/<年>/（与语料管线同目录约定），
+#   按 paper-<sha1前12> 写一条 extraction=manual 的题录条目 —— 每日管线
+#   （ingest_external_feeds.py）次日碰到同一篇会自动升级为全文提取；
+#   再增量索引一条（index_one_entry.py）—— 5556 的 PDF/翻译 API 按条目 id
+#   查库，必须秒级可见，不能等每日全量 rebuild（embed 5328 条约 4 分钟）。
+_POSTNEWS_ROOT = Path(__file__).resolve().parents[3]
+# ★ UNC（非 S:）：本模块跑在 supervisor 拉起的提权 Flask(High) 里，S: 不可见
+#   → 用 S:/ 时 GET /api/journals/pdf/<rel> 会静默 404。见 D:/PostNews/nas_paths.py。
+_NAS_REPO = journal_feed.NAS_REPO
+_GEOKB_DIR = Path('D:/ZSK/geokb')
+_GEOKB_PY = _GEOKB_DIR / 'venv' / 'Scripts' / 'python.exe'
+_fetch_lock = threading.Lock()
+_fetcher = None
+
+# ── 归档台账写入（本模块仍负责「补抓后登记」）────────────────────
+# 读取侧已全部下沉到 journal_feed（两端共享）；但 POST /api/journals/fetch-pdf
+# 这条**按需补抓**链路仍在本服务内执行，抓完要写台账并让共享层缓存立即失效。
+_LEDGER_PATH = _GEOKB_DIR / 'state' / 'papers_index.jsonl'
 
 
-# ── 英文标题的中文小字翻译 ──
-# 由 D:\PostNews\journal_title_zh.py 离线预生成（本机 llama.cpp 翻译），
-# 门户这里**只读**，不翻译、不联网 —— 缓存缺失时该条就没有 title_zh，
-# 前端照常显示英文原文，不会报错也不会空白。
-_TITLE_ZH_CACHE = {'mtime': 0, 'map': {}}
-
-
-def _title_zh_map():
-    """读标题翻译缓存，按 mtime 做进程内缓存（避免每请求都读盘）。"""
-    root = _deps['data_dir']
-    if not root:
-        return {}
-    p = root / 'journal_title_zh.json'
-    try:
-        if not p.exists():
-            return {}
-        mt = p.stat().st_mtime
-        if mt != _TITLE_ZH_CACHE['mtime']:
-            import json
-            with open(p, 'r', encoding='utf-8') as f:
-                data = json.load(f) or {}
-            m = {}
-            for k, v in (data.get('titles') or {}).items():
-                zh = (v or {}).get('zh') if isinstance(v, dict) else v
-                if zh:
-                    m[k] = zh.strip()
-            _TITLE_ZH_CACHE['mtime'] = mt
-            _TITLE_ZH_CACHE['map'] = m
-        return _TITLE_ZH_CACHE['map']
-    except Exception:
-        return _TITLE_ZH_CACHE['map']
-
-
-def _zh_of(title):
-    """标题 → 中文小字翻译；无缓存返回 ''。键规则见 journal_title_zh.py::_key"""
-    if not title:
-        return ''
-    k = re.sub(r'[^a-z0-9]', '', title.lower())
-    return _title_zh_map().get(k, '')
-
-
-def _file_mtime(name):
-    """数据文件的最后写入时间 —— 作为该文件内容「被获取到」的时间代理。
-
-    语义正确性：journal_updates.json 每次检测运行都被整体重写，内容就是那一轮
-    新文章，所以「文件写入时刻」即这批文章的获取时刻；而且它会随时间变旧，
-    文章能正常老化出窗口。（更准的来源是 journal_ledger.json 的 first_seen。）
-    """
-    root = _deps['data_dir']
-    try:
-        p = root / name if root else None
-        if p and p.exists():
-            return datetime.fromtimestamp(p.stat().st_mtime)
-    except Exception:
-        pass
-    return None
-
-
-def _parse_ts(v):
-    """宽松解析时间戳（台账 first_seen / 批次 date / 文件 mtime）。失败返回 None。"""
-    if isinstance(v, datetime):
-        return v
-    if not v:
-        return None
-    s = str(v).strip().replace('T', ' ')
-    for fmt in ('%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M', '%Y-%m-%d'):
+def _load_fetcher():
+    """惰性加载 journal_pdf_fetch 门面（PostNews 根目录，不在 portal sys.path）。"""
+    global _fetcher
+    if _fetcher is not None:
+        return _fetcher or None
+    with _fetch_lock:
+        if _fetcher is not None:
+            return _fetcher or None
+        import sys
+        root = str(_POSTNEWS_ROOT)
+        if root not in sys.path:
+            sys.path.insert(0, root)
         try:
-            return datetime.strptime(s[:19], fmt)
-        except Exception:
-            continue
+            from journal_pdf_fetch import fetch_pdf
+            _fetcher = fetch_pdf
+        except Exception as e:  # noqa: BLE001
+            print(f'[journals] journal_pdf_fetch 不可用: {e}')
+            _fetcher = False
+    return _fetcher or None
+
+
+def _safe_name(s, max_len=80):
+    """与 geokb scripts/pdf_downloader.safe_name 同规则（NAS 目录约定一致）。"""
+    s = re.sub(r'[\\/:*?"<>|\r\n\t]', '_', str(s))
+    s = re.sub(r'_+', '_', s).strip('_ ')
+    return s[:max_len] or 'untitled'
+
+
+def _manual_entry_md(eid, title, journal, date, rel):
+    """门户按钮即时建档的题录条目（extraction: manual，待每日管线升级）。
+
+    ⚠️ front matter 全部走 json.dumps 输出：曾把 `summary: {t}（…）` 直接拼行，
+    引号字符串后紧跟裸文本是非法 YAML，parse_entry 静默返回 None，
+    增量索引失败（条目存在但 5556 查不到，阅读/翻译全断）。
+    """
+    t = json.dumps(title, ensure_ascii=False)
+    j = json.dumps(journal or '未知', ensure_ascii=False)
+    summary = json.dumps(
+        f'{title}（journals 页手动下载建档，全文提取由每日管线自动升级）',
+        ensure_ascii=False)
+    src = json.dumps({'name': journal or 'papers_repo',
+                      'path': 'papers_repo/' + rel}, ensure_ascii=False)
+    return f"""---
+id: {eid}
+title: {t}
+module: papers
+tags: {json.dumps([journal] if journal else [], ensure_ascii=False)}
+summary: {summary}
+confidence: C
+status: active
+updated: {date}
+sources: [{src}]
+journal: {j}
+year: {json.dumps(date[:4])}
+extraction: manual
+---
+
+## 关键内容
+
+（本条目由门户 journals 页「下载 PDF」按钮即时建档：PDF 已存 NAS 论文仓库，
+结构化提取将在每日 GeoKB 管线中自动升级补充，无需手动处理。）
+
+## 来源
+
+- 期刊：{journal or '未知'}
+- 仓库文件：`papers_repo/{rel}`
+"""
+
+
+@journals_bp.post('/api/journals/fetch-pdf')
+def api_fetch_pdf():
+    """文章标题右侧「下载 PDF」：handler 集下载 → NAS → 题录条目 → 增量索引。"""
+    data = request.get_json(silent=True) or {}
+    journal = (data.get('journal') or '').strip()
+    title = (data.get('title') or '').strip()
+    url = (data.get('url') or '').strip()
+    if not title or not url:
+        return jsonify({'ok': False, 'error': 'bad_request',
+                        'message': '缺少 title / url'}), 400
+
+    fetcher = _load_fetcher()
+    if not fetcher:
+        return jsonify({'ok': False, 'error': 'fetcher_unavailable',
+                        'message': 'PDF 下载器不可用'}), 503
+
+    date = datetime.now().strftime('%Y-%m-%d')
     try:
-        return datetime.fromisoformat(str(v))
-    except Exception:
-        return None
+        r = fetcher(journal or 'unknown', title, url, date=date)
+    except Exception as e:  # noqa: BLE001
+        return jsonify({'ok': False, 'error': 'fetch_exception',
+                        'message': f'{type(e).__name__}: {e}'[:200]}), 500
+
+    # ── 版本闸门的两类拒绝（2026-10-29）──────────────────────────────
+    # 录用稿/校样、以及尚未正式出版（无卷期）的稿件，源站只给非排版版：
+    # 内容与正式版可能不同、无页码可引，收进库会污染引用口径。
+    # 判据在 journal_pdf_downloader.fetch_one 出口统一做（见 _gate_version）。
+    if r.get('status') in ('accepted_version', 'in_press'):
+        return jsonify({'ok': False, 'error': r['status'],
+                        'message': (r.get('note') or
+                                    '该文尚未正式出版，源站只有录用稿，暂不下载')[:200],
+                        'retry_when': 'published'}), 409
+    if r.get('status') != 'ok' or not r.get('pdf_bytes'):
+        return jsonify({'ok': False, 'error': r.get('status') or 'failed',
+                        'message': (r.get('note') or '下载失败')[:200],
+                        'pdf_url': r.get('pdf_url') or ''}), 502
+    pdf_bytes = r['pdf_bytes']
+    if pdf_bytes[:4] != b'%PDF':
+        return jsonify({'ok': False, 'error': 'not_pdf',
+                        'message': '源站返回内容不是 PDF'}), 502
+
+    digest = hashlib.sha1(pdf_bytes).hexdigest()
+    eid = f'paper-{digest[:12]}'
+
+    # ① NAS 落盘（与语料管线同目录/同命名约定；已存在则跳过写文件）
+    jname = _safe_name(journal or 'unknown', 40)
+    jdir = _NAS_REPO / 'by_journal' / jname / date[:4]
+    try:
+        jdir.mkdir(parents=True, exist_ok=True)
+        jpath = jdir / f"{date}_{_safe_name(title, 60)}_fetch.pdf"
+        existed = jpath.exists()
+        if not existed:
+            jpath.write_bytes(pdf_bytes)
+    except OSError as e:
+        return jsonify({'ok': False, 'error': 'nas_write_failed',
+                        'message': f'NAS 写入失败: {e}'[:200]}), 500
+    rel = f"by_journal/{jname}/{date[:4]}/{jpath.name}"
+
+    # ② 归档台账登记（写**本地**主副本；NAS 上的旧 index.jsonl 被 QTS 独占锁，
+    #    写不进去。eid 必须记录：journals 列表据此判「已归档」并挂阅读/翻译入口。）
+    try:
+        meta = {'title': title, 'url': url, 'journal': journal, 'date': date,
+                'pdf_url': r.get('pdf_url') or '', 'repo_path': str(jpath),
+                'size': len(pdf_bytes), 'source': r.get('source') or 'fetch',
+                'eid': eid,
+                'indexed_at': datetime.now().isoformat()}
+        _LEDGER_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with open(_LEDGER_PATH, 'a', encoding='utf-8') as f:
+            f.write(json.dumps(meta, ensure_ascii=False) + '\n')
+        # 共享层按 mtime+size 判缓存；本进程写完必须立刻失效，
+        # 否则刚抓到的这篇在列表里仍显示「在线抓取」直到进程重启。
+        journal_feed.invalidate_ledger_cache()
+    except Exception as e:  # noqa: BLE001
+        print(f'[journals] 台账登记失败（不影响入库）: {e}')
+
+    # ③ 题录条目（幂等：已存在就不动；manual 条目留给每日管线升级）
+    entry_path = _GEOKB_DIR / 'content' / 'papers' / f'{eid}.md'
+    entry_created = False
+    if not entry_path.exists():
+        try:
+            entry_path.parent.mkdir(parents=True, exist_ok=True)
+            entry_path.write_text(
+                _manual_entry_md(eid, title, journal, date, rel), encoding='utf-8')
+            entry_created = True
+        except OSError as e:
+            return jsonify({'ok': False, 'error': 'entry_write_failed',
+                            'message': f'条目写入失败: {e}'[:200],
+                            'eid': eid, 'pdf_rel': rel}), 500
+
+    # ④ 增量索引一条（5556 的 PDF/翻译 API 按 id 查库，必须秒级可见）
+    indexed = False
+    try:
+        p = subprocess.run(
+            [str(_GEOKB_PY), str(_GEOKB_DIR / 'scripts' / 'index_one_entry.py'), eid],
+            capture_output=True, text=True, timeout=180, cwd=str(_GEOKB_DIR),
+            creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
+        indexed = (p.returncode == 0)
+        if not indexed:
+            print(f'[journals] 增量索引失败({p.returncode}): '
+                  f'{(p.stdout or "")[:120]} {(p.stderr or "")[:120]}')
+    except Exception as e:  # noqa: BLE001
+        print(f'[journals] 增量索引异常: {e}')
+
+    pdf_url = f'/api/journals/pdf/{rel}'
+    return jsonify({'ok': True, 'eid': eid, 'pdf_rel': rel, 'pdf_url': pdf_url,
+                    'size': len(pdf_bytes), 'existed': existed,
+                    'entry_created': entry_created, 'indexed': indexed,
+                    'source': r.get('source') or ''})
 
 
-def _norm_key(title, url):
-    """跨源同文判定键：标题指纹 + URL 兜底。
+@journals_bp.get('/api/journals/pdf/<path:rel>')
+def api_journals_pdf(rel):
+    """NAS 论文 PDF 同源回源（Range 支持，喂自研阅读器 kpdf 分段加载）。
 
-    同一篇论文在官网是 `.../geology/article/54/9/901/731860/...`，走 CrossRef
-    兜底时变成 `https://doi.org/10.1130/g54149.1` —— URL 完全不同，只能按标题判。
+    只放行 papers_repo 内的 .pdf；原始译文（.zh.mono/.zh.dual）同目录同规则。
     """
-    t = re.sub(r'\W+', '', (title or '').lower())[:72]
-    if t:
-        return 't:' + t
-    u = re.sub(r'\W+', '', (url or '').lower())
-    return ('u:' + u) if u else ''
+    base = _NAS_REPO.resolve()
+    try:
+        target = (base / rel).resolve()
+    except OSError:
+        return jsonify({'ok': False, 'error': 'bad_path'}), 400
+    if (not str(target).startswith(str(base))
+            or target.suffix.lower() != '.pdf' or not target.is_file()):
+        return jsonify({'ok': False, 'error': 'not_found'}), 404
+
+    size = target.stat().st_size
+    rng = request.headers.get('Range', '')
+    start, end, status = 0, size - 1, 200
+    m = re.match(r'bytes=(\d*)-(\d*)', rng or '')
+    if m:
+        g1, g2 = m.group(1), m.group(2)
+        if g1:
+            start = int(g1)
+            end = int(g2) if g2 else size - 1
+        elif g2:
+            start, end = max(0, size - int(g2)), size - 1
+        end = min(end, size - 1)
+        if start <= end:
+            status = 206
+    length = end - start + 1
+    headers = {'Accept-Ranges': 'bytes', 'Content-Type': 'application/pdf',
+               'Cache-Control': 'public, max-age=86400',
+               'Content-Length': str(length)}
+    if status == 206:
+        headers['Content-Range'] = f'bytes {start}-{end}/{size}'
+
+    def gen():
+        with open(target, 'rb') as f:
+            f.seek(start)
+            remaining = length
+            while remaining > 0:
+                chunk = f.read(min(65536, remaining))
+                if not chunk:
+                    break
+                remaining -= len(chunk)
+                yield chunk
+
+    return Response(stream_with_context(gen()), status=status, headers=headers)
 
 
-def _date_label(dt, now):
-    """卡片上的获取日期：同年显示 MM-DD，跨年显示 YYYY-MM-DD。"""
-    if not dt:
-        return ''
-    return dt.strftime('%m-%d') if dt.year == now.year else dt.strftime('%Y-%m-%d')
-
-
-def _collect_recent(name, ledger, updates, pending, buffer_, ts_map, cutoff, now):
-    """合并多源文章 → 解析「获取时间」→ 去重 → 按获取时间倒序 → 60 天窗口过滤。
-
-    来源优先级（先到先得，同一篇不会重复添加）：台账 > 待推送批次 > 最近一轮更新 > 历史缓存。
-    返回 (items, stats)，stats = {'undated': 无时间戳条数, 'expired': 超窗口条数}。
-    """
-    seen, out = set(), []
-    stats = {'undated': 0, 'expired': 0}
-
-    def push(lst, fallback_ts, source):
-        for a in lst or []:
-            if not isinstance(a, dict):
-                continue
-            title = (a.get('title') or '').strip()
-            url = (a.get('url') or '').strip()
-            if not title and not url:
-                continue
-            key = _norm_key(title, url)
-            if not key or key in seen:
-                continue
-            seen.add(key)
-            dt = _parse_ts(a.get('first_seen') or a.get('pushed_at')) or fallback_ts
-            if dt is not None and dt < cutoff:
-                stats['expired'] += 1
-                continue
-            if dt is None:
-                # 解析不出时间：这些是"当前列表"里的存量，无法证明其超出窗口，
-                # 保守起见保留（并计入 undated 统计，便于事后核查）。
-                stats['undated'] += 1
-            out.append({
-                'title': title or url,
-                'title_zh': _zh_of(title),
-                'url': url,
-                'source': a.get('source') or source,
-                'volume': str(a.get('volume') or ''),
-                'issue': str(a.get('issue') or ''),
-                'obtained_at': dt.isoformat(timespec='seconds') if dt else '',
-                'obtained_label': _date_label(dt, now),
-                # 当天条目一律是「今天」，MM-DD 无信息量；「今日更新」板块改用它显示时刻。
-                # 60 天卡片仍用 obtained_label（跨日跨月，日期才有意义）。
-                'obtained_hm': dt.strftime('%H:%M') if dt else '',
-                'obtained_ts': dt.timestamp() if dt else 0.0,
-            })
-
-    led = ledger.get(name) if isinstance(ledger, dict) else None
-    if led:
-        push(led, None, 'ledger')
-    pend = pending.get(name) or {}
-    push(pend.get('new_articles') if isinstance(pend, dict) else pend,
-         ts_map.get('pending'), 'pending')
-    up = updates.get(name) or {}
-    push(up.get('new_articles') if isinstance(up, dict) else up,
-         ts_map.get('updates'), 'updates')
-    push(buffer_.get(name) if isinstance(buffer_, dict) else None,
-         ts_map.get('buffer'), 'buffer')
-
-    out.sort(key=lambda x: x['obtained_ts'], reverse=True)
-    return out, stats
-
-
-def _collect_topic(archive):
-    """把主题归档按期刊名分组，返回 {刊名: [结构化条目]}（保持归档内的相关度降序）"""
-    by_j = {}
-    for a in archive.get('articles') or []:
-        if not isinstance(a, dict):
-            continue
-        j = (a.get('journal') or '').strip()
-        if not j:
-            continue
-        score = a.get('relevance_score')
-        date = a.get('date') or ''
-        date_est = a.get('date_est') or ''
-        by_j.setdefault(j, []).append({
-            'title': (a.get('title') or '').strip(),
-            'url': (a.get('url') or '').strip(),
-            'doi': (a.get('doi') or '').strip(),
-            'date': date,
-            'date_est': date_est,
-            'date_label': date or (('≈' + date_est) if date_est else '日期待核实'),
-            'date_basis': a.get('date_basis') or '',
-            'volume': str(a.get('volume') or ''),
-            'issue': str(a.get('issue') or ''),
-            'pages': a.get('pages') or '',
-            'score': score if isinstance(score, (int, float)) else 0,
-            'tier': _tier_of(score),
-            'keywords': (a.get('matched_keywords') or [])[:6],
-            'region': a.get('region') or '',
-        })
-    return by_j
-
-
+# ── 取数：全部委托共享层 ─────────────────────────────────────
+# 本模块不再自行读 journal_*.json：/journal 页面同时挂在 5555 与 5556，
+# 两端必须显示同一份内容，取数逻辑只保留一份（journal_feed.build_feed）。
+# 权威载荷结构见 D:/PostNews/journal_feed.py 顶部说明。
 def _build():
-    # 以**本地时间**为准计算 60 天滚动窗口（机器时区 +0800，与用户所在地一致）
-    now = datetime.now()
-    cutoff = now - timedelta(days=WINDOW_DAYS)
+    return journal_feed.build_feed(_deps['data_dir'] or _POSTNEWS_ROOT)
 
-    journals = _read_json('journals.json') or {}
-    updates = _read_json('journal_updates.json') or {}
-    docs = _read_json('journal_doc_urls.json') or {}
-    pending_all = _read_json('journal_batch_pending.json') or {}
-    pending = pending_all.get('batch_updates') or {}
-    buffer_ = _read_json('journal_article_buffer.json') or {}
-    archive = _read_json('journal_topic_archive.json') or {}
 
-    # ★ 获取台账：本模块 60 天窗口的主时间源
-    ledger_all = _read_json('journal_ledger.json') or {}
-    ledger = ledger_all.get('journals') or {}
-    ledger_meta = ledger_all.get('_meta') or {}
-
-    ts_map = {
-        'pending': _parse_ts(pending_all.get('date')) or _file_mtime('journal_batch_pending.json'),
-        'updates': _file_mtime('journal_updates.json'),
-        'buffer': _file_mtime('journal_article_buffer.json'),
-    }
-
-    topic_by_j = _collect_topic(archive)
-    topic_meta = archive.get('_meta') or {}
-
-    groups, total_articles, updated_count = [], 0, 0
-    topic_total, topic_journals, tier_count = 0, 0, {}
-    undated_total, expired_total = 0, 0
-
-    # 「今日更新」板块：把当天（本地日期）获取到的文章跨刊汇总，
-    # 仍以 obtained_ts（获取时间）为唯一判据，与下方 60 天窗口同源同口径。
-    today_date = now.date()
-    today_items = []
-
-    for region_label, key in _REGION_ORDER:
-        rows = []
-        for j in journals.get(key, []) or []:
-            name = j.get('name') or ''
-            articles, astat = _collect_recent(name, ledger, updates, pending, buffer_,
-                                              ts_map, cutoff, now)
-            undated_total += astat['undated']
-            expired_total += astat['expired']
-            up = updates.get(name) or {}
-            doc = docs.get(name) or {}
-            doc_url = doc.get('url') if isinstance(doc, dict) else ''
-            if not doc_url and isinstance(doc, str):
-                doc_url = doc
-
-            topic = topic_by_j.get(name) or []
-            tier_count[name] = {}
-            for t in topic:
-                tier_count[name][t['tier']] = tier_count[name].get(t['tier'], 0) + 1
-
-            site = (j.get('website') or '').strip()
-
-            # 今日切片：无获取时间的条目无法证明是今天到的，一律不计入
-            has_today = False
-            today_count = 0
-            for a in articles:
-                ts = a.get('obtained_ts') or 0
-                if not ts:
-                    continue
-                try:
-                    if datetime.fromtimestamp(ts).date() != today_date:
-                        continue
-                except Exception:
-                    continue
-                has_today = True
-                today_count += 1
-                item = dict(a)
-                item['journal'] = name
-                item['journal_url'] = site
-                item['region'] = region_label
-                today_items.append(item)
-
-            rows.append({
-                'id': j.get('id') or name,
-                'name': name,
-                'name_en': j.get('name_en') or '',
-                'short_name': j.get('short_name') or '',
-                'name_cn': j.get('name_cn') or '',
-                'category': j.get('category') or '',
-                'publisher': j.get('publisher') or '',
-                'frequency': j.get('frequency') or '',
-                'issues_per_year': j.get('issues_per_year'),
-                'level': j.get('level') or [],
-                'priority': j.get('priority') or '',
-                'website': site,
-                'site_host': urlparse(site).netloc.replace('www.', '') if site else '',
-                'status': up.get('status') or '',
-                # —— 近 60 天获取到的文章（按获取时间倒序）——
-                'article_total': len(articles),
-                'articles': articles[:_MAX_EXPAND_PER_CARD],
-                'article_newest': articles[0]['obtained_label'] if articles else '',
-                # 排序用：本刊 60 天内最新一次的获取时刻（articles 已按时间倒序）
-                'article_newest_ts': articles[0]['obtained_ts'] if articles else 0.0,
-                # 当天是否有货 / 当天几条 —— 卡片排序与「今日 +N」标记都靠它
-                'has_today': has_today,
-                'today_count': today_count,
-                'article_undated': astat['undated'],
-                'doc_url': doc_url,
-                # — 主题归档 —
-                'topic_total': len(topic),
-                'topic_tiers': tier_count[name],
-                'topic_articles': topic[:_MAX_TOPIC_PER_CARD],
-            })
-            total_articles += len(articles)
-            if articles:
-                updated_count += 1
-            topic_total += len(topic)
-            if topic:
-                topic_journals += 1
-
-        # ★ 卡片排序：**当天有更新的刊排最前**，其余按「最近一次获取时间」倒序。
-        #   此前是完全按 journals.json 的固定次序，最新的刊常常被压到屏幕外。
-        #   用稳定排序（Python sort 稳定），键相同的卡片保持 journals.json 原始次序，
-        #   所以同一档位内的相对位置不会乱跳 —— 刷新页面不会看到卡片"随机"换位。
-        #   没有文章（article_newest_ts=0）的刊自然沉到本区域最底。
-        rows.sort(key=lambda r: (0 if r['has_today'] else 1, -r['article_newest_ts']))
-
-        if rows:
-            groups.append({
-                'region': region_label,
-                'count': len(rows),
-                'journals': rows,
-            })
-
-    today_items.sort(key=lambda x: x['obtained_ts'], reverse=True)
-
-    return {
-        'ok': True,
-        'total_journals': sum(g['count'] for g in groups),
-        'total_articles': total_articles,
-        'updated_journals': updated_count,
-        'max_per_card': _MAX_PER_CARD,
-        'max_expand_per_card': _MAX_EXPAND_PER_CARD,
-        'max_topic_per_card': _MAX_TOPIC_PER_CARD,
-        # ★ 60 天窗口元信息（前端展示窗口边界，便于核对"获取时间"口径）
-        'window': {
-            'days': WINDOW_DAYS,
-            'from': cutoff.date().isoformat(),
-            'to': now.date().isoformat(),
-            'now': now.strftime('%Y-%m-%d %H:%M'),
-            'ledger_available': bool(ledger),
-            'ledger_updated_at': ledger_meta.get('updated_at') or '',
-            'undated_total': undated_total,
-            'expired_total': expired_total,
-        },
-        'tiers': [{'key': k, 'label': l, 'floor': f} for k, l, f in TIERS],
-        'topic': {
-            'total': topic_total,
-            'journals_with_hits': topic_journals,
-            'window_from': topic_meta.get('window_from') or '',
-            'window_to': topic_meta.get('window_to') or '',
-            'generated_at': topic_meta.get('generated_at') or '',
-            'min_score': topic_meta.get('min_score'),
-            'candidate_count': topic_meta.get('candidate_count'),
-            'date_exact': topic_meta.get('date_exact'),
-            'date_estimated': topic_meta.get('date_estimated'),
-            'date_missing': topic_meta.get('date_missing'),
-            'available': bool(topic_total),
-        },
-        # 「今日更新」板块：当天（本地日期）跨刊汇总，与下方窗口同源同口径
-        'today': {
-            'date': now.strftime('%Y-%m-%d'),
-            'total': len(today_items),
-            'journal_count': len({i['journal'] for i in today_items}),
-            'items': today_items[:_TODAY_MAX],
-            'hidden': max(0, len(today_items) - _TODAY_MAX),
-        },
-        'groups': groups,
-    }
+# ★ 共享渲染层（2026-10-17）：/journal 同时挂在 5555 与 5556，必须一比一复刻且
+#   同步更新，所以模板与配置都只有一份（journal_page.py + journal_page.html），
+#   端点差异收敛到 CFG。本页只渲染自己那份配置（CFG_PORTAL）。
+#   见 D:/PostNews/journal_page.py 顶部说明。
+import journal_page  # noqa: E402
 
 
 @journals_bp.route('/journals')
 def journals_page():
-    return render_html(_TEMPLATE)
+    return Response(journal_page.render_html(journal_page.CFG_PORTAL),
+                    mimetype='text/html')
 
 
 @journals_bp.route('/api/journals/list')
 def api_journals_list():
     return jsonify(_build())
+
+
+# ── 补缺申请（2026-10-25）──────────────────────────────────────────────
+# 「今日更新」卡片右上角那颗按钮：点一下 = 立刻跑一轮投放箱入库
+# （等价于计划任务 12:01 / 18:01 的 inbox_ingest --run）。
+# 冷却 60s 按后端计；只有 inbox 真有 PDF 且**投放箱入库没在跑**时才有效。
+# 实现与口径说明见 modules/journals/refill.py 顶部。
+try:
+    from . import refill as _refill
+except ImportError:                      # 以脚本方式加载时没有包上下文
+    import refill as _refill  # type: ignore
+
+_refill.register(journals_bp)

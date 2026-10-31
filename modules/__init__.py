@@ -16,46 +16,36 @@
   每个模块单独 try/except —— 任何一个模块依赖缺失或写坏，
   只影响它自己的入口，不会把其他模块和翻译主服务一起拖下水。
 """
+import importlib
 import logging
-
-from .archive import init_archive
-from .geokb_admin import init_geokb_admin
-from .geokb_public import init_geokb_public
-from .journals import init_journals
-from .news import init_news
-from .notes import init_notes
-from .palette import init_palette
-from .queue import init_queue
-from .reader import init_reader
-from .share import init_share
-from .software import init_software
-from .stitch import init_stitch
-from .story import init_story
-from .tasks import init_tasks
-from .triangle import init_triangle
 
 logger = logging.getLogger('geo')
 
 __all__ = ['register_all']
 
 
-# (模块名, 注册函数, 是否需要 data_dir)
+# (模块名, 包名, 注册函数名, 是否需要 data_dir)
+# ★ 2026-10-29：改成惰性导入。原先 16 个 `from .x import init_x` 全是硬导入，
+#   任何一个模块缺依赖（例如 story 需要 markdown_it）就让整个 `modules` 包
+#   不可导入 —— 注释里承诺的「单独 try/except、互不拖累」根本没兑现，
+#   连带 tools/ 下任何 `from modules.tr import ...` 也一起崩。
 _MODULES = [
-    ('译文归档', init_archive, False),
-    ('今日早报', init_news, True),
-    ('期刊更新', init_journals, True),
-    ('科研配色', init_palette, False),
-    ('三角计算', init_triangle, False),
-    ('任务打卡', init_tasks, False),
-    ('笔记整理', init_notes, False),
-    ('图像拼合', init_stitch, False),
-    ('汇报说明书', init_story, False),
-    ('知识库浏览', init_geokb_public, False),
-    ('知识库管理', init_geokb_admin, False),
-    ('任务队列', init_queue, True),
-    ('PDF 阅读器', init_reader, False),
-    ('内网共享', init_share, False),
-    ('常用软件', init_software, False),
+    ('译文归档', 'archive', 'init_archive', False),
+    ('今日早报', 'news', 'init_news', True),
+    ('期刊更新', 'journals', 'init_journals', True),
+    ('科研配色', 'palette', 'init_palette', False),
+    ('三角计算', 'triangle', 'init_triangle', False),
+    ('任务打卡', 'tasks', 'init_tasks', False),
+    ('笔记整理', 'notes', 'init_notes', False),
+    ('论文导读', 'papers', 'init_papers', False),
+    ('图像拼合', 'stitch', 'init_stitch', False),
+    ('汇报说明书', 'story', 'init_story', False),
+    ('知识库浏览', 'geokb_public', 'init_geokb_public', False),
+    ('知识库管理', 'geokb_admin', 'init_geokb_admin', False),
+    ('任务队列', 'queue', 'init_queue', True),
+    ('PDF 阅读器', 'reader', 'init_reader', False),
+    ('内网共享', 'share', 'init_share', False),
+    ('常用软件', 'software', 'init_software', False),
 ]
 
 
@@ -76,13 +66,18 @@ def register_all(app, *, upload_dir=None, translated_dir=None, data_dir=None,
     """
     ok, failed = [], []
 
-    for name, init_fn, need_data in _MODULES:
+    for name, modname, funcname, need_data in _MODULES:
         try:
+            mod = importlib.import_module('.' + modname, __name__)
+            init_fn = getattr(mod, funcname)
             if name == '译文归档':
                 init_fn(app, upload_dir=upload_dir, translated_dir=translated_dir)
             elif name == 'PDF 阅读器':
                 # 阅读器的「最近文件」要能列原文与译文，故两个目录都注入
                 init_fn(app, upload_dir=upload_dir, translated_dir=translated_dir)
+            elif name == '论文导读':
+                # 只借统一串行锁（翻译与手动翻译/拼合互斥），不占用统一队列
+                init_fn(app, task_lane=task_lane)
             elif name == '图像拼合':
                 init_fn(app, submit_task=submit_task, get_task=get_task,
                         task_lane=task_lane, register_runner=register_runner)

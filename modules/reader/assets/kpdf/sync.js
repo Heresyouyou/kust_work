@@ -84,9 +84,13 @@ export class SyncGroup {
    *   slop       位置差小于该值(px)视为已对齐，跳过回写
    *   enabled    是否启用（关掉即两边独立滚动，便于人工比对）
    */
-  constructor({ mode = SYNC_MODE.ANCHOR, scaleMode = SCALE_MODE.FIT, slop = 1.5, enabled = true } = {}) {
+  constructor({ mode = SYNC_MODE.ANCHOR, scaleMode = SCALE_MODE.FIT, slop = 1.5,
+                enabled = true, scaleSync = true } = {}) {
     this.mode = mode;
     this.scaleMode = scaleMode;
+    // 缩放是否跟着联动。默认开（中英对照要一起放大才好读）；
+    // 关掉后滚动仍然同步，只有缩放各调各的 —— 给「左边原文太小、单独放大」留口子。
+    this.scaleSync = scaleSync !== false;
     this.slop = slop;
     this.enabled = enabled;
 
@@ -149,6 +153,12 @@ export class SyncGroup {
     }
   }
 
+  /** 开/关缩放联动。返回当前值。 */
+  setScaleSync(on) {
+    this.scaleSync = !!on;
+    return this.scaleSync;
+  }
+
   setScaleMode(mode) {
     if (mode && mode !== this.scaleMode) {
       this.scaleMode = mode;
@@ -206,7 +216,7 @@ export class SyncGroup {
       const toCount = target.doc.numPages;
       this._applying.add(target);
       try {
-        if (payload.kind === 'scale' && payload.scale) {
+        if (payload.kind === 'scale' && payload.scale && this.scaleSync) {
           // 缩放同步：'fit' 保持同等适配比例（宽页与窄页视觉一致），'equal' 用同一缩放值
           const ep = target.syncScale(payload.scale, source, this.scaleMode);
           target.applyScale(ep, { silent: true });
